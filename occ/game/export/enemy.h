@@ -17,6 +17,7 @@ class Enemy : public Actor
 
   virtual bool is_alive() const override { return health > 0; }
   virtual int get_points() const override { return points; }
+  virtual void on_hit() { health--; }
   virtual void on_death([[maybe_unused]] Level& level) {}
 
   int health;
@@ -67,6 +68,11 @@ class Bigfoot : public Enemy
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
+  }
+  virtual void on_hit() override
+  {
+    health--;
+    running_ = true;
   }
 
  private:

@@ -14,7 +14,9 @@ Current state of OCC:
 
 ![Animation](/screenshots/animation.gif?raw=true "Animation")
 
-![Screenshot 3](/screenshots/screenshot3.png?raw=true "Screenshot 3")
+![Level 4](/screenshots/screenshot2.png?raw=true "Level 4")
+
+![Main Level](/screenshots/screenshot3.png?raw=true "Main Level")
 
 Currently the engine can:
 
