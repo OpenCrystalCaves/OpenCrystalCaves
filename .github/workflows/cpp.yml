@@ -49,6 +49,9 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 sdl2-image sdl2-mixer --recurse
     - name: Configure CMake
+      env:
+        # Required for ubuntu 22.04 and C++20; TODO: remove once we go to ubuntu 24
+        CXX: /usr/bin/g++-13
       if: matrix.os != 'windows-latest'
       run: |
         mkdir ${{ matrix.build_type }}

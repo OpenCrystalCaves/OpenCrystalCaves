@@ -1,5 +1,7 @@
 #include "exe_data.h"
 
+#include <format>
+
 #include "misc.h"
 #include "path.h"
 #include <decompress.h>
