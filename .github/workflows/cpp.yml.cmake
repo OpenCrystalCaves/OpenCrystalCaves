@@ -21,7 +21,8 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-latest
+          # Required for C++20; TODO: remove once this is updated
+          - ubuntu-24.04
           # Temporarily disable due to broken python 3.12 via homebrew
           #- macos-latest
           - windows-latest
@@ -35,11 +36,12 @@ jobs:
         submodules: true
     - name: Set up Homebrew (Linux, macOS)
       id: set-up-homebrew
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      if: startsWith(matrix.os, 'ubuntu') || matrix.os == 'macos-latest'
       uses: Homebrew/actions/setup-homebrew@master
     - name: Install SDL via homebrew (Linux, macOS)
       # Because ubuntu 22 doesn't have the latest SDL libs
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      # TODO: check if ubuntu 24 works here
+      if: startsWith(matrix.os, 'ubuntu') || matrix.os == 'macos-latest'
       run: brew install sdl2 sdl2_image sdl2_mixer
     - name: Install packages (macOS)
       if: matrix.os == 'macos-latest'
@@ -49,9 +51,6 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 sdl2-image sdl2-mixer --recurse
     - name: Configure CMake
-      env:
-        # Required for ubuntu 22.04 and C++20; TODO: remove once we go to ubuntu 24
-        CXX: /usr/bin/g++-12
       if: matrix.os != 'windows-latest'
       run: |
         mkdir ${{ matrix.build_type }}
