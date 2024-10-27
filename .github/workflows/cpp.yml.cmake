@@ -51,7 +51,7 @@ jobs:
     - name: Configure CMake
       env:
         # Required for ubuntu 22.04 and C++20; TODO: remove once we go to ubuntu 24
-        CXX: /usr/bin/g++-13
+        CXX: /usr/bin/g++-12
       if: matrix.os != 'windows-latest'
       run: |
         mkdir ${{ matrix.build_type }}
