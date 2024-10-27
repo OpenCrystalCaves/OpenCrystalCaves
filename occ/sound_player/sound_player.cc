@@ -2,6 +2,7 @@
 https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Sound_format
 */
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -76,9 +77,7 @@ struct Sound
 
 std::filesystem::path get_sound_path(const int idx)
 {
-  // TODO: use <format> in C++20
-  const auto filename =
-    std::string(SND_FILENAME_FMT).replace(std::string(SND_FILENAME_FMT).find("{}"), std::string("{}").length(), std::to_string(idx + 1));
+  const auto filename = std::format(SND_FILENAME_FMT, idx + 1);
   // Try CWD first
   if (std::filesystem::exists(filename))
   {

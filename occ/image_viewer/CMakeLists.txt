@@ -3,7 +3,6 @@ add_executable(image_viewer
   "../occ/src/imagemgr.cc"
   "../occ/src/imagemgr.h"
 )
-target_compile_features(image_viewer PRIVATE cxx_std_17)
 target_link_libraries(image_viewer
   "utils"
   "sdl_wrapper"

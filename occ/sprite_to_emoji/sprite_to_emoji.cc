@@ -7,7 +7,7 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include <misc.h>
 #include <path.h>
 
-#define GFX_FILENAME_FMT "CC%d.GFX"
+#define GFX_FILENAME_FMT "CC{}.GFX"
 
 struct Header
 {
@@ -38,7 +38,7 @@ const std::string colors[] = {
 int main()
 {
   const int episode = 1;
-  const auto path = get_data_path(misc::string_format(GFX_FILENAME_FMT, episode));
+  const auto path = get_data_path(std::format(GFX_FILENAME_FMT, episode));
   std::ifstream input{path, std::ios::binary};
   Header header;
   int idx = 0;

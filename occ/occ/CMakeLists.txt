@@ -40,5 +40,3 @@ if(APPLE)
 		BUILD_WITH_INSTALL_RPATH 1
 		INSTALL_RPATH "@loader_path/../Frameworks;/Library/Frameworks")
 endif()
-
-target_compile_features(occ PRIVATE cxx_std_17)

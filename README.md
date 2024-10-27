@@ -51,7 +51,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 
 ## Compiling OCC
 
-OCC is built using C++17 and requires external libraries: [SDL 2.0](https://www.libsdl.org/), [SDL_image](https://www.libsdl.org/projects/old/SDL_image/) and [SDL_mixer](https://www.libsdl.org/projects/old/SDL_mixer/) and . SDL2 must be installed and available in `/usr/include/SDL2`. Additionally the build system `cmake` must be installed.
+OCC is built using C++20 and requires external libraries: [SDL 2.0](https://www.libsdl.org/), [SDL_image](https://www.libsdl.org/projects/old/SDL_image/) and [SDL_mixer](https://www.libsdl.org/projects/old/SDL_mixer/) and . SDL2 must be installed and available in `/usr/include/SDL2`. Additionally the build system `cmake` must be installed.
 
 Steps to compile (Linux, macOS):
 

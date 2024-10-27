@@ -16,6 +16,9 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/../.github/workflows/cpp.yml.cmake)
 	)
 endif()
 
+# TODO: Use CMakePresets.json
+set(CMAKE_CXX_STANDARD 20)
+
 if(UNIX AND NOT APPLE)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=leak -fsanitize=undefined -fuse-ld=gold")
 endif()

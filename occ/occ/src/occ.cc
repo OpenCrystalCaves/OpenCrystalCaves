@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <format>
 #include <memory>
 #include <utility>
 
@@ -16,7 +17,7 @@
 #include "logger.h"
 #include "path.h"
 
-#define ICON_FILENAME_FMT "caves%d.ico"
+#define ICON_FILENAME_FMT "caves{}.ico"
 
 
 int main()
@@ -41,7 +42,7 @@ int main()
   const int episode = 1;
 
   // Create Window
-  const auto icon_file = misc::string_format(ICON_FILENAME_FMT, episode);
+  const auto icon_file = std::format(ICON_FILENAME_FMT, episode);
   const auto icon_path = get_data_path(icon_file);
   if (icon_path.empty())
   {
@@ -118,6 +119,7 @@ int main()
   title.set_next(game_state);
   game_state.set_next(title);
   State* state = &splash;
+  state->reset();
 
   // Game loop
   {

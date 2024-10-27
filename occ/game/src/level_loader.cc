@@ -496,8 +496,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'x':
             // TODO: remember completion state
             // Show levels under construction with cones
-            // TODO: C++20 use contains
-            if (completedLevels.find(static_cast<LevelId>(entrance_level)) == completedLevels.end())
+            if (completedLevels.contains(static_cast<LevelId>(entrance_level)))
             {
               sprite = static_cast<int>(Sprite::SPRITE_CONES);
               flags |= TILE_RENDER_IN_FRONT;

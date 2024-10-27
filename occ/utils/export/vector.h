@@ -1,8 +1,6 @@
-#ifndef VECTOR_H_
-#define VECTOR_H_
+#pragma once
 
 #include <cmath>
-#include <vector>
 
 template <typename T>
 class Vector
@@ -103,14 +101,10 @@ class Vector
     return Vector(static_cast<int>(x_ / d), static_cast<int>(y_ / d));
   }
 
-  constexpr bool operator==(const Vector& other) const
+  template<typename Y>
+  constexpr bool operator==(const Vector<Y>& other) const
   {
     return x_ == other.x_ && y_ == other.y_;
-  }
-
-  constexpr bool operator!=(const Vector& other) const
-  {
-    return !(*this == other);
   }
 
   constexpr Vector& operator+=(const Vector& other)
@@ -162,5 +156,3 @@ class Vector
   template <typename Y>
   friend class Vector;
 };
-
-#endif  // VECTOR_H_

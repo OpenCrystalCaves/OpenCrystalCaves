@@ -41,8 +41,16 @@ constexpr bool isColliding(const Rectangle& a, const Rectangle& b)
   return a.position.x() < b.position.x() + b.size.x() && a.position.y() < b.position.y() + b.size.y() &&
     a.position.x() + a.size.x() > b.position.x() && a.position.y() + a.size.y() > b.position.y();
 }
-// TODO: make constexpr; available in C++20
-bool is_any_colliding(const std::vector<Rectangle>& v, const Rectangle& a);
+constexpr bool is_any_colliding(const std::vector<Rectangle>& v, const Rectangle& a)
+{
+  struct Collides
+  {
+    const Rectangle& r;
+    constexpr Collides(const Rectangle& r) : r(r) {}
+    constexpr bool operator()(const Rectangle& r2) const { return isColliding(r, r2); }
+  };
+  return std::any_of(v.cbegin(), v.cend(), Collides(a));
+}
 // Returns true if A is within B
 constexpr bool is_inside(const Rectangle& a, const Rectangle& b)
 {

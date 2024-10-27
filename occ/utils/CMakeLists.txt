@@ -25,7 +25,6 @@ target_include_directories(utils PUBLIC
 target_link_libraries(utils PUBLIC
   "unlzexe"
 )
-target_compile_features(utils PRIVATE cxx_std_17)
 
 add_executable(utils_test
   "test/src/geometry_test.cc"
@@ -41,7 +40,6 @@ target_link_libraries(utils_test
   gmock_main
   utils
 )
-target_compile_features(utils_test PRIVATE cxx_std_17)
 
 add_library(utils_stubs
 	"test/stubs/logger_stub.cc"
@@ -49,4 +47,3 @@ add_library(utils_stubs
 target_include_directories(utils_stubs PUBLIC
   "export"
 )
-target_compile_features(utils_stubs PRIVATE cxx_std_17)

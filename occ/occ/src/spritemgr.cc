@@ -14,9 +14,9 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include "sprite.h"
 #include "wchars.h"
 
-#define GFX_FILENAME_FMT "CC%d.GFX"
-#define FONT_FILENAME_FMT "CC%d-F%d.MNI"
-#define SPL_FILENAME_FMT "CC%d-SPL.MNI"
+#define GFX_FILENAME_FMT "CC{}.GFX"
+#define FONT_FILENAME_FMT "CC{}-F{}.MNI"
+#define SPL_FILENAME_FMT "CC{}-SPL.MNI"
 #define FILLER 2
 #define CHAR_STRIDE 50
 
@@ -179,7 +179,7 @@ std::unique_ptr<Surface> load_surface(const std::filesystem::path& path,
 std::unique_ptr<Surface> load_tiles(Window& window, const int episode)
 {
   // Load tileset
-  const auto path = get_data_path(misc::string_format(GFX_FILENAME_FMT, episode));
+  const auto path = get_data_path(std::format(GFX_FILENAME_FMT, episode));
   return load_surface(path, window, SPRITE_W, SPRITE_H, SPRITE_STRIDE, FILLER);
 }
 
@@ -209,13 +209,13 @@ std::unique_ptr<Surface> load_chars(Window& window, const int episode)
   int all_sheet_h = 0;
   for (int i = 1;; i++)
   {
-    const auto path = get_data_path(misc::string_format(FONT_FILENAME_FMT, episode, i));
+    const auto path = get_data_path(std::format(FONT_FILENAME_FMT, episode, i));
     if (!try_load_char_pixels(path, all_pixels, all_sheet_w, all_sheet_h))
     {
       break;
     }
   }
-  const auto spl_path = get_data_path(misc::string_format(SPL_FILENAME_FMT, episode));
+  const auto spl_path = get_data_path(std::format(SPL_FILENAME_FMT, episode));
   try_load_char_pixels(spl_path, all_pixels, all_sheet_w, all_sheet_h);
   if (all_pixels.empty())
   {
