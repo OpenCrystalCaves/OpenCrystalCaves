@@ -9,8 +9,8 @@
 #include "misc.h"
 
 static constexpr auto gravity = 8u;
-static constexpr auto jump_velocity = misc::make_array<int>(0, -8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
-static constexpr auto jump_velocity_fall_index = 10u;
+static constexpr auto jump_velocity = misc::make_array<int>(-8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
+static constexpr auto jump_velocity_fall_index = 9u;
 
 std::unique_ptr<Game> Game::create()
 {
@@ -244,8 +244,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   // Check jump
   if (!player_.noclip)
   {
-    if (player_input.jump && !player_.jumping && !player_.falling &&
-        !level_->collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? 1 : -1), player_.size))
+    if (player_input.jump && !player_.jumping && !player_.falling)
     {
       // Player wants to jump
       player_.jumping = true;
@@ -378,8 +377,17 @@ void GameImpl::update_player(const PlayerInput& player_input)
       if (player_.reverse_gravity ? player_.velocity.y() > 0 : player_.velocity.y() < 0)
       {
         // Player hit something while jumping up
-        // Skip to "falling down" velocity
-        player_.jump_tick = jump_velocity_fall_index;
+        const auto position_below = player_.position - geometry::Position(0, step_y);
+        if (level_->collides_solid(position_below, player_.size) || player_on_platform(position_below))
+        {
+          // If player already on platform, stop jumping immediately
+          player_.jumping = false;
+        }
+        else
+        {
+          // Skip to "falling down" velocity
+          player_.jump_tick = jump_velocity_fall_index;
+        }
       }
       else  // player_.velocity.y() > 0
       {
