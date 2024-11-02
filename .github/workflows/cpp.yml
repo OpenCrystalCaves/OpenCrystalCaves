@@ -78,8 +78,6 @@ jobs:
     - name: Upload a Build Artifact
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: ${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
         fail_on_unmatched_files: true
