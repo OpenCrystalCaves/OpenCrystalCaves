@@ -26,8 +26,8 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # occ is both the binary and the directory, so they can't be in the same folder...
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/../build")
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/../build")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/build)
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/build)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
@@ -156,27 +156,32 @@ target_compile_options(utils PRIVATE ${COMPILE_OPTIONS})
 
 # install/package
 
-set(INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/../build)
+set(INSTALL_PREFIX .)
 set(EXE_EXTENSION "")
 if(WIN32)
 	set(EXE_EXTENSION ".exe")
 endif()
 install(
   PROGRAMS
-    ${INSTALL_PREFIX}/occ${EXE_EXTENSION}
-    DESTINATION ${INSTALL_PREFIX})
+    ${CMAKE_BINARY_DIR}/build/occ${EXE_EXTENSION}
+    DESTINATION ${INSTALL_PREFIX}
+    COMPONENT occ)
 install(DIRECTORY
 	${CMAKE_SOURCE_DIR}/../media
-	DESTINATION ${INSTALL_PREFIX})
+	DESTINATION ${INSTALL_PREFIX}
+  COMPONENT occ)
 install(FILES
 	${CMAKE_SOURCE_DIR}/../README.md
-	DESTINATION ${INSTALL_PREFIX})
+	DESTINATION ${INSTALL_PREFIX}
+  COMPONENT occ)
 if(WIN32)
 	# Copy DLLs
   # TODO: scripts to download DLLs
 	file(GLOB DLLS "${CMAKE_SOURCE_DIR}/../dll/*.dll")
 	foreach(DLL ${DLLS})
-		install(FILES "${DLL}" DESTINATION ${INSTALL_PREFIX})
+		install(
+      FILES "${DLL}" DESTINATION ${INSTALL_PREFIX}
+      COMPONENT occ)
 	endforeach()
 endif()
 
@@ -187,7 +192,10 @@ set(CPACK_PACKAGE_VERSION ${VERSION})
 set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
-set(CPACK_PACKAGE_EXECUTABLES "occ;OpenCrystalCaves")
+set(CPACK_PACKAGE_EXECUTABLES "occ" "OpenCrystalCaves")
+# Only install/package OCC stuff, ignore googletest
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_ALL occ)
 if(WIN32)
 	set(CPACK_GENERATOR ZIP)
 	set(CPACK_PACKAGE_INSTALL_DIRECTORY "OpenCrystalCaves")
@@ -199,14 +207,12 @@ elseif(APPLE)
   # TODO: icon
 
 	# copy SDL frameworks
-	set(APPS occ)
 	set(LIBS SDL2 SDL2_image)
-	foreach(APP ${APPS})
-		foreach(LIB ${LIBS})
-			install(DIRECTORY /Library/Frameworks/${LIB}.framework
-				DESTINATION ${INSTALL_PREFIX}/Frameworks)
-		endforeach()
-	endforeach()
+  foreach(LIB ${LIBS})
+    install(DIRECTORY /Library/Frameworks/${LIB}.framework
+      DESTINATION ${INSTALL_PREFIX}/Frameworks
+      COMPONENT occ)
+  endforeach()
 else()
 	# probably linux
 
