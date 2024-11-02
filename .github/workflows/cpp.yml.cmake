@@ -67,7 +67,7 @@ jobs:
       run: |
         build/windows/get-sdl2-dlls.bat dll 64
     - name: Make package on tags
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
       run: |
         cd ${{ matrix.build_type }}
         cpack -C ${{ matrix.build_type }}
@@ -77,14 +77,14 @@ jobs:
         ls ${{ github.workspace }}/${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
     - name: Upload a Build Artifact
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: ${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
         fail_on_unmatched_files: true
     - name: Publish to itch.io (Linux)
-      if: startsWith(github.ref, 'refs/tags/') && startsWith(matrix.os, 'ubuntu')
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && startsWith(matrix.os, 'ubuntu')
       env:
         # Create a key at https://itch.io/user/settings/api-keys
         # And add the key as a Repository secret to https://github.com/gurka/OpenCrystalCaves/settings/secrets/actions
@@ -96,7 +96,7 @@ jobs:
         ./butler -V
         ./butler push ${{ matrix.build_type }}/OpenCrystalCaves-*-Linux.tar.gz congusbongus/opencrystalcaves:linux --userversion $VERSION
     - name: Publish to itch.io (macOS)
-      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'macos-latest'
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'macos-latest'
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
       run: |
@@ -106,7 +106,7 @@ jobs:
         ./butler -V
         ./butler push ${{ matrix.build_type }}/OpenCrystalCaves-*-OSX.dmg congusbongus/opencrystalcaves:mac --userversion $VERSION
     - name: Publish to itch.io (Windows)
-      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'windows-latest'
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
       run: |
