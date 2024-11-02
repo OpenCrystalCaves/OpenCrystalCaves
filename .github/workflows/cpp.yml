@@ -69,7 +69,9 @@ jobs:
     - name: Make package on tags
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        cpack -B ${{ matrix.build_type }} -C ${{ matrix.build_type }}
+        cd ${{ matrix.build_type }}
+        cpack -C ${{ matrix.build_type }}
+        cd -
         echo "${{ github.workspace }}/${{ matrix.build_type }}/"
         ls "${{ github.workspace }}/${{ matrix.build_type }}/"
         ls ${{ github.workspace }}/${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
