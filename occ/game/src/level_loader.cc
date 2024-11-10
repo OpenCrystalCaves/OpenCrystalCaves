@@ -266,6 +266,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_GRILLE_2);
             mode = TileMode::NONE;
             break;
+          case '*':  // [* = 2x2 gear
+            sprite = static_cast<int>(Sprite::SPRITE_GEAR_2);
+            mode = TileMode::NONE;
+            break;
           default:
             break;
         }
@@ -434,12 +438,27 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             switch (tile_ids[i - level->width])
             {
               case '[':
-                // Bottom left of grille
-                sprite = static_cast<int>(Sprite::SPRITE_GRILLE_3);
+                switch (tile_ids[i - level->width + 1])
+                {
+                  case '#':
+                    // Bottom left of grille
+                    sprite = static_cast<int>(Sprite::SPRITE_GRILLE_3);
+                    break;
+                  case '*':
+                    // Bottom left of gear
+                    sprite = static_cast<int>(Sprite::SPRITE_GEAR_3);
+                    break;
+                  default:
+                    break;
+                }
                 break;
               case '#':
                 // Bottom right of grille
                 sprite = static_cast<int>(Sprite::SPRITE_GRILLE_4);
+                break;
+              case '*':
+                // Bottom right of gear
+                sprite = static_cast<int>(Sprite::SPRITE_GEAR_4);
                 break;
               case '$':
                 // Air tank (bottom)
@@ -464,6 +483,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                     sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
                     flags |= TILE_ANIMATED;
                     sprite_count = 4;
+                    break;
+                  default:
                     break;
                 }
                 break;
@@ -496,7 +517,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'x':
             // TODO: remember completion state
             // Show levels under construction with cones
-            if (completedLevels.contains(static_cast<LevelId>(entrance_level)))
+            if (!completedLevels.contains(static_cast<LevelId>(entrance_level)))
             {
               sprite = static_cast<int>(Sprite::SPRITE_CONES);
               flags |= TILE_RENDER_IN_FRONT;
@@ -559,6 +580,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               case '#':
                 // [# = 2x2 grille
                 sprite = static_cast<int>(Sprite::SPRITE_GRILLE_1);
+                mode = TileMode::SIGN;
+                break;
+              case '*':
+                // [* = 2x2 gear
+                sprite = static_cast<int>(Sprite::SPRITE_GEAR_1);
                 mode = TileMode::SIGN;
                 break;
               default:
