@@ -321,6 +321,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         {
           case ' ':
             break;
+          case '!':
+            // Faucet
+            level->hazards.emplace_back(new Faucet(geometry::Position{x * 16, y * 16}));
+            break;
           case '#':
             // Spider
             level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}));

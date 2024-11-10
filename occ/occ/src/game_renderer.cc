@@ -298,7 +298,7 @@ void GameRenderer::render_tiles(bool in_front) const
   {
     for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
     {
-      const auto& tile = game_->get_tile(tile_x, tile_y);
+      const auto& tile = game_->get_level().get_tile(tile_x, tile_y);
 
       if (debug_ && !tile.is_solid() && tile.is_solid_for_slime())
       {

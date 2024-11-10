@@ -60,3 +60,24 @@ bool Level::collides_solid(const geometry::Position& position, const geometry::S
   }
   return false;
 }
+
+bool Level::collides_solid_top(const geometry::Position& position, const geometry::Size& size) const
+{
+  // Note: this function only works with size x and y <= 16
+  // With size 16x16 the object can cover at maximum 4 tiles
+  // Check all 4 tiles, even though we might check the same tile multiple times
+  const std::array<geometry::Position, 4> positions = {
+    geometry::Position((position.x() + 0) / 16, (position.y() + 0) / 16),
+    geometry::Position((position.x() + size.x() - 1) / 16, (position.y() + 0) / 16),
+    geometry::Position((position.x() + 0) / 16, (position.y() + size.y() - 1) / 16),
+    geometry::Position((position.x() + size.x() - 1) / 16, (position.y() + size.y() - 1) / 16)};
+  for (const auto& p : positions)
+  {
+    const auto& tile = get_tile(p.x(), p.y());
+    if (tile.is_solid_top())
+    {
+      return true;
+    }
+  }
+  return false;
+}

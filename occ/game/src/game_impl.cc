@@ -62,11 +62,6 @@ int GameImpl::get_bg_sprite(const int x, const int y) const
   return level_->get_bg(x, y);
 }
 
-const Tile& GameImpl::get_tile(int tile_x, int tile_y) const
-{
-  return level_->get_tile(tile_x, tile_y);
-}
-
 const Item& GameImpl::get_item(int tile_x, int tile_y) const
 {
   return level_->get_item(tile_x, tile_y);
@@ -652,8 +647,8 @@ bool GameImpl::player_on_platform(const geometry::Position& player_position)
   if ((player_position.y() + player_.size.y() - 1) % 16 == 0)
   {
     // Player can be on either 1 or 2 tiles, check both (or same...)
-    if (get_tile(player_position.x() / 16, (player_position.y() + player_.size.y() - 1) / 16).is_solid_top() ||
-        get_tile((player_position.x() + player_.size.x()) / 16, (player_position.y() + player_.size.y() - 1) / 16).is_solid_top())
+    if (level_->get_tile(player_position.x() / 16, (player_position.y() + player_.size.y() - 1) / 16).is_solid_top() ||
+        level_->get_tile((player_position.x() + player_.size.x()) / 16, (player_position.y() + player_.size.y() - 1) / 16).is_solid_top())
     {
       return true;
     }

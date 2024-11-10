@@ -192,3 +192,73 @@ class CorpseSlime : public Hazard
  private:
   Sprite sprite_;
 };
+
+
+class Droplet;
+
+class Faucet : public Hazard
+{
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🩵🩵📘🟦🟦🇪🇺🇪🇺⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬜⬜⬜⚪⚪⚪🪦⬛⬛⬛⬛
+  // ⬛⬛⬛⬛🩵🩵🩵📘🟦🟦🇪🇺🇪🇺🇪🇺⬛⬛⬛
+  // ⬛⬛⬛🩵🩵🩵📘🟦🟦🟦🟦🇪🇺🇪🇺🇪🇺⬛⬛
+  // ⬛⬛🩵🩵🩵📘🟦🟦🟦🟦🟦🟦🇪🇺🇪🇺🇪🇺⬛
+  // Drips droplet below
+ public:
+  Faucet(geometry::Position position) : Hazard(position) {}
+
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_FAUCET_1) + frame_))};
+  }
+  void remove_child() { child_ = nullptr; }
+
+ private:
+  int frame_ = 0;
+  Droplet* child_ = nullptr;
+};
+
+class Droplet : public Hazard
+{
+  // ⬛⬛⬛⬛⬛⬛⬛⬛🟦🟦⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟦🟦🩵⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛🟦🩵🟦🟦⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🟦🩵🩵🩵🟦⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🟦🩵🩵🩵🟦🟦⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛🟦🩵🩵🩵🟦🟦🟦⬛⬛⬛⬛⬛
+  // ⬛⬛⬛🟦🩵🩵🩵🩵🩵🟦🟦🟦⬛⬛⬛⬛
+  // ⬛⬛⬛🟦🩵🩵🩵🩵🩵🩵🟦🟦⬛⬛⬛⬛
+  // ⬛⬛⬛🟦🩵🩵🩵🩵🩵🩵🟦🟦🟦⬛⬛⬛
+  // ⬛⬛⬛🟦🩵🟦🩵🩵🩵🩵🩵🟦🟦⬛⬛⬛
+  // ⬛⬛⬛🟦🩵🩵🩵🩵🩵🩵🩵🟦🟦⬛⬛⬛
+  // ⬛⬛⬛🟦🩵🩵🩵🟦🩵🩵🩵🟦🟦⬛⬛⬛
+  // ⬛⬛⬛⬛🟦🩵🩵🟦🩵🩵🟦🟦🟦⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🟦🟦🟦🟦🟦🟦🟦⬛⬛⬛⬛
+  // Drops down, disappear on collide or out of frame
+ public:
+  Droplet(geometry::Position position, Faucet& parent) : Hazard(position), parent_(parent) {}
+
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_DROPLET_1 : Sprite::SPRITE_DROPLET_2)};
+  }
+  virtual bool is_alive() const override { return alive_; }
+
+ private:
+  bool left_;
+  int frame_ = 0;
+  Faucet& parent_;
+  bool alive_ = true;
+};
