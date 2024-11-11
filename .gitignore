@@ -36,3 +36,6 @@ build/*.pdb
 
 # macOS
 occ/build/
+
+# VSCode
+.vscode/

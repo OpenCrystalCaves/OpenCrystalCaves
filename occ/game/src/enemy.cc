@@ -210,3 +210,59 @@ std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites([[maybe_u
   return {std::make_pair(position,
                          static_cast<Sprite>(static_cast<int>(up_ ? Sprite::SPRITE_SPIDER_UP_1 : Sprite::SPRITE_SPIDER_DOWN_1) + frame_))};
 }
+
+void Rockman::update(const geometry::Rectangle& player_rect, Level& level)
+{
+  // Wake on detection
+  if (asleep_)
+  {
+    const auto detection_rects = get_detection_rects(level);
+    if (geometry::isColliding(detection_rects[0], player_rect))
+    {
+      asleep_ = false;
+      frame_ = 0;
+      left_ = true;
+    }
+    else if (geometry::isColliding(detection_rects[1], player_rect))
+    {
+      asleep_ = false;
+      frame_ = 0;
+      left_ = false;
+    }
+  }
+  // TODO: sleep on going off camera
+  if (!asleep_)
+  {
+    frame_++;
+    // Frame 4 is initially standing up; don't walk yet
+    // unless we're looping back to this frame
+    if (frame_ > 4)
+    {
+      const auto d = geometry::Position(left_ ? -2 : 2, 0);
+      position += d;
+      if (should_reverse(level))
+      {
+        left_ = !left_;
+        position -= d;
+      }
+    }
+    if (frame_ == 12)
+    {
+      frame_ = 4;
+    }
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Rockman::get_sprites([[maybe_unused]] const Level& level) const
+{
+  const int frame = static_cast<int>(Sprite::SPRITE_ROCKMAN_L_1) + frame_ + (left_ ? 0 : 12);
+  return {std::make_pair(position, static_cast<Sprite>(frame))};
+}
+
+std::vector<geometry::Rectangle> Rockman::get_detection_rects(const Level& level) const
+{
+  auto lr = create_detection_rects(-1, 0, level);
+  auto rr = create_detection_rects(1, 0, level);
+  lr.insert(lr.end(), rr.begin(), rr.end());
+  return lr;
+}

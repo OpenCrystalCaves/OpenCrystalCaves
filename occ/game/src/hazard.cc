@@ -79,7 +79,6 @@ void Faucet::update([[maybe_unused]] const geometry::Rectangle& player_rect, Lev
     if (frame_ == 6)
     {
       frame_ = 0;
-      // TODO: make sound
       geometry::Position child_pos = position + geometry::Position(0, 8);
       child_ = new Droplet(child_pos, *this);
       level.hazards.emplace_back(child_);
@@ -93,6 +92,7 @@ void Droplet::update([[maybe_unused]] const geometry::Rectangle& player_rect, Le
   position += geometry::Position(0, 6);
   if (level.collides_solid(position, geometry::Size(16, 16)) || level.collides_solid_top(position, geometry::Size(16, 16)))
   {
+    // TODO: make sound
     // TODO: leave alive for one more frame but don't hurt player
     alive_ = false;
     parent_.remove_child();

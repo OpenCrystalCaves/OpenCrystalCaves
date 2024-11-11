@@ -191,3 +191,34 @@ class Spider : public Enemy
   int frame_ = 0;
   SpiderWeb* child_ = nullptr;
 };
+
+
+class Rockman : public Enemy
+{
+  // ⬛⬛⬛⬛⬛⚪🪦⚪🪦⚪⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛🪦⚪🪦⚪🪦⚪🪦🟠🪦⬛⬛⬛⬛
+  // ⬛⬛⬛⚪🪦⚪🪦🟠🪦🟠🪦🟠🪦⬛⬛⬛
+  // ⬛⬛⚪🪦🟠🪦🟠🪦🟠🪦🟠🪦⬛🪦⬛⬛
+  // ⬛⚪🪦⚪🪦🟠🪦🟠🪦🟠🪦🟠🪦⬛🪦⬛
+  // ⬛🪦⚪🪦⚪🪦🟠🪦🟠🪦🟠🪦🟠🪦⬛⬛
+  // ⬛⚪🪦⚪🪦🟠🪦🟠🪦🟠🪦⬛🪦⬛🪦⬛
+  // ⬛🪦⚪🪦⚪🪦🟠🪦⬛🪦⬛🪦⬛🪦⬛⬛
+  // ⬛⬛🪦⚪🪦⚪🪦🟠🪦⬛🪦⬛🪦⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🟪🟪🟣🟣⬛🟣🟣⬛⬛⬛⬛
+  // ⬛🟪🟪⬛🟪🟪🟣🟣⬛⬛🟣🟣🟣⬛⬛⬛
+  // ⬛⬛🟪🟪🟪🟣🟣⬛⬛🟣🟣🟣🟣🟣⬛⬛
+  // Initially stopped, wakes on vision of player, moves left/right, needs P to kill
+ public:
+  // TODO: require P to kill
+  Rockman(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1, 100) {}
+
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override;
+
+ private:
+  bool left_ = false;
+  int frame_ = 0;
+  bool asleep_ = true;
+};

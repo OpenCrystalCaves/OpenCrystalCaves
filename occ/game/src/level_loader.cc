@@ -329,6 +329,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Spider
             level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}));
             break;
+          case '*':
+            // Rockman
+            level->enemies.emplace_back(new Rockman(geometry::Position{x * 16, y * 16}));
+            break;
           case '$':
             // Air tank (top)
             level->hazards.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, true));
@@ -730,6 +734,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             item = Item(Sprite::SPRITE_CANDLE, ItemType::ITEM_TYPE_SCORE, 1000);
             break;
           default:
+            LOG_INFO(
+              "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
             break;
         }
         break;
