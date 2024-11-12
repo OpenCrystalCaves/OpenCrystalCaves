@@ -33,6 +33,7 @@ Testing/
 build/*.dll
 build/*.exe
 build/*.pdb
+dll/
 
 # macOS
 occ/build/

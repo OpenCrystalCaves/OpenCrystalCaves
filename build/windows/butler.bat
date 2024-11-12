@@ -8,11 +8,6 @@ if "!BUTLER_API_KEY!" == "" (
 
 set PROJECT="congusbongus/opencrystalcaves"
 
-echo "Preparing butler..."
-curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
-7z x -y butler.zip
-butler -V
-
 for %%f in (OpenCrystalCaves*.zip) do (
   butler push --userversion !VERSION! %%f !PROJECT!:win
 )

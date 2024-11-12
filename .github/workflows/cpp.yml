@@ -75,7 +75,7 @@ jobs:
       run: |
         cd ${{ matrix.build_type }}
         cpack -C ${{ matrix.build_type }}
-        cd -
+        cd ..
         echo "${{ github.workspace }}/${{ matrix.build_type }}/"
         ls "${{ github.workspace }}/${{ matrix.build_type }}/"
         ls ${{ github.workspace }}/${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
@@ -112,4 +112,8 @@ jobs:
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
       run: |
+        curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
+        7z x -y butler.zip
+        butler -V
+        cd ${{ matrix.build_type }}
         .\build\windows\butler.bat

@@ -28,9 +28,8 @@ Currently the engine can:
 Features that are missing:
 
 - Loading and saving games.
-- Exiting levels.
-- Items.
-- Enemies.
+- Some items.
+- Some enemies.
 - (and much more).
 
 ## Differences with Crystal Caves

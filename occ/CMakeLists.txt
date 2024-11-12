@@ -174,16 +174,6 @@ install(FILES
 	${CMAKE_SOURCE_DIR}/../README.md
 	DESTINATION ${INSTALL_PREFIX}
   COMPONENT occ)
-if(WIN32)
-	# Copy DLLs
-  # TODO: scripts to download DLLs
-	file(GLOB DLLS "${CMAKE_SOURCE_DIR}/../dll/*.dll")
-	foreach(DLL ${DLLS})
-		install(
-      FILES "${DLL}" DESTINATION ${INSTALL_PREFIX}
-      COMPONENT occ)
-	endforeach()
-endif()
 
 set(CPACK_PACKAGE_NAME "OpenCrystalCaves")
 set(CPACK_PACKAGE_VENDOR "OpenCrystalCaves Team")
@@ -199,6 +189,13 @@ set(CPACK_COMPONENTS_ALL occ)
 if(WIN32)
 	set(CPACK_GENERATOR ZIP)
 	set(CPACK_PACKAGE_INSTALL_DIRECTORY "OpenCrystalCaves")
+	# Copy DLLs
+	file(GLOB DLLS "${CMAKE_SOURCE_DIR}/../dll/*.dll")
+	foreach(DLL ${DLLS})
+		install(
+      FILES "${DLL}" DESTINATION ${INSTALL_PREFIX}
+      COMPONENT occ)
+	endforeach()
 elseif(APPLE)
 	set(CPACK_GENERATOR "DragNDrop")
 	set(CPACK_DMG_FORMAT "UDBZ")
