@@ -482,6 +482,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               case -92:
                 // Bottom of green door; skip as we should have added it using the top
                 break;
+              case -93:
+                // Bottom of red door; skip as we should have added it using the top
+                break;
               default:
                 // Check tile above-left
                 switch (tile_ids[i - level->width - 1])
@@ -599,6 +602,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 break;
             }
             break;
+          case ']':
+            // Power
+            item = Item(Sprite::SPRITE_POWER, ItemType::ITEM_TYPE_POWER, 0);
+            break;
           case '/':
             level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}));
             break;
@@ -703,6 +710,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Top of green door
             level->actors.emplace_back(new Door(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_G));
             break;
+          case -93:
+            // Top of red door
+            level->actors.emplace_back(new Door(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_R));
+            break;
           case -94:
             // Blue lever
             level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_B));
@@ -710,6 +721,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -95:
             // Green lever
             level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_G));
+            break;
+          case -96:
+            // Red lever
+            level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_R));
             break;
           case -113:
             if (tile_ids[i + 1] == 'n')
