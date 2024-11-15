@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <sstream>
 
+#include "constants.h"
 #include "level_loader.h"
 #include "logger.h"
 #include "misc.h"
@@ -91,7 +92,7 @@ void GameImpl::update_level()
   {
     // Update platform
     const auto player_on_platform = (player_.position.y() + player_.size.y() == platform.position.y()) &&
-      (player_.position.x() < platform.position.x() + 16) && (player_.position.x() + player_.size.x() > platform.position.x());
+      (player_.position.x() < platform.position.x() + SPRITE_W) && (player_.position.x() + player_.size.x() > platform.position.x());
 
     platform.update(*level_);
 
@@ -118,8 +119,9 @@ void GameImpl::update_level()
   {
     if (entrance.state != EntranceState::COMPLETE)
     {
-      entrance.state =
-        geometry::isColliding({player_.position, player_.size}, {entrance.position, 16, 16}) ? EntranceState::OPEN : EntranceState::CLOSED;
+      entrance.state = geometry::isColliding({player_.position, player_.size}, {entrance.position, SPRITE_W, SPRITE_H})
+        ? EntranceState::OPEN
+        : EntranceState::CLOSED;
       if (entrance.state == EntranceState::OPEN)
       {
         entering_level = static_cast<LevelId>(entrance.level);
@@ -134,7 +136,7 @@ void GameImpl::update_level()
   {
     if (!level_->exit->open)
     {
-      level_->exit->open = geometry::isColliding({player_.position, player_.size}, {level_->exit->position, 16, 32});
+      level_->exit->open = geometry::isColliding({player_.position, player_.size}, {level_->exit->position, SPRITE_W, 2 * SPRITE_H});
       if (level_->exit->open)
       {
         // TODO: play sound
@@ -333,7 +335,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     if (!player_.noclip &&
         (level_->collides_solid(new_player_pos, player_.size) ||
          // collide with world edges
-         new_player_pos.x() < 0 || new_player_pos.x() >= level_->width * 16 - player_.size.x()))
+         new_player_pos.x() < 0 || new_player_pos.x() >= level_->width * SPRITE_W - player_.size.x()))
     {
       player_.collide_x = true;
       break;
@@ -424,10 +426,10 @@ void GameImpl::update_items()
   // Player can cover at maximum 4 items
   // Check all 4 items, even though we might check the same item multiple times
   const std::array<geometry::Position, 4> positions = {
-    geometry::Position((player_.position.x() + 0) / 16, (player_.position.y() + 0) / 16),
-    geometry::Position((player_.position.x() + player_.size.x() - 1) / 16, (player_.position.y() + 0) / 16),
-    geometry::Position((player_.position.x() + 0) / 16, (player_.position.y() + player_.size.y() - 1) / 16),
-    geometry::Position((player_.position.x() + player_.size.x() - 1) / 16, (player_.position.y() + player_.size.y() - 1) / 16)};
+    geometry::Position((player_.position.x() + 0) / SPRITE_W, (player_.position.y() + 0) / SPRITE_H),
+    geometry::Position((player_.position.x() + player_.size.x() - 1) / SPRITE_W, (player_.position.y() + 0) / SPRITE_H),
+    geometry::Position((player_.position.x() + 0) / SPRITE_W, (player_.position.y() + player_.size.y() - 1) / SPRITE_H),
+    geometry::Position((player_.position.x() + player_.size.x() - 1) / SPRITE_W, (player_.position.y() + player_.size.y() - 1) / SPRITE_H)};
 
   for (const auto& position : positions)
   {
@@ -450,6 +452,11 @@ void GameImpl::update_items()
         case ItemType::ITEM_TYPE_SCORE:
           LOG_DEBUG("Player took item of type score (%d), amount: %d", item.get_type(), item.get_amount());
           score_ += item.get_amount();
+          break;
+        case ItemType::ITEM_TYPE_POWER:
+          LOG_DEBUG("Player took item of type power", item.get_type());
+          // Last 16 seconds
+          player_.power_tick = 16 * FPS / FRAMES_PER_TICK;
           break;
         default:
           LOG_ERROR("unknown item type");
@@ -649,11 +656,12 @@ bool GameImpl::player_on_platform(const geometry::Position& player_position)
   // and moving platforms
 
   // Standing on a static platform requires the player to stand on the edge of a tile
-  if ((player_position.y() + player_.size.y() - 1) % 16 == 0)
+  if ((player_position.y() + player_.size.y() - 1) % SPRITE_H == 0)
   {
     // Player can be on either 1 or 2 tiles, check both (or same...)
-    if (level_->get_tile(player_position.x() / 16, (player_position.y() + player_.size.y() - 1) / 16).is_solid_top() ||
-        level_->get_tile((player_position.x() + player_.size.x()) / 16, (player_position.y() + player_.size.y() - 1) / 16).is_solid_top())
+    if (level_->get_tile(player_position.x() / SPRITE_W, (player_position.y() + player_.size.y() - 1) / SPRITE_H).is_solid_top() ||
+        level_->get_tile((player_position.x() + player_.size.x()) / SPRITE_W, (player_position.y() + player_.size.y() - 1) / SPRITE_H)
+          .is_solid_top())
     {
       return true;
     }
@@ -663,7 +671,7 @@ bool GameImpl::player_on_platform(const geometry::Position& player_position)
   for (const auto& platform : level_->moving_platforms)
   {
     // Player only collides if standing exactly on top of the platform, just like with static platforms
-    if ((player_position.y() + player_.size.y() - 1 == platform.position.y()) && (player_position.x() < platform.position.x() + 16) &&
+    if ((player_position.y() + player_.size.y() - 1 == platform.position.y()) && (player_position.x() < platform.position.x() + SPRITE_W) &&
         (player_position.x() + player_.size.x() > platform.position.x()))
     {
       return true;

@@ -7,7 +7,6 @@ enum class ItemType : int
   ITEM_TYPE_CRYSTAL = 0,
   ITEM_TYPE_AMMO = 1,
   ITEM_TYPE_SCORE = 2,
-  // TODO: implement
   ITEM_TYPE_POWER = 3,
 };
 

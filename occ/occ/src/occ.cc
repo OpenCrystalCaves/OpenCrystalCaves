@@ -11,6 +11,7 @@
 #include "imagemgr.h"
 #include "spritemgr.h"
 #include "state.h"
+#include "utils.h"
 
 // From utils
 #include "geometry.h"
@@ -128,7 +129,6 @@ int main()
 
     // Game loop logic
     auto sdl_tick = sdl->get_tick();
-    const auto ms_per_update = 57;  // 17.5~ ticks per second
     auto tick_last_update = sdl_tick;
     auto lag = 0u;
 
@@ -151,13 +151,13 @@ int main()
         auto elapsed_ticks = sdl_tick - tick_last_update;
         tick_last_update = sdl_tick;
         lag += elapsed_ticks;
-        if (lag >= ms_per_update)
+        if (lag >= MS_PER_TICK)
         {
           break;
         }
-        sdl->delay(ms_per_update - lag);
+        sdl->delay(MS_PER_TICK - lag);
       }
-      while (lag >= ms_per_update)
+      while (lag >= MS_PER_TICK)
       {
         // Read input
         event->poll_event(&input);
@@ -175,7 +175,7 @@ int main()
           state = new_state;
         }
 
-        lag -= ms_per_update;
+        lag -= MS_PER_TICK;
       }
 
       /////////////////////////////////////////////////////////////////////////

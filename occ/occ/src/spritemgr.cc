@@ -8,6 +8,7 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include <fstream>
 #include <map>
 
+#include "constants.h"
 #include "logger.h"
 #include "misc.h"
 #include "occ_math.h"

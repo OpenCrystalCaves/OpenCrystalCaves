@@ -225,7 +225,7 @@ class Rockman : public Enemy
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override;
   virtual int get_points() const override { return 100; }
-  virtual bool is_tough() const { return true; }
+  virtual bool is_tough() const override { return true; }
 
  private:
   bool left_ = false;

@@ -8,6 +8,7 @@
 #include "occ_math.h"
 #include "player.h"
 #include "spritemgr.h"
+#include "utils.h"
 
 GameRenderer::GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface, Window& window)
   : game_(game),
@@ -419,5 +420,13 @@ void GameRenderer::render_statusbar() const
   if (game_->has_key())
   {
     sprite_manager_->render_icon(Icon::ICON_KEY, statusbar_rect.position + geometry::Position(23 * CHAR_W, dy));
+  }
+  // Timer
+  if (game_->get_player().power_tick > 0)
+  {
+    sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(27 * CHAR_W, dy));
+    sprite_manager_->render_number(game_->get_player().power_tick * FRAMES_PER_TICK / FPS,
+                                   statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
+    sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
   }
 }

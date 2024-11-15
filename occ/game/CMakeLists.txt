@@ -4,6 +4,7 @@ project(game)
 
 add_library(game
   "export/actor.h"
+  "export/constants.h"
   "export/enemy.h"
   "export/entrance.h"
   "export/exit.h"

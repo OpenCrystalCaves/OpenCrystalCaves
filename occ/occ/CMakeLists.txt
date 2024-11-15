@@ -5,7 +5,6 @@ project(occ)
 file(GLOB AHEASING_HDRS "../external/AHEasing/AHEasing/*.h")
 file(GLOB AHEASING_SRCS "../external/AHEasing/AHEasing/*.c")
 add_executable(occ
-  "src/constants.h"
   "src/game_renderer.cc"
   "src/game_renderer.h"
   "src/imagemgr.cc"
