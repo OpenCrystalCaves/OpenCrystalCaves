@@ -5,6 +5,18 @@
 
 // TODO: hurt player on touch, all enemy types
 
+
+void Enemy::on_hit(const bool power)
+{
+  if (is_tough() && !power)
+  {
+    return;
+  }
+  health -= power ? health : 1;
+  // TODO: if hurt, enter flashing state
+  // TODO: play sound
+}
+
 bool Enemy::should_reverse(const Level& level) const
 {
   // Reverse direction if colliding left/right or about to fall

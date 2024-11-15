@@ -271,6 +271,11 @@ void GameImpl::update_player(const PlayerInput& player_input)
     player_.shooting = player_input.shoot;
   }
 
+  if (player_.power_tick > 0)
+  {
+    player_.power_tick--;
+  }
+
   /**
    * 2. Update player velocity based on player information
    */
@@ -498,7 +503,7 @@ void GameImpl::update_missile()
       {
         missile_.alive = false;
 
-        enemy->on_hit();
+        enemy->on_hit(player_.power_tick > 0);
 
         break;
       }

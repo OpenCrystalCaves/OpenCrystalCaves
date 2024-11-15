@@ -33,6 +33,8 @@ struct Player
 
   bool shooting = false;
 
+  unsigned power_tick = 0u;
+
   bool noclip = false;
   bool godmode = false;
   bool reverse_gravity = false;
