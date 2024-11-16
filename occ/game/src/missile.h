@@ -3,19 +3,27 @@
 #include "geometry.h"
 #include "misc.h"
 
+struct Level;
+struct Player;
+
 struct Missile
 {
-  Missile() : alive(false), frame(0), position(), right(false) {}
+  Missile() : position() {}
 
-  bool alive;
-  unsigned frame;
+  bool alive = false;
+  unsigned frame = 0;
+  bool is_power = false;
   geometry::Position position;
-  bool right;             // Direction...
+  bool right = false;     // Direction...
   unsigned cooldown = 0;  // cooldown from previous missile explosion
 
+  void init(const Player& player);
   bool is_in_cooldown() const;
   void set_cooldown();
-  void update();
+  // Returns whether it exploded
+  bool update(const Level& level);
+  int get_sprite() const;
+  int get_num_sprites() const;
 
   // Note: this is the actual size of the missile and is used for collision detection.
   //       The missile sprites are size 16x16.

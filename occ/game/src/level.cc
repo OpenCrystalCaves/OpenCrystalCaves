@@ -81,3 +81,21 @@ bool Level::collides_solid_top(const geometry::Position& position, const geometr
   }
   return false;
 }
+
+/**
+ * Checks if given position and size collides with any enemy.
+ *
+ * Returns the first colliding enemy, or null if none found.
+ */
+Enemy* Level::collides_enemy(const geometry::Position& position, const geometry::Size& size) const
+{
+  const auto rect = geometry::Rectangle(position, size);
+  for (auto&& enemy : enemies)
+  {
+    if (geometry::isColliding(rect, geometry::Rectangle(enemy->position, enemy->size)))
+    {
+      return enemy.get();
+    }
+  }
+  return nullptr;
+}

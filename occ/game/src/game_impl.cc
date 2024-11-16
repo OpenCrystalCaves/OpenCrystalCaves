@@ -487,56 +487,22 @@ void GameImpl::update_missile()
     }
   }
 
-  // Move the missile if it's alive
-  if (missile_.alive)
+  if (missile_.update(*level_))
   {
-    auto speed = missile_.frame < missile_.speed.size() ? missile_.speed[missile_.frame] : missile_.speed.back();
-    while (speed-- > 0)
-    {
-      missile_.position += geometry::Position((missile_.right ? 1 : -1), 0);
-
-      // Adjust position due to collision size being smaller than sprite size
-      if (level_->collides_solid(missile_.position + geometry::Position(0, 3), missile_.size))
-      {
-        missile_.alive = false;
-        missile_.set_cooldown();
-        particles_.emplace_back(new Explosion(missile_.position));
-        break;
-      }
-
-      // Adjust position due to collision size being smaller than sprite size
-      auto enemy = collides_enemy(missile_.position + geometry::Position(0, 3), missile_.size);
-      if (enemy)
-      {
-        missile_.alive = false;
-
-        enemy->on_hit(player_.power_tick > 0);
-
-        break;
-      }
-    }
+    particles_.emplace_back(new Explosion(missile_.position));
   }
-  missile_.update();
 
   // Player wants to shoot new missile
   if (player_.shooting && !missile_.is_in_cooldown())
   {
-    if (num_ammo_ > 0)
+    if (num_ammo_ > 0 || player_.godmode || player_.power_tick > 0)
     {
-      missile_.alive = true;
-      missile_.frame = 0;
-      if (player_.direction == Player::Direction::right)
-      {
-        missile_.right = true;
-        missile_.position = player_.position + geometry::Position(player_.size.x() - 2, 0);
-      }
-      else
-      {
-        missile_.right = false;
-        missile_.position = player_.position - geometry::Position(player_.size.x() - 2, 0);
-      }
+      missile_.init(player_);
 
-      num_ammo_ -= 1;
+      if (!player_.godmode && player_.power_tick == 0)
+      {
+        num_ammo_ -= 1;
+      }
     }
     else
     {
@@ -547,7 +513,7 @@ void GameImpl::update_missile()
   // Add missile to objects_ if alive
   if (missile_.alive)
   {
-    objects_.emplace_back(missile_.position, (missile_.right ? 296 : 302), 6, false);
+    objects_.emplace_back(missile_.position, missile_.get_sprite(), missile_.get_num_sprites(), false);
   }
 }
 
@@ -630,24 +596,6 @@ void GameImpl::update_actors()
       objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
     }
   }
-}
-
-/**
- * Checks if given position and size collides with any enemy.
- *
- * Returns the first colliding enemy, or null if none found.
- */
-Enemy* GameImpl::collides_enemy(const geometry::Position& position, const geometry::Size& size)
-{
-  const auto rect = geometry::Rectangle(position, size);
-  for (auto&& enemy : level_->enemies)
-  {
-    if (geometry::isColliding(rect, geometry::Rectangle(enemy->position, enemy->size)))
-    {
-      return enemy.get();
-    }
-  }
-  return nullptr;
 }
 
 bool GameImpl::player_on_platform(const geometry::Position& player_position)
