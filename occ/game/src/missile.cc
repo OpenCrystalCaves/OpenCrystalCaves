@@ -21,6 +21,7 @@ void Missile::init(const Player& player)
     right = false;
     position = player.position - geometry::Position(player.size.x() - 2, 0);
   }
+  // TODO: shot sound
 }
 
 bool Missile::is_in_cooldown() const
@@ -51,6 +52,7 @@ bool Missile::update(const Level& level)
         alive = false;
         set_cooldown();
         explode = true;
+        // TODO: sound
         break;
       }
 

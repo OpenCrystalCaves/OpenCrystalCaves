@@ -7,9 +7,9 @@ Display Crystal Caves levels
 
 #include "../game/src/level.h"
 #include "../game/src/level_loader.h"
-#include "../occ/src/constants.h"
 #include "../occ/src/spritemgr.h"
 #include "../utils/export/exe_data.h"
+#include "constants.h"
 #include "event.h"
 #include "graphics.h"
 #include "logger.h"

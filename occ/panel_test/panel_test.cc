@@ -5,13 +5,14 @@ Display Crystal Caves window panels
 #include <fstream>
 #include <iostream>
 
-#include "../occ/src/constants.h"
 #include "../occ/src/panel.h"
 #include "../occ/src/spritemgr.h"
+#include "constants.h"
 #include "event.h"
 #include "graphics.h"
 #include "logger.h"
 #include "sdl_wrapper.h"
+#include "utils.h"
 
 int main(int argc, char* argv[])
 {

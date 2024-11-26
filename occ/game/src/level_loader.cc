@@ -116,6 +116,7 @@ enum class TileMode
   VOLCANO,
   EJECTA,
   EXIT,
+  COLUMN,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -315,6 +316,18 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         sprite = static_cast<int>(Sprite::SPRITE_EXIT_TOP_RIGHT_1);
         flags |= TILE_SOLID;
         mode = TileMode::NONE;
+        break;
+      case TileMode::COLUMN:
+        flags |= TILE_SOLID_TOP;
+        if (tile_id == 'n')
+        {
+          sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD_R);
+          mode = TileMode::NONE;
+        }
+        else
+        {
+          sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD);
+        }
         break;
       default:
         switch (tile_id)
@@ -587,6 +600,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 sprite = static_cast<int>(Sprite::SPRITE_RED_CRATE_1);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::SIGN;
+                break;
+              case 'T':
+                // [Tn = Head of column
+                sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD_L);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::COLUMN;
                 break;
               case '#':
                 // [# = 2x2 grille

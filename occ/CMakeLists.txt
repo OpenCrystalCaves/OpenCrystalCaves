@@ -89,6 +89,7 @@ target_include_directories(sound_player SYSTEM PUBLIC
 add_subdirectory("char_viewer")
 target_compile_options(char_viewer PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(char_viewer SYSTEM PUBLIC
+  "game/export"
   "occ/src"
   "sdl_wrapper/export"
   "utils/export"
@@ -97,6 +98,7 @@ target_include_directories(char_viewer SYSTEM PUBLIC
 add_subdirectory("font_viewer")
 target_compile_options(font_viewer PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(font_viewer SYSTEM PUBLIC
+  "game/export"
   "occ/src"
   "sdl_wrapper/export"
   "utils/export"
@@ -105,6 +107,7 @@ target_include_directories(font_viewer SYSTEM PUBLIC
 add_subdirectory("level_viewer")
 target_compile_options(level_viewer PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(level_viewer SYSTEM PUBLIC
+  "game/export"
   "occ/src"
   "sdl_wrapper/export"
   "utils/export"
@@ -121,6 +124,7 @@ target_include_directories(panel_test SYSTEM PUBLIC
 add_subdirectory("sprite_viewer")
 target_compile_options(sprite_viewer PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(sprite_viewer SYSTEM PUBLIC
+  "game/export"
   "occ/src"
   "sdl_wrapper/export"
   "utils/export"
