@@ -20,7 +20,7 @@ std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites([[maybe_
 
 void Laser::update(const geometry::Rectangle& player_rect, Level& level)
 {
-  if (child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+  if ((level.switch_flags & SWITCH_FLAG_LASERS) && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
     geometry::Position child_pos = position + geometry::Position(left_ ? -12 : 12, -1);
     child_ = new LaserBeam(child_pos, left_, *this);

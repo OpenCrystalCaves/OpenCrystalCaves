@@ -14,6 +14,12 @@
 #include "sprite.h"
 #include "tile.h"
 
+enum SwitchFlag
+{
+  SWITCH_FLAG_MOVING_PLATFORMS = 1,
+  SWITCH_FLAG_LASERS = 2,
+};
+
 struct Level
 {
   LevelId level_id;
@@ -43,6 +49,6 @@ struct Level
   std::unique_ptr<Exit> exit;
   bool has_earth = false;
   bool has_moon = false;
-  bool switch_on = false;
+  int switch_flags = SWITCH_FLAG_LASERS;
   std::bitset<3> lever_on = {0};
 };

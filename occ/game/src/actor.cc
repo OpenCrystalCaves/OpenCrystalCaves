@@ -155,12 +155,12 @@ std::vector<std::pair<geometry::Position, Sprite>> Door::get_sprites(const Level
 
 bool Switch::interact(Level& level)
 {
-  level.switch_on = !level.switch_on;
+  level.switch_flags ^= switch_flag_;
   // TODO: play on sound
   return true;
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Switch::get_sprites(const Level& level) const
 {
-  return {{position, static_cast<Sprite>(static_cast<int>(sprite_) + static_cast<int>(level.switch_on))}};
+  return {{position, static_cast<Sprite>(static_cast<int>(sprite_) + static_cast<int>(!!(level.switch_flags & switch_flag_)))}};
 }

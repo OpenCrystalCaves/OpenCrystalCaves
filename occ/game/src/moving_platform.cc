@@ -35,5 +35,5 @@ Vector<int> MovingPlatform::get_velocity(const Level& level) const
 
 bool MovingPlatform::is_moving(const Level& level) const
 {
-  return !controlled_ || level.switch_on;
+  return !controlled_ || (level.switch_flags & SWITCH_FLAG_MOVING_PLATFORMS);
 }

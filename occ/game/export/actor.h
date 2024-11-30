@@ -134,7 +134,12 @@ class Switch : public Actor
   // ⬛⬛🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦⬛⬛
   // Switches that turn things off/on (e.g. moving platforms)
  public:
-  Switch(geometry::Position position, Sprite sprite) : Actor(position, geometry::Size(16, 16)), sprite_(sprite) {}
+  Switch(geometry::Position position, Sprite sprite, int switch_flag)
+    : Actor(position, geometry::Size(16, 16)),
+      sprite_(sprite),
+      switch_flag_(switch_flag)
+  {
+  }
 
   virtual bool interact(Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
@@ -142,4 +147,5 @@ class Switch : public Actor
 
  private:
   Sprite sprite_;
+  int switch_flag_;
 };

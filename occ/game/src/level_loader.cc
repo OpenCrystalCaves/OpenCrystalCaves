@@ -530,7 +530,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case 'v':
             // Horizontal toggle switch
-            level->actors.emplace_back(new Switch(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SWITCH_OFF));
+            level->actors.emplace_back(
+              new Switch(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SWITCH_OFF, SWITCH_FLAG_MOVING_PLATFORMS));
             break;
           case 'V':
             level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, false});
@@ -681,6 +682,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -24:
             sprite = static_cast<int>(Sprite::SPRITE_PIPE_V);
+            break;
+          case -40:
+            // Switch for turning off laser
+            level->actors.emplace_back(new Switch(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SWITCH_OFF, SWITCH_FLAG_LASERS));
             break;
           case -41:
             // Stopped vertical moving platform
