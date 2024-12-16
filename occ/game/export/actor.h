@@ -149,3 +149,30 @@ class Switch : public Actor
   Sprite sprite_;
   int switch_flag_;
 };
+
+class Chest : public Actor
+{
+  // ⬛⬛⬛⬛🟠🟠🪦🟠🪦🟠🪦🟠⬛⬛⬛⬛
+  // ⬛⬛🟠🟠🟠🪦🟠🟠🟠🪦🟠🪦🟠🟠⬛⬛
+  // ⬛🟠🪦🟠🪦🟠🪦🟠🪦🟠🪦🟠🪦🟠🟠⬛
+  // ⬛🟠🟠🪦🟠🟠🟠🟠🟠🟠🟠🟠🟠🪦🟠⬛
+  // ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛🪦🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🪦🟠⬛
+  // ⬛🟠🪦🟠🪦🟠🪦⬛⬛🟠🪦🟠🟠🟠🟠⬛
+  // ⬛🪦🟠🪦🟠🟠⬛⬛⬛⬛🟠🪦🟠🪦🟠⬛
+  // ⬛🟠🪦🟠🪦🟠⬛⬛⬛⬛🪦🟠🪦🟠🟠⬛
+  // ⬛🟠🟠🪦🟠🟠🟠⬛⬛🪦🟠🟠🟠🪦🟠⬛
+  // ⬛🟠🪦🟠🪦🟠🪦⬛⬛🟠🪦🟠🪦🟠🟠⬛
+  // ⬛🟠🟠🟠🟠🟠🟠⬛⬛⬛🟠🪦🟠🟠🟠⬛
+  // ⬛🟠🪦🟠🪦🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠⬛
+  // Can collect if player has key - then replaced with an open chest sprite
+ public:
+  Chest(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
+
+  virtual bool interact(Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual void update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level) override {}
+
+ private:
+  bool collected_ = false;
+};

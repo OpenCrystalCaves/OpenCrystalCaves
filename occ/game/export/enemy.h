@@ -218,7 +218,6 @@ class Rockman : public Enemy
   // ⬛⬛🟪🟪🟪🟣🟣⬛⬛🟣🟣🟣🟣🟣⬛⬛
   // Initially stopped, wakes on vision of player, moves left/right, needs P to kill
  public:
-  // TODO: require P to kill
   Rockman(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
@@ -231,4 +230,34 @@ class Rockman : public Enemy
   bool left_ = false;
   int frame_ = 0;
   bool asleep_ = true;
+};
+
+class MineCart : public Enemy
+{
+  // ⬛⬛⬛⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛🟨⬛🟨🟨🟨🟨🟨⬛⬛🟨🟨⬛⬛
+  // ⬛⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⬛
+  // ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦⬛⬛
+  // ⬛⬛🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦⬛⬛
+  // ⬛⬛⬛🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦⬛⬛⬛
+  // ⬛⬛⬛⬜⬜⬛🪦🪦🪦🪦⬛⬜⬜⬛⬛⬛
+  // ⬛⬛⬜⬛⬛⬜⬛⬛⬛⬛⬜⬛⬜⬜⬛⬛
+  // ⬛⬛⬜⬜⬛⬜⬛⬛⬛⬛⬜⬛⬛⬜⬛⬛
+  // ⬛⬛⬛⬜⬜⬛⬛⬛⬛⬛⬛⬜⬜⬛⬛⬛
+  // Moves left/right and pauses at edges, needs P to kill
+ public:
+  MineCart(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
+
+  virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  // TODO: confirm points
+  virtual int get_points() const override { return 100; }
+  virtual bool is_tough() const override { return true; }
+
+ private:
+  bool left_ = false;
+  int frame_ = 0;
+  int pause_frame_ = 0;
 };

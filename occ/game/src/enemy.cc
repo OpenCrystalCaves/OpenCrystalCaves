@@ -278,3 +278,34 @@ std::vector<geometry::Rectangle> Rockman::get_detection_rects(const Level& level
   lr.insert(lr.end(), rr.begin(), rr.end());
   return lr;
 }
+
+void MineCart::update(const geometry::Rectangle& player_rect, Level& level)
+{
+  if (pause_frame_ > 0)
+  {
+    pause_frame_--;
+  }
+  else
+  {
+    frame_++;
+    if (frame_ == 4)
+    {
+      frame_ = 0;
+    }
+    const auto d = geometry::Position(left_ ? -4 : 4, 0);
+    position += d;
+    if (should_reverse(level))
+    {
+      position -= d;
+      pause_frame_ = 56;  // TODO: measure
+      left_ = !left_;
+    }
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> MineCart::get_sprites([[maybe_unused]] const Level& level) const
+{
+  return {std::make_pair(position,
+                         pause_frame_ > 0 ? Sprite::SPRITE_MINE_CART_1
+                                          : static_cast<Sprite>((static_cast<int>(Sprite::SPRITE_MINE_CART_1) + frame_)))};
+}

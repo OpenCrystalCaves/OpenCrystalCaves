@@ -50,5 +50,6 @@ struct Level
   bool has_earth = false;
   bool has_moon = false;
   int switch_flags = SWITCH_FLAG_LASERS;
+  bool has_key = false;
   std::bitset<3> lever_on = {0};
 };

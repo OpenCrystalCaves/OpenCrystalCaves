@@ -164,3 +164,18 @@ std::vector<std::pair<geometry::Position, Sprite>> Switch::get_sprites(const Lev
 {
   return {{position, static_cast<Sprite>(static_cast<int>(sprite_) + static_cast<int>(!!(level.switch_flags & switch_flag_)))}};
 }
+
+bool Chest::interact(Level& level)
+{
+  if (!level.has_key)
+  {
+    return false;
+  }
+  // TODO: play on sound
+  return true;
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Chest::get_sprites(const Level& level) const
+{
+  return {{position, collected_ ? Sprite::SPRITE_CHEST_OPEN : Sprite::SPRITE_CHEST_CLOSED}};
+}

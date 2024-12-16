@@ -392,6 +392,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(block_sprite) + 10;  // E
             flags |= TILE_SOLID;
             break;
+          case '9':
+            // Mine cart
+            level->enemies.emplace_back(new MineCart(geometry::Position{x * 16, y * 16}));
+            break;
           case 'f':
             sprite = static_cast<int>(block_sprite) + 4;  // SW
             flags |= TILE_SOLID;
@@ -726,6 +730,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Blue mushroom
             item = Item(Sprite::SPRITE_MUSHROOM_BLUE, ItemType::ITEM_TYPE_SCORE, 1000);
             break;
+          case -89:
+            // Chest
+            level->actors.emplace_back(new Chest(geometry::Position{x * 16, y * 16}));
+            break;
           case -91:
             // Top of blue door
             level->actors.emplace_back(new Door(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_B));
@@ -749,6 +757,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -96:
             // Red lever
             level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_R));
+            break;
+          case -112:
+            sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
             break;
           case -113:
             if (tile_ids[i + 1] == 'n')
