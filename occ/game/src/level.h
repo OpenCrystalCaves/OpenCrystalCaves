@@ -37,6 +37,10 @@ struct Level
   bool collides_solid_top(const geometry::Position& position, const geometry::Size& size) const;
   Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size) const;
 
+  // Helper fields for the level viewer
+  std::vector<int> tile_ids;
+  std::vector<bool> tile_unknown;
+
   std::vector<int> bgs;
   std::vector<Tile> tiles;
   std::vector<Item> items;

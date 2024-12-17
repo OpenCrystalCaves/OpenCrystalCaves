@@ -175,7 +175,7 @@ bool Chest::interact(Level& level)
   return true;
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Chest::get_sprites(const Level& level) const
+std::vector<std::pair<geometry::Position, Sprite>> Chest::get_sprites([[maybe_unused]] const Level& level) const
 {
   return {{position, collected_ ? Sprite::SPRITE_CHEST_OPEN : Sprite::SPRITE_CHEST_CLOSED}};
 }

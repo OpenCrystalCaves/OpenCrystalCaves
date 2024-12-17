@@ -144,7 +144,25 @@ int main(int argc, char* argv[])
         {
           sprite_manager.render_tile(static_cast<int>(item.get_sprite()), {x * SPRITE_W, y * SPRITE_H});
         }
+        if (level->tile_unknown[x + y * level->width])
+        {
+          sprite_manager.render_text(L"?", {x * SPRITE_W, y * SPRITE_H});
+        }
       }
+    }
+    // Show hovered tile and draw its index
+    const int mx = input.mouse.x() / SPRITE_W;
+    const int my = input.mouse.y() / SPRITE_H;
+    const geometry::Rectangle rect{{mx * SPRITE_W, my * SPRITE_H}, {SPRITE_W, SPRITE_H}};
+    window->render_rectangle(rect, {255, 255, 255, 255});
+    const size_t index = mx + my * level->width;
+    if (index < level->tile_ids.size())
+    {
+      const auto tooltip =
+        std::format(L"x: {}\ny: {}\ntile_id: {} ({})", mx, my, level->tile_ids[index], static_cast<char>(level->tile_ids[index]));
+      const int tooltip_x = std::min(rect.position.x() + rect.size.x(), level->width * SPRITE_W - 80);
+      const int tooltip_y = std::min(rect.position.y() + rect.size.y(), 22 * SPRITE_H - 16);
+      sprite_manager.render_text(tooltip, geometry::Position{tooltip_x, tooltip_y});
     }
     window->refresh();
     sdl->delay(30);

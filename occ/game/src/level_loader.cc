@@ -143,7 +143,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
   auto level = std::make_unique<Level>();
 
   // Read the tile ids of the level
-  std::vector<int> tile_ids;
   level->width = 0;
   for (int row = 0; row < levelRows[l]; row++)
   {
@@ -157,7 +156,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     LOG_DEBUG("%s", row_str.c_str());
     for (int i = 0; i < len; i++, ptr++)
     {
-      tile_ids.push_back(static_cast<int>(*ptr));
+      level->tile_ids.push_back(static_cast<int>(*ptr));
+      level->tile_unknown.push_back(false);
     }
   }
   level->level_id = level_id;
@@ -172,7 +172,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
   auto mode = TileMode::NONE;
   int volcano_sprite = -1;
   int entrance_level = static_cast<int>(LevelId::LEVEL_1);
-  for (int i = 0; i < static_cast<int>(tile_ids.size()); i++)
+  for (int i = 0; i < static_cast<int>(level->tile_ids.size()); i++)
   {
     const int x = i % level->width;
     if (x == 0)
@@ -183,7 +183,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
       volcano_sprite = -1;
     }
     const int y = i / level->width;
-    const auto tile_id = tile_ids[i];
+    const auto tile_id = level->tile_ids[i];
     Tile tile;
     int bg = static_cast<int>(background.first);
     if (is_stars_row)
@@ -213,7 +213,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -103:
             sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
             flags |= TILE_SOLID;
-            if (tile_ids[i] == -103)
+            if (level->tile_ids[i] == -103)
             {
               // TODO: add hidden crystal
             }
@@ -222,7 +222,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -102:
             sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
             flags |= TILE_SOLID;
-            if (tile_ids[i] == -102)
+            if (level->tile_ids[i] == -102)
             {
               // TODO: add hidden crystal
             }
@@ -300,7 +300,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
       case TileMode::VOLCANO:
         sprite = volcano_sprite;
         volcano_sprite++;
-        if (tile_ids[i + 1] != 'n')
+        if (level->tile_ids[i + 1] != 'n')
         {
           mode = TileMode::NONE;
           volcano_sprite = -1;
@@ -460,10 +460,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             {
               break;
             }
-            switch (tile_ids[i - level->width])
+            switch (level->tile_ids[i - level->width])
             {
               case '[':
-                switch (tile_ids[i - level->width + 1])
+                switch (level->tile_ids[i - level->width + 1])
                 {
                   case '#':
                     // Bottom left of grille
@@ -489,6 +489,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 // Air tank (bottom)
                 level->hazards.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, false));
                 break;
+              case 'T':
+                // Column below head
+                sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
+                break;
               case 'X':
                 // Bottom-left of exit
                 // Ignore - we've already added an exit
@@ -504,7 +508,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 break;
               default:
                 // Check tile above-left
-                switch (tile_ids[i - level->width - 1])
+                switch (level->tile_ids[i - level->width - 1])
                 {
                   case 'X':
                     // Bottom-right of exit
@@ -564,7 +568,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->player_spawn = geometry::Position(x * 16, y * 16);
             break;
           case 'z':
-            if (is_horizon_row || (x == 0 && tile_ids[i + 1] == 'Z'))
+            if (is_horizon_row || (x == 0 && level->tile_ids[i + 1] == 'Z'))
             {
               // Random horizon tile
               bg = static_cast<int>(HORIZON[rand() % HORIZON.size()]);
@@ -580,7 +584,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'Z':
             break;
           case '[':
-            switch (tile_ids[i + 1])
+            switch (level->tile_ids[i + 1])
             {
                 // [4n = winners drugs sign
               case '4':
@@ -623,6 +627,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 mode = TileMode::SIGN;
                 break;
               default:
+                level->tile_unknown[i] = true;
                 break;
             }
             break;
@@ -662,7 +667,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->enemies.emplace_back(new Bigfoot(geometry::Position{x * 16, y * 16}));
             break;
           case -16:
-            if (tile_ids[i + 1] == 'n')
+            if (level->tile_ids[i + 1] == 'n')
             {
               // Wood struts
               sprite = static_cast<int>(Sprite::SPRITE_WOOD_STRUT_1);
@@ -711,7 +716,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_SIGN_DOWN);
             break;
           case -77:
-            if (tile_ids[i + 1] == 'n')
+            if (level->tile_ids[i + 1] == 'n')
             {
               // Wood pillar
               sprite = static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_1);
@@ -762,7 +767,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
             break;
           case -113:
-            if (tile_ids[i + 1] == 'n')
+            if (level->tile_ids[i + 1] == 'n')
             {
               // -113 nnn = bottom of volcano
               sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_BOTTOM_1);
@@ -771,7 +776,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             }
             break;
           case -114:
-            if (tile_ids[i + 1] == 'n')
+            if (level->tile_ids[i + 1] == 'n')
             {
               // -114 n = top of volcano
               sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_1);
@@ -786,6 +791,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           default:
             LOG_INFO(
               "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
+            level->tile_unknown[i] = true;
             break;
         }
         break;
