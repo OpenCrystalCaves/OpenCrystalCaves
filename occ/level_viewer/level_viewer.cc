@@ -2,6 +2,7 @@
 Display Crystal Caves levels
 */
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 
@@ -155,11 +156,11 @@ int main(int argc, char* argv[])
     const int my = input.mouse.y() / SPRITE_H;
     const geometry::Rectangle rect{{mx * SPRITE_W, my * SPRITE_H}, {SPRITE_W, SPRITE_H}};
     window->render_rectangle(rect, {255, 255, 255, 255});
-    const size_t index = mx + my * level->width;
-    if (index < level->tile_ids.size())
+    const size_t mi = mx + my * level->width;
+    if (mi < level->tile_ids.size())
     {
       const auto tooltip =
-        std::format(L"x: {}\ny: {}\ntile_id: {} ({})", mx, my, level->tile_ids[index], static_cast<char>(level->tile_ids[index]));
+        std::format(L"x: {}\ny: {}\ntile_id: {} ({})", mx, my, level->tile_ids[index], static_cast<char>(level->tile_ids[mi]));
       const int tooltip_x = std::min(rect.position.x() + rect.size.x(), level->width * SPRITE_W - 80);
       const int tooltip_y = std::min(rect.position.y() + rect.size.y(), 22 * SPRITE_H - 16);
       sprite_manager.render_text(tooltip, geometry::Position{tooltip_x, tooltip_y});

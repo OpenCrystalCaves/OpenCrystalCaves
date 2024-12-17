@@ -139,7 +139,7 @@ struct SoundData
     std::string s(len * freq_len * spec.channels * bps, '\0');
     Uint8* ptr = (Uint8*)s.data();
     Uint8 dc = 64;
-    for (int i = 0; i < src_len; i++)
+    for (size_t i = 0; i < src_len; i++)
     {
       // Generate square wave at frequency
       const auto freq = sound.data[i];
@@ -271,7 +271,7 @@ int main()
   // Convert sounds to chunks
   std::vector<std::string> raw_chunks;
   std::vector<Mix_Chunk*> chunks;
-  for (int i = 0; i < sdata.sounds.size(); i++)
+  for (int i = 0; i < static_cast<int>(sdata.sounds.size()); i++)
   {
     raw_chunks.push_back(sdata.to_raw(i));
     chunks.push_back(Mix_QuickLoad_RAW((Uint8*)raw_chunks[i].data(), (Uint32)raw_chunks[i].size()));

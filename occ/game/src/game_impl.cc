@@ -566,7 +566,7 @@ void GameImpl::update_enemies()
 
 void GameImpl::update_hazards()
 {
-  for (int i = 0; i < level_->hazards.size(); i++)
+  for (size_t i = 0; i < level_->hazards.size(); i++)
   {
     auto h = level_->hazards[i].get();
     h->update({player_.position, player_.size}, *level_);

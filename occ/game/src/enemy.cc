@@ -279,7 +279,7 @@ std::vector<geometry::Rectangle> Rockman::get_detection_rects(const Level& level
   return lr;
 }
 
-void MineCart::update(const geometry::Rectangle& player_rect, Level& level)
+void MineCart::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
 {
   if (pause_frame_ > 0)
   {
