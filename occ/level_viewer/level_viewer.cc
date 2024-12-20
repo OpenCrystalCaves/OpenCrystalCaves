@@ -160,8 +160,8 @@ int main(int argc, char* argv[])
     if (mi < level->tile_ids.size())
     {
       const auto tooltip =
-        std::format(L"x: {}\ny: {}\ntile_id: {} ({})", mx, my, level->tile_ids[index], static_cast<char>(level->tile_ids[mi]));
-      const int tooltip_x = std::min(rect.position.x() + rect.size.x(), level->width * SPRITE_W - 80);
+        std::format(L"x: {}\ny: {}\ntile_id: {} ({})", mx, my, level->tile_ids[mi], static_cast<char>(level->tile_ids[mi]));
+      const int tooltip_x = std::min(rect.position.x() + rect.size.x(), level->width * SPRITE_W - 128);
       const int tooltip_y = std::min(rect.position.y() + rect.size.y(), 22 * SPRITE_H - 16);
       sprite_manager.render_text(tooltip, geometry::Position{tooltip_x, tooltip_y});
     }

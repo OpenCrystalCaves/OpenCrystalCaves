@@ -735,6 +735,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Blue mushroom
             item = Item(Sprite::SPRITE_MUSHROOM_BLUE, ItemType::ITEM_TYPE_SCORE, 1000);
             break;
+          case -87:
+            // Egg
+            item = Item(Sprite::SPRITE_EGG, ItemType::ITEM_TYPE_EGG, 1000);
+            break;
           case -89:
             // Chest
             level->actors.emplace_back(new Chest(geometry::Position{x * 16, y * 16}));

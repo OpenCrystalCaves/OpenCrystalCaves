@@ -8,6 +8,7 @@ enum class ItemType : int
   ITEM_TYPE_AMMO = 1,
   ITEM_TYPE_SCORE = 2,
   ITEM_TYPE_POWER = 3,
+  ITEM_TYPE_EGG = 4,  // TODO: shootable, spawn BONUS
 };
 
 #define CRYSTAL_SCORE 50
