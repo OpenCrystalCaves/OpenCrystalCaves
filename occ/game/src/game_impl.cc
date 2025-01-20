@@ -458,6 +458,14 @@ void GameImpl::update_items()
           // Last 16 seconds
           player_.power_tick = 16 * FPS / FRAMES_PER_TICK;
           break;
+        case ItemType::ITEM_TYPE_EGG:
+          LOG_DEBUG("Player took egg", item.get_type());
+          score_ += item.get_amount();
+          break;
+        case ItemType::ITEM_TYPE_KEY:
+          LOG_DEBUG("Player took key", item.get_type());
+          has_key_ = true;
+          break;
         default:
           LOG_ERROR("unknown item type");
           break;

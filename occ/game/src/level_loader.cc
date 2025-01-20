@@ -118,6 +118,7 @@ enum class TileMode
   EXIT,
   COLUMN,
   CRATE,
+  HAMMER_RAIL,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -351,6 +352,20 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'y':
             sprite = static_cast<int>(Sprite::SPRITE_CRATE_UR);
             mode = TileMode::NONE;
+            break;
+          default:
+            break;
+        }
+        break;
+      case TileMode::HAMMER_RAIL:
+        switch (tile_id)
+        {
+          case 'n':
+            if (level->tile_ids[i + 1] != 'n')
+            {
+              mode = TileMode::NONE;
+            }
+            sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_2);
             break;
           default:
             break;
@@ -599,6 +614,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Snake
             level->enemies.emplace_back(new Snake(geometry::Position{x * 16, y * 16}));
             break;
+          case 'T':
+            // Hammer rail
+            sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
+            mode = TileMode::HAMMER_RAIL;
+            break;
           case 'u':
             // TODO: volcano spawn point?
             sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_R_1);
@@ -825,6 +845,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Egg
             item = Item(Sprite::SPRITE_EGG, ItemType::ITEM_TYPE_EGG, 1000);
             break;
+          case -88:
+            // Key
+            item = Item(Sprite::SPRITE_KEY, ItemType::ITEM_TYPE_KEY, 0);
+            break;
           case -89:
             // Chest
             level->actors.emplace_back(new Chest(geometry::Position{x * 16, y * 16}));
@@ -877,6 +901,13 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -117:
             // Candle
             item = Item(Sprite::SPRITE_CANDLE, ItemType::ITEM_TYPE_SCORE, 1000);
+            break;
+          case -119:
+            // Pipe in hole (H)
+            sprite = static_cast<int>(Sprite::SPRITE_HOLE_PIPE_H);
+            break;
+          case -126:
+            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
             break;
           default:
             LOG_INFO(
