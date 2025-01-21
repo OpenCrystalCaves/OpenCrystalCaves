@@ -90,11 +90,58 @@ void Droplet::update([[maybe_unused]] const geometry::Rectangle& player_rect, Le
 {
   frame_ = 1 - frame_;
   position += geometry::Position(0, 6);
-  if (level.collides_solid(position, geometry::Size(16, 16)) || level.collides_solid_top(position, geometry::Size(16, 16)))
+  if (level.collides_solid(position, size) || level.collides_solid_top(position, size))
   {
     // TODO: make sound
     // TODO: leave alive for one more frame but don't hurt player
     alive_ = false;
     parent_.remove_child();
+  }
+}
+
+
+void Hammer::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
+{
+  constexpr int BOTTOM_FRAMES = 18;
+  if (frame_ > 0)
+  {
+    // Hammer at bottom
+    frame_--;
+    if (frame_ == BOTTOM_FRAMES - 1)
+    {
+      // Slight recoil
+      position -= geometry::Position(0, 2);
+    }
+    else if (frame_ == BOTTOM_FRAMES - 2)
+    {
+      // Return to bottom
+      position += geometry::Position(0, 2);
+    }
+    else if (frame_ == 0)
+    {
+      // Rise again
+      rising_ = true;
+    }
+  }
+  else if (rising_)
+  {
+    // Rising
+    position -= geometry::Position(0, 2);
+    if (level.collides_solid(position, size))
+    {
+      position += geometry::Position(0, 2);
+      rising_ = false;
+    }
+  }
+  else
+  {
+    // Falling
+    position += geometry::Position(0, 8);
+    if (level.collides_solid(position, size))
+    {
+      position -= geometry::Position(0, 8);
+      frame_ = BOTTOM_FRAMES;
+      // TODO: sound
+    }
   }
 }

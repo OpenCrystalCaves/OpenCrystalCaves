@@ -119,6 +119,7 @@ enum class TileMode
   COLUMN,
   CRATE,
   HAMMER_RAIL,
+  HAMMER,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -371,6 +372,20 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
         }
         break;
+      case TileMode::HAMMER:
+        switch (tile_id)
+        {
+          case 'n':
+            if (level->tile_ids[i + 1] != 'n')
+            {
+              mode = TileMode::NONE;
+            }
+            sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_2);
+            break;
+          default:
+            break;
+        }
+        break;
       default:
         switch (tile_id)
         {
@@ -574,6 +589,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 // Column below head
                 sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
                 break;
+              case 'U':
+                // Hammer
+                sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
+                mode = TileMode::HAMMER;
+                break;
               case 'X':
                 // Bottom-left of exit
                 // Ignore - we've already added an exit
@@ -618,6 +638,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Hammer rail
             sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
             mode = TileMode::HAMMER_RAIL;
+            break;
+          case 'U':
+            // Hammer
+            sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
+            mode = TileMode::HAMMER;
+            level->hazards.emplace_back(new Hammer(geometry::Position{x * 16, y * 16}));
             break;
           case 'u':
             // TODO: volcano spawn point?
