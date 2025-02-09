@@ -9,10 +9,6 @@
 #include "logger.h"
 #include "misc.h"
 
-static constexpr auto gravity = 8u;
-static constexpr auto jump_velocity = misc::make_array<int>(-8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
-static constexpr auto jump_velocity_fall_index = 9u;
-
 std::unique_ptr<Game> Game::create()
 {
   return std::make_unique<GameImpl>();
@@ -32,7 +28,6 @@ bool GameImpl::init(const ExeData& exe_data, const LevelId level)
 
   score_ = 0u;
   num_ammo_ = 5u;
-  num_lives_ = 3u;
   has_key_ = false;
 
   missile_.alive = false;
@@ -56,6 +51,18 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   update_missile();
   update_enemies();
   update_hazards();
+
+  // Hurt player when colliding enemy/hazards
+  const auto prect = geometry::Rectangle(player_.position, player_.size);
+  for (auto&& enemy : level_->enemies)
+  {
+    if (geometry::isColliding(prect, geometry::Rectangle(enemy->position, enemy->size)))
+    {
+      player_.hurt();
+      break;
+    }
+  }
+  // TODO: also get hurt from hazards
 }
 
 int GameImpl::get_bg_sprite(const int x, const int y) const
@@ -273,151 +280,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     player_.shooting = player_input.shoot;
   }
 
-  if (player_.power_tick > 0)
-  {
-    player_.power_tick--;
-  }
-
-  /**
-   * 2. Update player velocity based on player information
-   */
-
-  // Set y velocity
-  if (!player_.noclip)
-  {
-    if (player_.jumping)
-    {
-      player_.velocity = Vector<int>(player_.velocity.x(), jump_velocity[player_.jump_tick]);
-    }
-    else
-    {
-      player_.velocity = Vector<int>(player_.velocity.x(), gravity);
-    }
-    if (player_.reverse_gravity)
-    {
-      player_.velocity = Vector<int>(player_.velocity.x(), -player_.velocity.y());
-    }
-  }
-
-  // Set x velocity
-  if (player_.walking)
-  {
-    // First step is 2 pixels / tick, then 4 pixels / tick
-    const auto velocity = player_.walk_tick == 0u ? 2 : 4;
-    if (player_.direction == Player::Direction::right)
-    {
-      player_.velocity = Vector<int>(velocity, player_.velocity.y());
-    }
-    else  // player_.direction == Player::Direction::left
-    {
-      player_.velocity = Vector<int>(-velocity, player_.velocity.y());
-    }
-  }
-  else
-  {
-    player_.velocity = Vector<int>(0, player_.velocity.y());
-  }
-
-  /**
-   * 3. Update player position based on player velocity
-   */
-
-  player_.collide_x = false;
-  player_.collide_y = false;
-  const auto destination = player_.position + player_.velocity;
-
-  // Move on x axis
-  const auto step_x = destination.x() > player_.position.x() ? 1 : -1;
-  while (player_.position.x() != destination.x())
-  {
-    const auto new_player_pos = player_.position + geometry::Position(step_x, 0);
-
-    if (!player_.noclip &&
-        (level_->collides_solid(new_player_pos, player_.size) ||
-         // collide with world edges
-         new_player_pos.x() < 0 || new_player_pos.x() >= level_->width * SPRITE_W - player_.size.x()))
-    {
-      player_.collide_x = true;
-      break;
-    }
-
-    player_.position = new_player_pos;
-  }
-
-  // Move on y axis
-  const auto step_y = destination.y() > player_.position.y() ? 1 : -1;
-  while (player_.position.y() != destination.y())
-  {
-    const auto new_player_pos = player_.position + geometry::Position(0, step_y);
-
-    // If player is falling down (step_y == 1) we need to check for collision with platforms
-    if (!player_.noclip && (level_->collides_solid(new_player_pos, player_.size) || (step_y == 1 && player_on_platform(new_player_pos))))
-    {
-      player_.collide_y = true;
-      break;
-    }
-
-    player_.position = new_player_pos;
-  }
-
-  /**
-   * 4. Update player information based on collision
-   */
-
-  // Check if player hit something while walking
-  if (player_.walking && player_.collide_x)
-  {
-    player_.walking = false;
-  }
-
-  // Check if player still jumping
-  if (player_.jumping)
-  {
-    // Check if player hit something while jumping
-    if (player_.collide_y)
-    {
-      if (player_.reverse_gravity ? player_.velocity.y() > 0 : player_.velocity.y() < 0)
-      {
-        // Player hit something while jumping up
-        const auto position_below = player_.position - geometry::Position(0, step_y);
-        if (level_->collides_solid(position_below, player_.size) || player_on_platform(position_below))
-        {
-          // If player already on platform, stop jumping immediately
-          player_.jumping = false;
-        }
-        else
-        {
-          // Skip to "falling down" velocity
-          player_.jump_tick = jump_velocity_fall_index;
-        }
-      }
-      else  // player_.velocity.y() > 0
-      {
-        // Player landed
-        player_.jumping = false;
-      }
-    }
-    else if (player_.jump_tick == jump_velocity.size() - 1u)
-    {
-      // Player jump ended
-      player_.jumping = false;
-    }
-    else if (player_.jump_tick != 0 &&
-             level_->collides_solid(player_.position + geometry::Position(0, player_.reverse_gravity ? -1 : 1), player_.size))
-    {
-      // Player did not actually collide with the ground, but standing directly above it
-      // and this isn't the first tick in the jump, so we can consider the jump to have
-      // ended here
-      player_.jumping = false;
-    }
-  }
-
-  // Check if player is falling
-  if (!player_.noclip)
-  {
-    player_.falling = !player_.jumping && player_.velocity.y() > 0 && !player_.collide_y &&
-      !level_->collides_solid(player_.position + geometry::Position(0, 1), player_.size);
-  }
+  player_.update(*level_);
 }
 
 void GameImpl::update_items()
@@ -604,35 +467,4 @@ void GameImpl::update_actors()
       objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
     }
   }
-}
-
-bool GameImpl::player_on_platform(const geometry::Position& player_position)
-{
-  // Need to check both static platforms (e.g. foreground items with SOLID_TOP)
-  // and moving platforms
-
-  // Standing on a static platform requires the player to stand on the edge of a tile
-  if ((player_position.y() + player_.size.y() - 1) % SPRITE_H == 0)
-  {
-    // Player can be on either 1 or 2 tiles, check both (or same...)
-    if (level_->get_tile(player_position.x() / SPRITE_W, (player_position.y() + player_.size.y() - 1) / SPRITE_H).is_solid_top() ||
-        level_->get_tile((player_position.x() + player_.size.x()) / SPRITE_W, (player_position.y() + player_.size.y() - 1) / SPRITE_H)
-          .is_solid_top())
-    {
-      return true;
-    }
-  }
-
-  // Check moving platforms
-  for (const auto& platform : level_->moving_platforms)
-  {
-    // Player only collides if standing exactly on top of the platform, just like with static platforms
-    if ((player_position.y() + player_.size.y() - 1 == platform.position.y()) && (player_position.x() < platform.position.x() + SPRITE_W) &&
-        (player_position.x() + player_.size.x() > platform.position.x()))
-    {
-      return true;
-    }
-  }
-
-  return false;
 }

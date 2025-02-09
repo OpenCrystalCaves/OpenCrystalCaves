@@ -279,8 +279,15 @@ void GameRenderer::render_player() const
   // Note: player size is 12x16 but the sprite is 16x16 so we need to adjust where
   // the player is rendered
   const geometry::Rectangle dest_rect{player_render_pos.x() - 2, player_render_pos.y(), 16, 16};
-
-  sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+  if (game_->get_player().is_flashing())
+  {
+    // TODO: draw white sprite
+    window_.fill_rect(dest_rect, {255u, 255u, 255u});
+  }
+  else
+  {
+    sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+  }
 
   if (debug_)
   {
@@ -412,7 +419,7 @@ void GameRenderer::render_statusbar() const
   // ammo
   sprite_manager_->render_number(game_->get_num_ammo(), statusbar_rect.position + geometry::Position(15 * CHAR_W, dy));
   // Hearts
-  for (unsigned i = 0; i < game_->get_num_lives(); i++)
+  for (unsigned i = 0; i < game_->get_player().health_; i++)
   {
     sprite_manager_->render_icon(Icon::ICON_HEART, statusbar_rect.position + geometry::Position((i + 19) * CHAR_W, dy));
   }

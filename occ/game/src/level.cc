@@ -1,5 +1,7 @@
 #include "level.h"
 
+#include "constants.h"
+
 const Tile& Level::get_tile(const int x, const int y) const
 {
   if (x < 0 || x >= width || y < 0 || y >= height)
@@ -98,4 +100,34 @@ Enemy* Level::collides_enemy(const geometry::Position& position, const geometry:
     }
   }
   return nullptr;
+}
+
+bool Level::player_on_platform(const geometry::Position& position, const geometry::Size& size) const
+{
+  // Need to check both static platforms (e.g. foreground items with SOLID_TOP)
+  // and moving platforms
+
+  // Standing on a static platform requires the player to stand on the edge of a tile
+  if ((position.y() + size.y() - 1) % SPRITE_H == 0)
+  {
+    // Player can be on either 1 or 2 tiles, check both (or same...)
+    if (get_tile(position.x() / SPRITE_W, (position.y() + size.y() - 1) / SPRITE_H).is_solid_top() ||
+        get_tile((position.x() + size.x()) / SPRITE_W, (position.y() + size.y() - 1) / SPRITE_H).is_solid_top())
+    {
+      return true;
+    }
+  }
+
+  // Check moving platforms
+  for (const auto& platform : moving_platforms)
+  {
+    // Player only collides if standing exactly on top of the platform, just like with static platforms
+    if ((position.y() + size.y() - 1 == platform.position.y()) && (position.x() < platform.position.x() + SPRITE_W) &&
+        (position.x() + size.x() > platform.position.x()))
+    {
+      return true;
+    }
+  }
+
+  return false;
 }

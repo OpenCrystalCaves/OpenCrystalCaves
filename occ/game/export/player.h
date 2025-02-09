@@ -6,6 +6,8 @@
 #include "level_id.h"
 #include "vector.h"
 
+class Level;
+
 struct Player
 {
   // Note: this is the player's actual size and is used for collision detection
@@ -34,8 +36,14 @@ struct Player
   bool shooting = false;
 
   unsigned power_tick = 0u;
+  unsigned hurt_tick = 0u;
+  unsigned health_ = 3u;
 
   bool noclip = false;
   bool godmode = false;
   bool reverse_gravity = false;
+
+  void update(const Level& level);
+  void hurt();
+  bool is_flashing() const;
 };

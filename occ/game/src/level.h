@@ -14,6 +14,8 @@
 #include "sprite.h"
 #include "tile.h"
 
+class Player;
+
 enum SwitchFlag
 {
   SWITCH_FLAG_MOVING_PLATFORMS = 1,
@@ -36,6 +38,7 @@ struct Level
   bool collides_solid(const geometry::Position& position, const geometry::Size& size, const bool is_slime = false) const;
   bool collides_solid_top(const geometry::Position& position, const geometry::Size& size) const;
   Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size) const;
+  bool player_on_platform(const geometry::Position& position, const geometry::Size& size) const;
 
   // Helper fields for the level viewer
   std::vector<int> tile_ids;
