@@ -25,8 +25,7 @@ jobs:
     strategy:
       matrix:
         os:
-          # Required for C++20; TODO: remove once this is updated
-          - ubuntu-24.04
+          - ubuntu-latest
           # Temporarily disable due to broken python 3.12 via homebrew
           #- macos-latest
           - windows-latest
@@ -38,14 +37,17 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
-    - name: Set up Homebrew (Linux, macOS)
+    - name: Install packages (Linux)
+      if: startsWith(matrix.os, 'ubuntu')
+      run: |
+        sudo apt-get update
+        sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev
+    - name: Set up Homebrew (macOS)
       id: set-up-homebrew
-      if: startsWith(matrix.os, 'ubuntu') || matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-latest'
       uses: Homebrew/actions/setup-homebrew@master
-    - name: Install SDL via homebrew (Linux, macOS)
-      # Because ubuntu 22 doesn't have the latest SDL libs
-      # TODO: check if ubuntu 24 works here
-      if: startsWith(matrix.os, 'ubuntu') || matrix.os == 'macos-latest'
+    - name: Install SDL via homebrew (macOS)
+      if: matrix.os == 'macos-latest'
       run: brew install sdl2 sdl2_image sdl2_mixer
     - name: Install packages (macOS)
       if: matrix.os == 'macos-latest'
