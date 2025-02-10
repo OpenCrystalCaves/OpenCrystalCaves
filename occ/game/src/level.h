@@ -14,7 +14,7 @@
 #include "sprite.h"
 #include "tile.h"
 
-class Player;
+struct Player;
 
 enum SwitchFlag
 {

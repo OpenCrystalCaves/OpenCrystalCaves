@@ -6,7 +6,7 @@
 #include "level_id.h"
 #include "vector.h"
 
-class Level;
+struct Level;
 
 struct Player
 {
