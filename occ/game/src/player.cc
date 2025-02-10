@@ -30,6 +30,14 @@ void Player::update(const Level& level)
   {
     hurt_tick--;
   }
+  else
+  {
+    crushed = false;
+  }
+  if (jumping || shooting)
+  {
+    crushed = false;
+  }
 
   // Set y velocity
   if (!noclip)
@@ -167,7 +175,7 @@ void Player::update(const Level& level)
   }
 }
 
-void Player::hurt()
+void Player::hurt(const HurtType& hurt_type)
 {
   // Hurt me- you can't get hurt again
   if (hurt_tick > 0)
@@ -183,6 +191,10 @@ void Player::hurt()
   }
   // TODO: die on 0 health
   // TODO: sound
+  if (hurt_type == HurtType::HURT_TYPE_CRUSHING && !falling)
+  {
+    crushed = true;
+  }
 }
 
 bool Player::is_flashing() const

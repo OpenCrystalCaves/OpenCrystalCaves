@@ -196,6 +196,8 @@ void GameRenderer::render_player() const
   static constexpr int sprite_jumping_left = 285;
   static constexpr int sprite_shooting_left = 287;
 
+  static constexpr std::array<int, 12> sprite_walking_dy = {0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1};
+
   const geometry::Rectangle src_rect = [this]()
   {
     const auto& player = game_->get_player();
@@ -279,7 +281,21 @@ void GameRenderer::render_player() const
   // Note: player size is 12x16 but the sprite is 16x16 so we need to adjust where
   // the player is rendered
   const geometry::Rectangle dest_rect{player_render_pos.x() - 2, player_render_pos.y(), 16, 16};
-  if (game_->get_player().is_flashing())
+  if (game_->get_player().crushed)
+  {
+    // only render the hat and the feet
+    constexpr int feet_h = 2;
+    constexpr int hat_h = 3;
+    const geometry::Rectangle feet_src_rect{src_rect.position.x(), src_rect.position.y() + 16 - feet_h, src_rect.size.x(), feet_h};
+    const geometry::Rectangle feet_dest_rect{dest_rect.position.x(), dest_rect.position.y() + 16 - feet_h, dest_rect.size.x(), feet_h};
+    sprite_manager_->get_surface()->blit_surface(feet_src_rect, feet_dest_rect);
+    const int hat_dy = sprite_walking_dy[game_->get_player().walk_tick % sprite_walking_dy.size()];
+    const geometry::Rectangle hat_src_rect{src_rect.position, src_rect.size.x(), hat_h};
+    const geometry::Rectangle hat_dest_rect{
+      dest_rect.position.x(), dest_rect.position.y() + 16 - hat_h - feet_h, dest_rect.size.x(), hat_h + hat_dy};
+    sprite_manager_->get_surface()->blit_surface(hat_src_rect, hat_dest_rect);
+  }
+  else if (game_->get_player().is_flashing())
   {
     // TODO: draw white sprite
     window_.fill_rect(dest_rect, {255u, 255u, 255u});

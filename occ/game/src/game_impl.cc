@@ -56,13 +56,22 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   const auto prect = geometry::Rectangle(player_.position, player_.size);
   for (auto&& enemy : level_->enemies)
   {
-    if (geometry::isColliding(prect, geometry::Rectangle(enemy->position, enemy->size)))
+    const auto hurt_type = enemy->hurt_type();
+    if (hurt_type != HurtType::HURT_TYPE_NONE && geometry::isColliding(prect, geometry::Rectangle(enemy->position, enemy->size)))
     {
-      player_.hurt();
+      player_.hurt(hurt_type);
       break;
     }
   }
-  // TODO: also get hurt from hazards
+  for (auto&& hazard : level_->hazards)
+  {
+    const auto hurt_type = hazard->hurt_type();
+    if (hurt_type != HurtType::HURT_TYPE_NONE && geometry::isColliding(prect, geometry::Rectangle(hazard->position, hazard->size)))
+    {
+      player_.hurt(hurt_type);
+      break;
+    }
+  }
 }
 
 int GameImpl::get_bg_sprite(const int x, const int y) const

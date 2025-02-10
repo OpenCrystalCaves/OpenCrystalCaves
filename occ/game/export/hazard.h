@@ -100,6 +100,7 @@ class LaserBeam : public Hazard
     return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
   }
   virtual bool is_alive() const override { return alive_; }
+  virtual HurtType hurt_type() const override { return HurtType::HURT_TYPE_NORMAL; }
 
  private:
   bool left_;
@@ -133,6 +134,7 @@ class Thorn : public Hazard
   {
     return create_detection_rects(0, -1, level, true);
   }
+  virtual HurtType hurt_type() const override { return HurtType::HURT_TYPE_NORMAL; }
 
  private:
   int frame_ = 0;
@@ -164,6 +166,7 @@ class SpiderWeb : public Hazard
     return {std::make_pair(position, Sprite::SPRITE_SPIDER_WEB)};
   }
   virtual bool is_alive() const override { return alive_; }
+  virtual HurtType hurt_type() const override { return HurtType::HURT_TYPE_NORMAL; }
 
  private:
   Spider& parent_;
@@ -189,6 +192,7 @@ class CorpseSlime : public Hazard
   {
     return {std::make_pair(position, sprite_)};
   }
+  virtual HurtType hurt_type() const override { return HurtType::HURT_TYPE_NORMAL; }
 
  private:
   Sprite sprite_;
@@ -256,6 +260,7 @@ class Droplet : public Hazard
     return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_DROPLET_1 : Sprite::SPRITE_DROPLET_2)};
   }
   virtual bool is_alive() const override { return alive_; }
+  virtual HurtType hurt_type() const override { return HurtType::HURT_TYPE_NORMAL; }
 
  private:
   bool left_;
@@ -309,6 +314,10 @@ class Hammer : public Hazard
       std::make_pair(position + geometry::Position(0, 16), Sprite::SPRITE_HAMMER_3),
       std::make_pair(position + +geometry::Position(16, 16), Sprite::SPRITE_HAMMER_4),
     };
+  }
+  virtual HurtType hurt_type() const override
+  {
+    return (rising_ || frame_ > 0) ? HurtType::HURT_TYPE_NORMAL : HurtType::HURT_TYPE_CRUSHING;
   }
 
  private:

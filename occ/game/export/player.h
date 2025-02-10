@@ -6,6 +6,7 @@
 #include "level_id.h"
 #include "vector.h"
 
+enum class HurtType;
 struct Level;
 
 struct Player
@@ -35,6 +36,8 @@ struct Player
 
   bool shooting = false;
 
+  bool crushed = false;
+
   unsigned power_tick = 0u;
   unsigned hurt_tick = 0u;
   unsigned health_ = 3u;
@@ -44,6 +47,6 @@ struct Player
   bool reverse_gravity = false;
 
   void update(const Level& level);
-  void hurt();
+  void hurt(const HurtType& hurt_type);
   bool is_flashing() const;
 };

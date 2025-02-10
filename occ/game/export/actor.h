@@ -13,6 +13,13 @@ enum class LeverColor : int
   LEVER_COLOR_G = 2,
 };
 
+enum class HurtType
+{
+  HURT_TYPE_NONE,
+  HURT_TYPE_NORMAL,
+  HURT_TYPE_CRUSHING,
+};
+
 struct Level;
 
 class Actor
@@ -29,6 +36,7 @@ class Actor
   virtual bool interact([[maybe_unused]] Level& level) { return false; };
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const = 0;
   virtual std::vector<geometry::Rectangle> get_detection_rects([[maybe_unused]] const Level& level) const { return {}; }
+  virtual HurtType hurt_type() const { return HurtType::HURT_TYPE_NONE; }
 
   geometry::Position position;
   geometry::Size size;
