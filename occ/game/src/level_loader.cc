@@ -24,6 +24,7 @@ constexpr int levelRows[] = {
   6,
   // main
   25,
+  // 1-8
   24,
   24,
   24,
@@ -32,6 +33,7 @@ constexpr int levelRows[] = {
   24,
   23,
   23,
+  // 9-16
   24,
   24,
   24,
@@ -48,6 +50,7 @@ const std::pair<Sprite, geometry::Size> levelBGs[] = {
   {Sprite::SPRITE_STARS_1, {6, 1}},
   // main
   {Sprite::SPRITE_ROCKS_1, {2, 2}},
+  // 1-8
   {Sprite::SPRITE_HEX_ROCKS_1, {4, 2}},
   {Sprite::SPRITE_VERTICAL_WALL_1, {2, 2}},
   {Sprite::SPRITE_COBBLE_1, {2, 2}},
@@ -56,6 +59,7 @@ const std::pair<Sprite, geometry::Size> levelBGs[] = {
   {Sprite::SPRITE_DARK_STONE_1, {3, 2}},
   {Sprite::SPRITE_DIAMOND_WALL_1, {2, 2}},
   {Sprite::SPRITE_COLUMN_AND_KNOB_1, {2, 2}},
+  // 9-16
   {Sprite::SPRITE_GREEN_SCAFFOLD_1, {3, 2}},
   {Sprite::SPRITE_WOOD_WALL_1, {4, 2}},
   {Sprite::SPRITE_GREY_STONE_1, {2, 2}},
@@ -89,6 +93,32 @@ const Sprite blockColors[] = {
   Sprite::SPRITE_BLOCK_GREEN_NW,
   Sprite::SPRITE_BLOCK_PEBBLE_NW,
   Sprite::SPRITE_BLOCK_METAL_NW,
+  Sprite::SPRITE_BLOCK_PEBBLE_NW,
+};
+const Sprite bump_platforms[] = {
+  // Intro 1-2
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  // Main
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  // 1-8
+  Sprite::SPRITE_BUMP_PLATFORM_RED_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_RED_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  // 9-16
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_GREEN_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
 };
 std::vector<Sprite> STARS{
   // The sprite with the bright star (3) seems to be less common...
@@ -167,6 +197,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
   level->height = levelRows[static_cast<int>(level_id)];
   const auto background = levelBGs[static_cast<int>(level_id)];
   const auto block_sprite = blockColors[static_cast<int>(level_id)];
+  const int bump_sprite = static_cast<int>(bump_platforms[static_cast<int>(level_id)]);
 
   level->has_earth = false;
   level->has_moon = false;
@@ -214,7 +245,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         {
           case 'd':
           case -103:
-            sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
+            sprite = bump_sprite + 1;
             flags |= TILE_SOLID;
             if (level->tile_ids[i] == -103)
             {
@@ -223,7 +254,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case 'n':
           case -102:
-            sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
+            sprite = bump_sprite + 1;
             flags |= TILE_SOLID;
             if (level->tile_ids[i] == -102)
             {
@@ -469,7 +500,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'D':
           case -104:
             // Keep adding bumpable platforms until we get an 'n'
-            sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_L);
+            sprite = bump_sprite;
             flags |= TILE_SOLID;
             if (tile_id == -104)
             {
@@ -478,7 +509,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             mode = TileMode::BUMPABLE_PLATFORM;
             break;
           case 'd':
-            sprite = static_cast<int>(Sprite::SPRITE_BUMP_PLATFORM_RED_MID);
+            sprite = bump_sprite + 1;
             flags |= TILE_SOLID;
             break;
           case 'A':
