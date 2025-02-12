@@ -150,6 +150,7 @@ enum class TileMode
   CRATE,
   HAMMER_RAIL,
   HAMMER,
+  GLASS_BALL,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -417,6 +418,20 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
         }
         break;
+      case TileMode::GLASS_BALL:
+        switch (tile_id)
+        {
+          case 'n':
+            if (level->tile_ids[i + 1] != 'n')
+            {
+              mode = TileMode::NONE;
+            }
+            sprite = static_cast<int>(level->tile_ids[i - 1] == 'n' ? Sprite::SPRITE_GLASS_BALL_4 : Sprite::SPRITE_GLASS_BALL_2);
+            break;
+          default:
+            break;
+        }
+        break;
       default:
         switch (tile_id)
         {
@@ -633,6 +648,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 // Bottom right of crate
                 sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
                 break;
+              case -8:
+                // Glass ball thing
+                sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_3);
+                mode = TileMode::GLASS_BALL;
+                break;
               case -91:
                 // Bottom of blue door; skip as we should have added it using the top
                 break;
@@ -813,6 +833,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_BARREL);
             flags |= TILE_SOLID_TOP;
             break;
+          case -8:
+            // Glass ball thing
+            sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_1);
+            mode = TileMode::GLASS_BALL;
+            break;
           case -11:
             // Shovel
             item = Item(Sprite::SPRITE_SHOVEL, ItemType::ITEM_TYPE_SCORE, 800);
@@ -962,6 +987,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -119:
             // Pipe in hole (H)
             sprite = static_cast<int>(Sprite::SPRITE_HOLE_PIPE_H);
+            break;
+          case -118:
+            // Pipe in hole (V)
+            sprite = static_cast<int>(Sprite::SPRITE_HOLE_PIPE_V);
             break;
           case -126:
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
