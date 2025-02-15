@@ -309,3 +309,52 @@ std::vector<std::pair<geometry::Position, Sprite>> MineCart::get_sprites([[maybe
                          pause_frame_ > 0 ? Sprite::SPRITE_MINE_CART_1
                                           : static_cast<Sprite>((static_cast<int>(Sprite::SPRITE_MINE_CART_1) + frame_)))};
 }
+
+void Caterpillar::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+{
+  frame_++;
+  const auto d = geometry::Position(left_ ? -2 : 2, 0);
+  position += d;
+  if (should_reverse(level))
+  {
+    left_ = !left_;
+    position -= d;
+  }
+  if (frame_ == 8)
+  {
+    frame_ = 0;
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Caterpillar::get_sprites([[maybe_unused]] const Level& level) const
+{
+  // TODO: caterpillar like undulating frames
+  const auto rank = get_rank();
+  Sprite base_sprite = Sprite::SPRITE_CATERPILLAR_L_HEAD_1;
+  int flip_d = 10;
+  if (rank == 3)
+  {
+    base_sprite = Sprite::SPRITE_CATERPILLAR_L_TAIL_1;
+    flip_d = 2;
+  }
+  else if (rank > 0)
+  {
+    base_sprite = Sprite::SPRITE_CATERPILLAR_L_BODY_1;
+    flip_d = 6;
+  }
+  const int frame = static_cast<int>(base_sprite) + (frame_ / 2 & 0x1) + (left_ ? 0 : flip_d);
+  return {std::make_pair(position, static_cast<Sprite>(frame))};
+}
+
+int Caterpillar::get_rank() const
+{
+  auto pp = parent_;
+  int rank;
+  for (rank = 0; pp != nullptr; rank++)
+  {
+    pp = pp->parent_;
+  }
+  return rank;
+}
+
+// TODO: only head of caterpillar vulnerable

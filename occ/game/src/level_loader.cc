@@ -151,6 +151,7 @@ enum class TileMode
   HAMMER_RAIL,
   HAMMER,
   GLASS_BALL,
+  CATERPILLAR,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -207,6 +208,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
   auto mode = TileMode::NONE;
   int volcano_sprite = -1;
   int entrance_level = static_cast<int>(LevelId::LEVEL_1);
+  Caterpillar* caterpillar = nullptr;
   for (int i = 0; i < static_cast<int>(level->tile_ids.size()); i++)
   {
     const int x = i % level->width;
@@ -251,6 +253,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             if (level->tile_ids[i] == -103)
             {
               // TODO: add hidden crystal
+              LOG_INFO(
+                "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
+              level->tile_unknown[i] = true;
             }
             break;
           case 'n':
@@ -260,6 +265,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             if (level->tile_ids[i] == -102)
             {
               // TODO: add hidden crystal
+              LOG_INFO(
+                "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
+              level->tile_unknown[i] = true;
             }
             mode = TileMode::NONE;
             break;
@@ -427,7 +435,28 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               mode = TileMode::NONE;
             }
             sprite = static_cast<int>(level->tile_ids[i - 1] == 'n' ? Sprite::SPRITE_GLASS_BALL_4 : Sprite::SPRITE_GLASS_BALL_2);
+            flags |= TILE_RENDER_IN_FRONT;
             break;
+          default:
+            break;
+        }
+        break;
+      case TileMode::CATERPILLAR:
+        switch (tile_id)
+        {
+          case 'P':  // fallthrough
+          case 'n':
+          {
+            auto new_caterpillar = new Caterpillar(geometry::Position{x * 16, y * 16}, caterpillar);
+            caterpillar = new_caterpillar;
+            level->enemies.emplace_back(caterpillar);
+            if (level->tile_ids[i + 1] != 'n')
+            {
+              mode = TileMode::NONE;
+              caterpillar = nullptr;
+            }
+          }
+          break;
           default:
             break;
         }
@@ -520,6 +549,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             if (tile_id == -104)
             {
               // TODO: add hidden crystal
+              LOG_INFO(
+                "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
+              level->tile_unknown[i] = true;
             }
             mode = TileMode::BUMPABLE_PLATFORM;
             break;
@@ -652,6 +684,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 // Glass ball thing
                 sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_3);
                 mode = TileMode::GLASS_BALL;
+                flags |= TILE_RENDER_IN_FRONT;
                 break;
               case -91:
                 // Bottom of blue door; skip as we should have added it using the top
@@ -702,6 +735,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite_count = 4;
             flags |= TILE_ANIMATED;
             mode = TileMode::EJECTA;
+            LOG_INFO(
+              "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
+            level->tile_unknown[i] = true;
             break;
           case 'v':
             // Horizontal toggle switch
@@ -765,17 +801,26 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::CRATE;
                 break;
+              case 'd':
+                // [d = danger sign
+                sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::SIGN;
+                break;
               case 'm':
                 // [m = mine sign
                 sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_1);
                 flags |= TILE_RENDER_IN_FRONT;
                 mode = TileMode::SIGN;
                 break;
-              case 'd':
-                // [d = danger sign
-                sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::SIGN;
+              case 'P':
+                // [P = caterpillar
+                {
+                  auto new_caterpillar = new Caterpillar(geometry::Position{x * 16, y * 16}, caterpillar);
+                  caterpillar = new_caterpillar;
+                  level->enemies.emplace_back(caterpillar);
+                  mode = TileMode::CATERPILLAR;
+                }
                 break;
               case 'r':
                 // [r = red crate
@@ -837,6 +882,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Glass ball thing
             sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_1);
             mode = TileMode::GLASS_BALL;
+            flags |= TILE_RENDER_IN_FRONT;
             break;
           case -11:
             // Shovel
@@ -889,6 +935,14 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite_count = 4;
             flags |= TILE_ANIMATED;
             break;
+          case -53:
+            sprite = static_cast<int>(Sprite::SPRITE_PILLAR_1);
+            flags |= TILE_RENDER_IN_FRONT;
+            break;
+          case -54:
+            sprite = static_cast<int>(Sprite::SPRITE_PILLAR_3);
+            flags |= TILE_RENDER_IN_FRONT;
+            break;
           case -56:
             // Slime barrier
             flags |= TILE_BLOCKS_SLIME;
@@ -902,6 +956,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -67:
             sprite = static_cast<int>(Sprite::SPRITE_LEDGE_R);
             flags |= TILE_SOLID_TOP;
+            break;
+          case -70:
+            sprite = static_cast<int>(Sprite::SPRITE_PILLAR_2);
+            flags |= TILE_RENDER_IN_FRONT;
             break;
           case -77:
             if (level->tile_ids[i + 1] == 'n')
