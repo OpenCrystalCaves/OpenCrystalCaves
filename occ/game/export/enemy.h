@@ -282,15 +282,20 @@ class Caterpillar : public Enemy
   // ⬛⬛⬛⬛⬛⬛🟩🟩🟩🪦🦚⬛⬛⬛⬛⬛⬛⬛⬛🟩🦚🟩🦚🟩🟩🦚🪦🦚🪦🦚⬛⬛⬛⬛⬛🟩🦚🟩🦚🦚🟩🦚🟩🦚🪦🦚⬛⬛⬛⬛⬛🦚🟩🦚🟩🦚🟩🪦🦚🪦🦚🪦⬛⬛
   // Moves left/right; only head is vulnerable; following segments become heads once previous head is destroyed
  public:
-  Caterpillar(geometry::Position position, const Caterpillar* parent) : Enemy(position, geometry::Size(16, 16), 1), parent_(parent) {}
+  Caterpillar(geometry::Position position, const Caterpillar* parent);
 
   virtual void update(const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
-  virtual int get_points() const override { return 100; }
-  virtual bool is_tough() const override { return true; }
+  virtual int get_points() const override { return 1000; }
+  virtual bool is_tough() const override
+  {  // only head of caterpillar vulnerable
+    return rank_ > 0;
+  }
+  virtual void on_death(Level& level) override;
 
  private:
-  int get_rank() const;
+  // Rank 0 = head
+  int rank_ = -1;
   bool left_ = true;
   int frame_ = 0;
   const Caterpillar* parent_;

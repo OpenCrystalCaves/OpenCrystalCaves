@@ -310,8 +310,35 @@ std::vector<std::pair<geometry::Position, Sprite>> MineCart::get_sprites([[maybe
                                           : static_cast<Sprite>((static_cast<int>(Sprite::SPRITE_MINE_CART_1) + frame_)))};
 }
 
+Caterpillar::Caterpillar(geometry::Position position, const Caterpillar* parent)
+  : Enemy(position, geometry::Size(16, 16), 1),
+    parent_(parent)
+{
+}
+
 void Caterpillar::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
 {
+  // Determine rank if it is not set yet
+  if (rank_ == -1)
+  {
+    if (parent_ == nullptr)
+    {
+      rank_ = 0;
+    }
+    else
+    {
+      auto pp = parent_;
+      int rank;
+      for (rank = 0; pp != nullptr; rank++)
+      {
+        pp = pp->parent_;
+      }
+      rank_ = rank;
+    }
+
+    // Initialise frame based on rank so we get a ^v^v pattern
+    frame_ = rank_ * 2;
+  }
   frame_++;
   const auto d = geometry::Position(left_ ? -2 : 2, 0);
   position += d;
@@ -328,16 +355,14 @@ void Caterpillar::update([[maybe_unused]] const geometry::Rectangle& player_rect
 
 std::vector<std::pair<geometry::Position, Sprite>> Caterpillar::get_sprites([[maybe_unused]] const Level& level) const
 {
-  // TODO: caterpillar like undulating frames
-  const auto rank = get_rank();
   Sprite base_sprite = Sprite::SPRITE_CATERPILLAR_L_HEAD_1;
   int flip_d = 10;
-  if (rank == 3)
+  if (rank_ == 3)
   {
     base_sprite = Sprite::SPRITE_CATERPILLAR_L_TAIL_1;
     flip_d = 2;
   }
-  else if (rank > 0)
+  else if (rank_ > 0)
   {
     base_sprite = Sprite::SPRITE_CATERPILLAR_L_BODY_1;
     flip_d = 6;
@@ -346,15 +371,18 @@ std::vector<std::pair<geometry::Position, Sprite>> Caterpillar::get_sprites([[ma
   return {std::make_pair(position, static_cast<Sprite>(frame))};
 }
 
-int Caterpillar::get_rank() const
-{
-  auto pp = parent_;
-  int rank;
-  for (rank = 0; pp != nullptr; rank++)
-  {
-    pp = pp->parent_;
-  }
-  return rank;
-}
 
-// TODO: only head of caterpillar vulnerable
+void Caterpillar::on_death(Level& level)
+{
+  Enemy::on_death(level);
+
+  // Make the child the next head
+  for (auto&& enemy : level.enemies)
+  {
+	auto caterpillar = reinterpret_cast<Caterpillar*>(enemy.get());
+    if (caterpillar->parent_ == this)
+    {
+      caterpillar->rank_ = 0;
+    }
+  }
+}
