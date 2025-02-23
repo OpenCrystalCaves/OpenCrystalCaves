@@ -248,27 +248,15 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         {
           case 'd':
           case -103:
-            sprite = bump_sprite + 1;
+            level->actors.emplace_back(
+              new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite + 1), tile_id == -103));
             flags |= TILE_SOLID;
-            if (level->tile_ids[i] == -103)
-            {
-              // TODO: add hidden crystal
-              LOG_INFO(
-                "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
-              level->tile_unknown[i] = true;
-            }
             break;
           case 'n':
           case -102:
-            sprite = bump_sprite + 1;
+            level->actors.emplace_back(
+              new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite + 2), tile_id == -102));
             flags |= TILE_SOLID;
-            if (level->tile_ids[i] == -102)
-            {
-              // TODO: add hidden crystal
-              LOG_INFO(
-                "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
-              level->tile_unknown[i] = true;
-            }
             mode = TileMode::NONE;
             break;
           default:
@@ -544,20 +532,17 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'D':
           case -104:
             // Keep adding bumpable platforms until we get an 'n'
-            sprite = bump_sprite;
+            level->actors.emplace_back(
+              new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite), tile_id == -104));
             flags |= TILE_SOLID;
-            if (tile_id == -104)
-            {
-              // TODO: add hidden crystal
-              LOG_INFO(
-                "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
-              level->tile_unknown[i] = true;
-            }
             mode = TileMode::BUMPABLE_PLATFORM;
             break;
           case 'd':
-            sprite = bump_sprite + 1;
+          case -103:
+            level->actors.emplace_back(
+              new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite + 1), tile_id == -103));
             flags |= TILE_SOLID;
+            mode = TileMode::BUMPABLE_PLATFORM;
             break;
           case 'A':
             // Green slime

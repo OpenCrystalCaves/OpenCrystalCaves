@@ -179,3 +179,29 @@ std::vector<std::pair<geometry::Position, Sprite>> Chest::get_sprites([[maybe_un
 {
   return {{position, collected_ ? Sprite::SPRITE_CHEST_OPEN : Sprite::SPRITE_CHEST_CLOSED}};
 }
+
+bool BumpPlatform::interact([[maybe_unused]] Level& level)
+{
+  // TODO: give crystal
+  has_crystal_ = false;
+  frame_ = 8;
+  return true;
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> BumpPlatform::get_sprites([[maybe_unused]] const Level& level) const
+{
+  const int dy = 2 - std::abs((frame_ / 4) - 2);
+  if (has_crystal_)
+  {
+    return {{position, sprite_}, {position, Sprite::SPRITE_CRYSTAL_HIDDEN}};
+  }
+  return {{position + geometry::Position(0, dy), sprite_}};
+}
+
+void BumpPlatform::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
+{
+  if (frame_ > 0)
+  {
+    frame_--;
+  }
+}
