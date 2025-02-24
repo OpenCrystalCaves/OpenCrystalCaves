@@ -310,35 +310,10 @@ std::vector<std::pair<geometry::Position, Sprite>> MineCart::get_sprites([[maybe
                                           : static_cast<Sprite>((static_cast<int>(Sprite::SPRITE_MINE_CART_1) + frame_)))};
 }
 
-Caterpillar::Caterpillar(geometry::Position position, const Caterpillar* parent)
-  : Enemy(position, geometry::Size(16, 16), 1),
-    parent_(parent)
-{
-}
+Caterpillar::Caterpillar(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
 void Caterpillar::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
 {
-  // Determine rank if it is not set yet
-  if (rank_ == -1)
-  {
-    if (parent_ == nullptr)
-    {
-      rank_ = 0;
-    }
-    else
-    {
-      auto pp = parent_;
-      int rank;
-      for (rank = 0; pp != nullptr; rank++)
-      {
-        pp = pp->parent_;
-      }
-      rank_ = rank;
-    }
-
-    // Initialise frame based on rank so we get a ^v^v pattern
-    frame_ = rank_ * 2;
-  }
   frame_++;
   const auto d = geometry::Position(left_ ? -2 : 2, 0);
   position += d;
@@ -357,7 +332,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Caterpillar::get_sprites([[ma
 {
   Sprite base_sprite = Sprite::SPRITE_CATERPILLAR_L_HEAD_1;
   int flip_d = 10;
-  if (rank_ == 3)
+  if (rank_ == 3 || (rank_ > 0 && child_ == nullptr))
   {
     base_sprite = Sprite::SPRITE_CATERPILLAR_L_TAIL_1;
     flip_d = 2;
@@ -376,13 +351,17 @@ void Caterpillar::on_death(Level& level)
 {
   Enemy::on_death(level);
 
-  // Make the child the next head
-  for (auto&& enemy : level.enemies)
+  // Decrease rank on all children
+  for (auto child = child_; child != nullptr; child = child->child_)
   {
-	auto caterpillar = reinterpret_cast<Caterpillar*>(enemy.get());
-    if (caterpillar->parent_ == this)
-    {
-      caterpillar->rank_ = 0;
-    }
+    child->rank_--;
   }
+}
+
+void Caterpillar::set_child(Caterpillar& child)
+{
+  child_ = &child;
+  child.rank_ = rank_ + 1;
+  // Initialise frame based on rank so we get a ^v^v pattern
+  child.frame_ = child.rank_ * 2;
 }

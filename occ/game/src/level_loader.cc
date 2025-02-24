@@ -435,7 +435,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'P':  // fallthrough
           case 'n':
           {
-            auto new_caterpillar = new Caterpillar(geometry::Position{x * 16, y * 16}, caterpillar);
+            auto new_caterpillar = new Caterpillar(geometry::Position{x * 16, y * 16});
+            if (caterpillar)
+            {
+              caterpillar->set_child(*new_caterpillar);
+            }
             caterpillar = new_caterpillar;
             level->enemies.emplace_back(caterpillar);
             if (level->tile_ids[i + 1] != 'n')
@@ -801,7 +805,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               case 'P':
                 // [P = caterpillar
                 {
-                  auto new_caterpillar = new Caterpillar(geometry::Position{x * 16, y * 16}, caterpillar);
+                  auto new_caterpillar = new Caterpillar(geometry::Position{x * 16, y * 16});
+                  if (caterpillar)
+                  {
+                    caterpillar->set_child(*new_caterpillar);
+                  }
                   caterpillar = new_caterpillar;
                   level->enemies.emplace_back(caterpillar);
                   mode = TileMode::CATERPILLAR;
