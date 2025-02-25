@@ -68,10 +68,40 @@ jobs:
       run: cmake --build ${{ matrix.build_type }} --config ${{ matrix.build_type }}
     - name: Test
       run: ctest -V
-    - name: Download DLLs on tags (Windows)
+
+    - name: Download SDL2 DLLs on tags (Windows)
+      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
+      uses: carlosperate/download-file-action@v2
+      with:
+        file-url: 'https://www.libsdl.org/release/SDL2-2.26.4-win32-x64.zip'
+        file-name: 'sdl2.zip'
+        location: './dll'
+
+    - name: Download SDL2_image DLLs on tags (Windows)
+      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
+      uses: carlosperate/download-file-action@v2
+      with:
+        file-url: 'https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.8.1-win32-x64.zip'
+        file-name: 'sdl2_image.zip'
+        location: './dll'
+
+    - name: Download SDL2_mixer DLLs on tags (Windows)
+      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
+      uses: carlosperate/download-file-action@v2
+      with:
+        file-url: 'https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.6.3-win32-x64.zip'
+        file-name: 'sdl2_mixer.zip'
+        location: './dll'
+
+    - name: Extract SDL2 DLLs on tags (Windows)
       if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
       run: |
-        build/windows/get-sdl2-dlls.bat dll 64
+        cd dll
+        7z x -y sdl2.zip
+        7z x -y sdl2_image.zip
+        7z x -y sdl2_mixer.zip
+        copy .\optional\*.dll .
+
     - name: Make package on tags
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'windows-latest'
       run: |
