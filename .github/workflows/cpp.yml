@@ -75,7 +75,7 @@ jobs:
       with:
         file-url: 'https://www.libsdl.org/release/SDL2-2.26.4-win32-x64.zip'
         file-name: 'sdl2.zip'
-        location: './dll'
+        location: './${{ matrix.build_type }}/dll'
 
     - name: Download SDL2_image DLLs on tags (Windows)
       if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
@@ -83,7 +83,7 @@ jobs:
       with:
         file-url: 'https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.8.1-win32-x64.zip'
         file-name: 'sdl2_image.zip'
-        location: './dll'
+        location: './${{ matrix.build_type }}/dll'
 
     - name: Download SDL2_mixer DLLs on tags (Windows)
       if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
@@ -91,12 +91,12 @@ jobs:
       with:
         file-url: 'https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.6.3-win32-x64.zip'
         file-name: 'sdl2_mixer.zip'
-        location: './dll'
+        location: './${{ matrix.build_type }}/dll'
 
     - name: Extract SDL2 DLLs on tags (Windows)
       if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
       run: |
-        cd dll
+        cd ${{ matrix.build_type }}/dll
         7z x -y sdl2.zip
         7z x -y sdl2_image.zip
         7z x -y sdl2_mixer.zip
@@ -117,6 +117,11 @@ jobs:
       with:
         files: ${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
         fail_on_unmatched_files: true
+
+    - name: Set up butler
+      uses: jdno/setup-butler@v1
+      run: butler -V
+
     # - name: Publish to itch.io (Linux)
     #   if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && startsWith(matrix.os, 'ubuntu')
     #   env:
@@ -124,28 +129,17 @@ jobs:
     #     # And add the key as a Repository secret to https://github.com/gurka/OpenCrystalCaves/settings/secrets/actions
     #     BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
     #   run: |
-    #     curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
-    #     unzip butler.zip
-    #     chmod +x butler
-    #     ./butler -V
     #     ./butler push ${{ matrix.build_type }}/OpenCrystalCaves-*-Linux*.tar.gz congusbongus/opencrystalcaves:linux --userversion $VERSION
     - name: Publish to itch.io (macOS)
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'macos-latest'
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
       run: |
-        curl -L -o butler.zip https://broth.itch.ovh/butler/darwin-amd64/LATEST/archive/default
-        unzip butler.zip
-        chmod +x butler
-        ./butler -V
         ./butler push ${{ matrix.build_type }}/OpenCrystalCaves-*-OSX*.dmg congusbongus/opencrystalcaves:mac --userversion $VERSION
     - name: Publish to itch.io (Windows)
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'windows-latest'
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
       run: |
-        curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
-        7z x -y butler.zip
-        butler -V
         cd ${{ matrix.build_type }}
         .\build\windows\butler.bat
