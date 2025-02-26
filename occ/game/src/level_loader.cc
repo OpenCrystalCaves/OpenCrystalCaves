@@ -643,6 +643,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                         sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
                       }
                       break;
+                    case 'X':
+                      // Bottom-right of exit
+                      sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
+                      flags |= TILE_ANIMATED;
+                      sprite_count = 4;
+                      break;
                     default:
                       break;
                   }
@@ -685,18 +691,13 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 // Bottom of red door; skip as we should have added it using the top
                 break;
               default:
-                // Check tile above-left
-                switch (level->tile_ids[i - level->width - 1])
-                {
-                  case 'X':
-                    // Bottom-right of exit
-                    sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
-                    flags |= TILE_ANIMATED;
-                    sprite_count = 4;
-                    break;
-                  default:
-                    break;
-                }
+                LOG_INFO("Unknown tile on level %d (%d,%d) tile_id=%d (%c)",
+                         static_cast<int>(level_id),
+                         x,
+                         y,
+                         tile_id,
+                         static_cast<char>(tile_id));
+                level->tile_unknown[i] = true;
                 break;
             }
             break;
