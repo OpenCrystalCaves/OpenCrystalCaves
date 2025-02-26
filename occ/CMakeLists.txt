@@ -4,7 +4,7 @@ cmake_policy(SET CMP0067 NEW)
 project(occ)
 
 set(VERSION_MAJOR "0")
-set(VERSION_MINOR "2")
+set(VERSION_MINOR "3")
 set(VERSION_PATCH "0")
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
