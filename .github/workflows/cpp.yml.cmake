@@ -120,6 +120,10 @@ jobs:
 
     - name: Set up butler
       uses: jdno/setup-butler@v1
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
+
+    - name: Verify butler
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
       run: butler -V
 
     # - name: Publish to itch.io (Linux)
