@@ -47,9 +47,12 @@ bool Missile::update(const Level& level)
     {
       position += geometry::Position(dx, 0);
 
-      if (level.collides_solid(collision_position, size))
+      // Check colliding solid actors (closed doors)
+      auto actor = level.collides_actor(collision_position, size);
+      if (actor)
       {
         alive = false;
+        actor->on_hit(is_power);
         set_cooldown();
         explode = true;
         // TODO: sound
@@ -63,6 +66,15 @@ bool Missile::update(const Level& level)
 
         enemy->on_hit(is_power);
 
+        break;
+      }
+
+      if (level.collides_solid(collision_position, size))
+      {
+        alive = false;
+        set_cooldown();
+        explode = true;
+        // TODO: sound
         break;
       }
     }

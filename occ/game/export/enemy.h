@@ -16,7 +16,7 @@ class Enemy : public Actor
   virtual ~Enemy() = default;
 
   virtual bool is_alive() const override { return health > 0; }
-  virtual void on_hit(const bool power);
+  virtual void on_hit(const bool power) override;
   virtual void on_death([[maybe_unused]] Level& level)
   {
     // TODO: create corpse animation

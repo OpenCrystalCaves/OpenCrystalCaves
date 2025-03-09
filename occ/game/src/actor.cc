@@ -205,3 +205,9 @@ void BumpPlatform::update([[maybe_unused]] const geometry::Rectangle& player_rec
     frame_--;
   }
 }
+
+void ClearBlock::on_hit([[maybe_unused]] const bool power)
+{
+  is_alive_ = false;
+  // TODO: play sound
+}

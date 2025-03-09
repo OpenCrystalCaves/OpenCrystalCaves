@@ -32,11 +32,12 @@ class Actor
   virtual int get_points() const { return 0; }
   virtual bool is_solid([[maybe_unused]] const Level& level) const { return false; }
 
-  virtual void update(const geometry::Rectangle& player_rect, Level& level) = 0;
+  virtual void update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level) {}
   virtual bool interact([[maybe_unused]] Level& level) { return false; };
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const = 0;
   virtual std::vector<geometry::Rectangle> get_detection_rects([[maybe_unused]] const Level& level) const { return {}; }
   virtual HurtType hurt_type() const { return HurtType::HURT_TYPE_NONE; }
+  virtual void on_hit([[maybe_unused]] const bool power) {}
 
   geometry::Position position;
   geometry::Size size;
@@ -219,4 +220,36 @@ class BumpPlatform : public Actor
   int frame_ = 0;
   Sprite sprite_;
   bool has_crystal_;
+};
+
+class ClearBlock : public Actor
+{
+  // ⬛⬛⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬛⬛
+  // ⬛⬜⬜⬜⬜⬜⬛⬛⬛⬛⬛⬛⬛⬛📘⬛
+  // ⬛⬜⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛📘⬛
+  // ⬛⬜⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛📘⬛
+  // ⬛⬜⬜⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛📘⬛
+  // ⬛⬜⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛📘⬛
+  // ⬛⬜⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛📘⬛
+  // ⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛📘⬛
+  // ⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛📘⬛
+  // ⬛⬜⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛📘⬛
+  // ⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛📘📘⬛
+  // ⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛📘📘⬛
+  // ⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛📘📘📘📘⬛
+  // ⬛⬛📘📘📘📘📘📘📘📘📘📘📘📘⬛⬛
+  // Destructible block
+ public:
+  ClearBlock(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
+
+  virtual bool is_alive() const override { return is_alive_; }
+  virtual bool is_solid([[maybe_unused]] const Level& level) const { return true; }
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {std::make_pair(position, Sprite::SPRITE_CLEAR_BLOCK)};
+  }
+  virtual void on_hit(const bool power) override;
+
+ private:
+  bool is_alive_ = true;
 };

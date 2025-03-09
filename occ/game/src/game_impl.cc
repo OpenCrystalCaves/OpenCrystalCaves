@@ -446,15 +446,15 @@ void GameImpl::update_enemies()
 
 void GameImpl::update_hazards()
 {
-  for (size_t i = 0; i < level_->hazards.size(); i++)
+  for (auto it = level_->hazards.begin(); it != level_->hazards.end();)
   {
-    auto h = level_->hazards[i].get();
+    auto h = it->get();
     h->update({player_.position, player_.size}, *level_);
 
     // Check if hazard died
     if (!h->is_alive())
     {
-      level_->hazards.erase(level_->hazards.begin() + i);
+      it = level_->hazards.erase(it);
     }
     else
     {
@@ -462,18 +462,29 @@ void GameImpl::update_hazards()
       {
         objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
       }
+      it++;
     }
   }
 }
 
 void GameImpl::update_actors()
 {
-  for (auto&& a : level_->actors)
+  for (auto it = level_->actors.begin(); it != level_->actors.end();)
   {
+    auto a = it->get();
     a->update({player_.position, player_.size}, *level_);
-    for (const auto& sprite_pos : a->get_sprites(*level_))
+    // Check if actor died
+    if (!a->is_alive())
     {
-      objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
+      it = level_->actors.erase(it);
+    }
+    else
+    {
+      for (const auto& sprite_pos : a->get_sprites(*level_))
+      {
+        objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
+      }
+      it++;
     }
   }
 }

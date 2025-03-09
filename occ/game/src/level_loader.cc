@@ -520,6 +520,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Mine cart
             level->enemies.emplace_back(new MineCart(geometry::Position{x * 16, y * 16}));
             break;
+          case 'B':
+            // Clear block
+            level->actors.emplace_back(new ClearBlock(geometry::Position{x * 16, y * 16}));
+            break;
           case 'f':
             sprite = static_cast<int>(block_sprite) + 4;  // SW
             flags |= TILE_SOLID;

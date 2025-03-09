@@ -37,6 +37,7 @@ struct Level
   void remove_item(const int x, const int y);
   bool collides_solid(const geometry::Position& position, const geometry::Size& size, const bool is_slime = false) const;
   bool collides_solid_top(const geometry::Position& position, const geometry::Size& size) const;
+  Actor* collides_actor(const geometry::Position& position, const geometry::Size& size) const;
   Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size) const;
   bool player_on_platform(const geometry::Position& position, const geometry::Size& size) const;
 

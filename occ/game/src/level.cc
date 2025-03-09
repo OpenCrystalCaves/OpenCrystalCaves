@@ -85,6 +85,25 @@ bool Level::collides_solid_top(const geometry::Position& position, const geometr
 }
 
 /**
+ * Checks if given position and size collides with any actor.
+ *
+ * Returns the first colliding actor, or null if none found.
+ * TODO: combine this with collides enemy/hazard
+ */
+Actor* Level::collides_actor(const geometry::Position& position, const geometry::Size& size) const
+{
+  const auto rect = geometry::Rectangle(position, size);
+  for (auto&& actor : actors)
+  {
+    if (geometry::isColliding(rect, geometry::Rectangle(actor->position, actor->size)))
+    {
+      return actor.get();
+    }
+  }
+  return nullptr;
+}
+
+/**
  * Checks if given position and size collides with any enemy.
  *
  * Returns the first colliding enemy, or null if none found.
