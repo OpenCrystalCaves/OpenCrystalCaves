@@ -67,12 +67,12 @@ enum class SoundType : int
 
 struct Sound
 {
+  int16_t data[300];
   uint16_t priority;
   uint16_t unknown0;
   uint16_t vibrate;
   uint16_t unknown1;
   uint16_t unknown2;
-  int16_t data[300];
 };
 
 std::filesystem::path get_sound_path(const int idx)
@@ -302,8 +302,9 @@ int main()
         if (index >= 0 && index < (int)chunks.size())
         {
           const auto& sound = sdata.sounds[index];
-          std::cout << "Playing sound " << itoc(index) << " vibrate=" << std::hex << sound.vibrate << " unknown0=" << sound.unknown0
-                    << " unknown1=" << sound.unknown1 << " unknown2=" << sound.unknown2 << std::dec << "\n";
+          std::cout << "Playing sound " << itoc(index) << " priority=" << sound.priority << " vibrate=" << std::hex << sound.vibrate
+                    << " unknown0=" << sound.unknown0 << " unknown1=" << sound.unknown1 << " unknown2=" << sound.unknown2 << std::dec
+                    << "\n";
           if (Mix_PlayChannel(-1, chunks[index], 0) == -1)
           {
             LOG_CRITICAL("Could not play sound: %s", SDL_GetError());
