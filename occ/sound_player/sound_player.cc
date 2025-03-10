@@ -30,20 +30,20 @@ enum class SoundType : int
   SOUND_JUMP,
   SOUND_UNKNOWN1,
   SOUND_START_LEVEL,
-  SOUND_UNKNOWN3,
-  SOUND_UNKNOWN4,
-  SOUND_UNKNOWN5,
-  SOUND_UNKNOWN6,
-  SOUND_UNKNOWN7,
-  SOUND_PICKUP_GUN,  // also blue mushrooms
-  SOUND_UNKNOWN9,
-  SOUND_CHEST,
-  SOUND_UNKNOWNB,
-  SOUND_UNKNOWNC,
-  SOUND_UNKNOWND,
+  SOUND_END_LEVEL,
+  SOUND_DIE,
   SOUND_ENEMY_DIE,
+  SOUND_UNKNOWN6,
+  SOUND_CRYSTAL,
+  SOUND_PICKUP_GUN,  // also blue mushrooms
+  SOUND_SECRET_CRYSTAL,
+  SOUND_CHEST,
+  SOUND_FRUIT,
+  SOUND_UNKNOWNC,
+  SOUND_FIRE0,
+  SOUND_UNKNOWNE,
   SOUND_TURRET_FIRE,
-  SOUND_ICE_BREAK,
+  SOUND_UNKNOWNG,
   SOUND_POISONED,
   SOUND_UNKNOWNI,
   SOUND_SWITCH,
@@ -52,17 +52,17 @@ enum class SoundType : int
   SOUND_UNKNOWNM,
   SOUND_UNKNOWNN,
   SOUND_UNKNOWNO,
-  SOUND_UNKNOWNP,
+  SOUND_QUIT,
   SOUND_UNKNOWNQ,
-  SOUND_DRILL,
+  SOUND_UNKNOWNR,
   SOUND_UNKNOWNS,
   SOUND_UNKNOWNT,
-  SOUND_UNKNOWNU,
+  SOUND_DRILL,
   SOUND_APOGEE,
   SOUND_FADE_OUT,
-  SOUND_DIE,
-  SOUND_UNKNOWNY,
-  SOUND_UNKNOWNZ,
+  SOUND_UNKNOWNX,
+  SOUND_PANEL,
+  SOUND_MAIN_LEVEL,
 };
 
 struct Sound
@@ -131,10 +131,6 @@ struct SoundData
         break;
       }
       len++;
-      if ((src_len % sound.vibrate) != 0)
-      {
-        len++;
-      }
     }
     std::string s(len * freq_len * spec.channels * bps, '\0');
     Uint8* ptr = (Uint8*)s.data();
@@ -143,11 +139,11 @@ struct SoundData
     {
       // Generate square wave at frequency
       const auto freq = sound.data[i];
-      const int freq_interval = freq > 0 ? (65536 / freq) : 0;
+      const int freq_interval = freq > 0 ? (32768 / freq) : 0;
       for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
       {
         Uint8 amp = dc;
-        if (freq == 0)
+        if (freq == 0 || (i % sound.vibrate) != 0)
         {
           amp = spec.silence;
         }
@@ -157,25 +153,11 @@ struct SoundData
           amp = dc;
           freq_counter = 0;
         }
-        freq_counter++;
         for (int c = 0; c < spec.channels; c++)
         {
           for (int b = 0; b < bps; b++)
           {
             *ptr++ = amp;
-          }
-        }
-      }
-      if ((i % sound.vibrate) != 0)
-      {
-        for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
-        {
-          for (int c = 0; c < spec.channels; c++)
-          {
-            for (int b = 0; b < bps; b++)
-            {
-              *ptr++ = spec.silence;
-            }
           }
         }
       }
