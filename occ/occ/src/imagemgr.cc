@@ -33,7 +33,7 @@ std::unique_ptr<Surface> load_surface(Window& window, const int episode, const C
   auto surface = Surface::from_image(path, window);
   if (!surface)
   {
-    LOG_CRITICAL("Could not load '%ls'", path.c_str());
+    LOG_CRITICAL("Could not load '%s'", path.c_str());
     return nullptr;
   }
   return surface;

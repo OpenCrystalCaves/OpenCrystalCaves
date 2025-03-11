@@ -12,6 +12,8 @@ add_executable(occ
   "src/occ.cc"
   "src/panel.cc"
   "src/panel.h"
+  "src/soundmgr.cc"
+  "src/soundmgr.h"
   "src/spritemgr.cc"
   "src/spritemgr.h"
   "src/state.cc"
@@ -33,6 +35,7 @@ target_link_libraries(occ
   "game"
   SDL2::SDL2
   SDL2_image::SDL2_image
+  SDL2_mixer::SDL2_mixer
 )
 if(APPLE)
 	set_target_properties(occ PROPERTIES

@@ -19,7 +19,7 @@ target_include_directories(sdl_wrapper PUBLIC
   "export"
   ${SDL2_INCLUDE_DIRS}
 )
-target_link_libraries(sdl_wrapper SDL2::SDL2 SDL2_image::SDL2_image)
+target_link_libraries(sdl_wrapper SDL2::SDL2 SDL2_image::SDL2_image SDL2_mixer::SDL2_mixer)
 
 add_executable(sdl_wrapper_test
   "test/src/stubs/sdl_stub.cc"

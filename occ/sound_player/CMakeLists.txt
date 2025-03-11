@@ -1,5 +1,7 @@
 add_executable(sound_player
   "sound_player.cc"
+  "../occ/src/soundmgr.cc"
+  "../occ/src/soundmgr.h"
 )
 target_link_libraries(sound_player
   "utils"

@@ -82,7 +82,7 @@ std::string load_pixels(const std::filesystem::path& path,
                         int& sheet_w,
                         int& sheet_h)
 {
-  LOG_DEBUG("Reading %ls...", path.c_str());
+  LOG_DEBUG("Reading %s...", path.c_str());
   std::ifstream input{path, std::ios::binary};
   const int count = read_sprite_count(input, filler);
   if (count == 0)
@@ -173,7 +173,7 @@ std::unique_ptr<Surface> load_surface(const std::filesystem::path& path,
   auto surface = Surface::from_pixels(sheet_w, sheet_h, (uint32_t*)all_pixels.data(), window);
   if (!surface)
   {
-    LOG_CRITICAL("Could not load '%ls'", path.c_str());
+    LOG_CRITICAL("Could not load '%s'", path.c_str());
   }
   return surface;
 }
