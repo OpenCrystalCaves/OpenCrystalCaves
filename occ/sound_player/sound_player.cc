@@ -33,25 +33,25 @@ enum class SoundType : int
   SOUND_END_LEVEL,
   SOUND_DIE,
   SOUND_ENEMY_DIE,
-  SOUND_UNKNOWN6,
+  SOUND_ENEMY_HURT,  // TODO: some effect is missing, this is too short
   SOUND_CRYSTAL,
-  SOUND_PICKUP_GUN,  // also blue mushrooms
+  SOUND_PICKUP_GUN,  // also P pill, blue mushrooms
   SOUND_SECRET_CRYSTAL,
   SOUND_CHEST,
   SOUND_FRUIT,
   SOUND_UNKNOWNC,
-  SOUND_FIRE0,
-  SOUND_UNKNOWNE,
+  SOUND_FIRE,
+  SOUND_POWER_FIRE,
   SOUND_TURRET_FIRE,
   SOUND_UNKNOWNG,
   SOUND_POISONED,
   SOUND_UNKNOWNI,
   SOUND_SWITCH,
   SOUND_LEVER,
-  SOUND_UNKNOWNL,
-  SOUND_UNKNOWNM,
+  SOUND_BLUE_MUSHROOM,
+  SOUND_HAMMER,
   SOUND_UNKNOWNN,
-  SOUND_UNKNOWNO,
+  SOUND_STALACTITE_FALL,
   SOUND_QUIT,
   SOUND_UNKNOWNQ,
   SOUND_UNKNOWNR,
@@ -60,7 +60,7 @@ enum class SoundType : int
   SOUND_DRILL,
   SOUND_APOGEE,
   SOUND_FADE_OUT,
-  SOUND_UNKNOWNX,
+  SOUND_HIGH_SCORE,
   SOUND_PANEL,
   SOUND_MAIN_LEVEL,
 };
@@ -115,31 +115,32 @@ struct SoundData
 
   std::string to_raw(int sound_index) const
   {
+    // Magic number to get the right sound duration
     const int freq_len = 320;
     // Bytes per sample (single channel)
     const int bps = (spec.format & 0xFF) / 8;
 
     // Find length of sound
     const auto& sound = sounds[sound_index];
-    size_t len = 0;
     size_t src_len;
-    for (src_len = 0, len = 0;; src_len++, len++)
+    for (src_len = 0; src_len < 300; src_len++)
     {
       const auto freq = sound.data[src_len];
-      if (src_len >= 300 || freq == -1)
+      if (freq == -1)
       {
         break;
       }
-      len++;
     }
-    std::string s(len * freq_len * spec.channels * bps, '\0');
+    std::string s(src_len * freq_len * spec.channels * bps, '\0');
     Uint8* ptr = (Uint8*)s.data();
     Uint8 dc = 64;
     for (size_t i = 0; i < src_len; i++)
     {
       // Generate square wave at frequency
       const auto freq = sound.data[i];
-      const int freq_interval = freq > 0 ? (32768 / freq) : 0;
+      // Magic numerator to get the right pitch
+      // If you want to adjust this number you gotta have perfect pitch
+      const int freq_interval = freq > 0 ? (22050 / freq) : 0;
       for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
       {
         Uint8 amp = dc;
