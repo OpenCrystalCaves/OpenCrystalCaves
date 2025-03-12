@@ -18,7 +18,7 @@ class GameImpl : public Game
  public:
   GameImpl() : player_(), level_(), objects_(), score_(0u), num_ammo_(0u), has_key_(false), missile_(), particles_() {}
 
-  bool init(const ExeData& exe_data, const LevelId level) override;
+  virtual bool init(AbstractSoundManager& sound_manager, const ExeData& exe_data, const LevelId level) override;
   void update(unsigned game_tick, const PlayerInput& player_input) override;
 
   const Player& get_player() const override { return player_; }
@@ -48,6 +48,7 @@ class GameImpl : public Game
   void update_hazards();
   void update_actors();
 
+  AbstractSoundManager* sound_manager_;
   Player player_;
   std::unique_ptr<Level> level_;
   std::vector<Object> objects_;

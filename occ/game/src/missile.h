@@ -3,6 +3,7 @@
 #include "geometry.h"
 #include "misc.h"
 
+class AbstractSoundManager;
 struct Level;
 struct Player;
 
@@ -17,11 +18,11 @@ struct Missile
   bool right = false;     // Direction...
   unsigned cooldown = 0;  // cooldown from previous missile explosion
 
-  void init(const Player& player);
+  void init(AbstractSoundManager& sound_manager, const Player& player);
   bool is_in_cooldown() const;
   void set_cooldown();
   // Returns whether it exploded
-  bool update(const Level& level);
+  bool update(AbstractSoundManager& sound_manager, const Level& level);
   int get_sprite() const;
   int get_num_sprites() const;
 

@@ -9,7 +9,7 @@ constexpr geometry::Size Player::size;
 static constexpr auto jump_velocity = misc::make_array<int>(-8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 9u;
 
-void Player::update(const Level& level)
+void Player::update(AbstractSoundManager& sound_manager, const Level& level)
 {
   /**
    * Updating the player is done in these steps:
@@ -45,6 +45,10 @@ void Player::update(const Level& level)
     if (jumping)
     {
       velocity = Vector<int>(velocity.x(), jump_velocity[jump_tick]);
+      if (jump_tick == 0)
+      {
+        sound_manager.play_sound(SoundType::SOUND_JUMP);
+      }
     }
     else
     {

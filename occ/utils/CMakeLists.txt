@@ -9,6 +9,7 @@ add_library(utils
   "export/occ_math.h"
   "export/misc.h"
   "export/path.h"
+  "export/sound.h"
   "export/sprite.h"
   "export/vector.h"
   "src/exe_data.cc"

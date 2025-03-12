@@ -13,6 +13,7 @@
 #include "player_input.h"
 #include "tile.h"
 
+class AbstractSoundManager;
 struct Level;
 
 class Game
@@ -22,7 +23,7 @@ class Game
 
   virtual ~Game() = default;
 
-  virtual bool init(const ExeData& exe_data, const LevelId level) = 0;
+  virtual bool init(AbstractSoundManager& sound_manager, const ExeData& exe_data, const LevelId level) = 0;
   virtual void update(unsigned game_tick, const PlayerInput& player_input) = 0;
 
   virtual const Player& get_player() const = 0;

@@ -3,10 +3,8 @@
 #include "hazard.h"
 #include "level.h"
 
-// TODO: hurt player on touch, all enemy types
 
-
-void Enemy::on_hit(const bool power)
+void Enemy::on_hit(AbstractSoundManager& sound_manager, const bool power)
 {
   if (is_tough() && !power)
   {
@@ -14,7 +12,15 @@ void Enemy::on_hit(const bool power)
   }
   health -= power ? health : 1;
   // TODO: if hurt, enter flashing state
-  // TODO: play sound
+  if (is_alive())
+  {
+    sound_manager.play_sound(SoundType::SOUND_ENEMY_HURT);
+  }
+}
+
+void Enemy::on_death(AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+{
+  sound_manager.play_sound(SoundType::SOUND_ENEMY_DIE);
 }
 
 bool Enemy::should_reverse(const Level& level) const
@@ -25,7 +31,7 @@ bool Enemy::should_reverse(const Level& level) const
     !level.collides_solid(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y()));
 }
 
-void Bigfoot::update(const geometry::Rectangle& player_rect, Level& level)
+void Bigfoot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ == 8)
@@ -62,7 +68,9 @@ std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites([[maybe_
   };
 }
 
-void Hopper::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void Hopper::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                    [[maybe_unused]] const geometry::Rectangle& player_rect,
+                    Level& level)
 {
   frame_ += left_ ? -1 : 1;
   if (frame_ == 18)
@@ -90,7 +98,9 @@ std::vector<std::pair<geometry::Position, Sprite>> Hopper::get_sprites([[maybe_u
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_HOPPER_1) + frame_))};
 }
 
-void Slime::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void Slime::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                   [[maybe_unused]] const geometry::Rectangle& player_rect,
+                   Level& level)
 {
   frame_++;
   if (frame_ == 4)
@@ -151,7 +161,9 @@ std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites([[maybe_un
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame_))};
 }
 
-void Snake::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void Snake::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                   [[maybe_unused]] const geometry::Rectangle& player_rect,
+                   Level& level)
 {
   // State changes / pause
   frame_++;
@@ -188,14 +200,17 @@ std::vector<std::pair<geometry::Position, Sprite>> Snake::get_sprites([[maybe_un
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame))};
 }
 
-void Snake::on_death(Level& level)
+void Snake::on_death(AbstractSoundManager& sound_manager, Level& level)
 {
+  Enemy::on_death(sound_manager, level);
   // Create a corpse
   level.hazards.emplace_back(new CorpseSlime(position, Sprite::SPRITE_SNAKE_SLIME));
   // TODO: authentic mode, align corpse to tile coord
 }
 
-void Spider::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
+void Spider::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                    [[maybe_unused]] const geometry::Rectangle& player_rect,
+                    [[maybe_unused]] Level& level)
 {
   frame_++;
   if (frame_ == 8)
@@ -223,7 +238,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites([[maybe_u
                          static_cast<Sprite>(static_cast<int>(up_ ? Sprite::SPRITE_SPIDER_UP_1 : Sprite::SPRITE_SPIDER_DOWN_1) + frame_))};
 }
 
-void Rockman::update(const geometry::Rectangle& player_rect, Level& level)
+void Rockman::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   // Wake on detection
   if (asleep_)
@@ -279,7 +294,9 @@ std::vector<geometry::Rectangle> Rockman::get_detection_rects(const Level& level
   return lr;
 }
 
-void MineCart::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void MineCart::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                      [[maybe_unused]] const geometry::Rectangle& player_rect,
+                      Level& level)
 {
   if (pause_frame_ > 0)
   {
@@ -312,7 +329,9 @@ std::vector<std::pair<geometry::Position, Sprite>> MineCart::get_sprites([[maybe
 
 Caterpillar::Caterpillar(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
-void Caterpillar::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void Caterpillar::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                         [[maybe_unused]] const geometry::Rectangle& player_rect,
+                         Level& level)
 {
   frame_++;
   const auto d = geometry::Position(left_ ? -2 : 2, 0);
@@ -347,9 +366,9 @@ std::vector<std::pair<geometry::Position, Sprite>> Caterpillar::get_sprites([[ma
 }
 
 
-void Caterpillar::on_death(Level& level)
+void Caterpillar::on_death(AbstractSoundManager& sound_manager, Level& level)
 {
-  Enemy::on_death(level);
+  Enemy::on_death(sound_manager, level);
 
   // Decrease rank on all children
   for (auto child = child_; child != nullptr; child = child->child_)

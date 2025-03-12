@@ -14,8 +14,9 @@ std::unique_ptr<Game> Game::create()
   return std::make_unique<GameImpl>();
 }
 
-bool GameImpl::init(const ExeData& exe_data, const LevelId level)
+bool GameImpl::init(AbstractSoundManager& sound_manager, const ExeData& exe_data, const LevelId level)
 {
+  sound_manager_ = &sound_manager;
   level_ = LevelLoader::load(exe_data, level);
   if (!level_)
   {
@@ -155,8 +156,8 @@ void GameImpl::update_level()
       level_->exit->open = geometry::isColliding({player_.position, player_.size}, {level_->exit->position, SPRITE_W, 2 * SPRITE_H});
       if (level_->exit->open)
       {
-        // TODO: play sound
         entering_level = static_cast<LevelId>(LevelId::MAIN_LEVEL);
+        sound_manager_->play_sound(SoundType::SOUND_END_LEVEL);
       }
     }
     level_->exit->update();
@@ -277,7 +278,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     const auto rect = geometry::Rectangle(player_.position, player_.size);
     for (auto&& a : level_->actors)
     {
-      if (geometry::isColliding(rect, geometry::Rectangle(a->position, a->size)) && a->interact(*level_))
+      if (geometry::isColliding(rect, geometry::Rectangle(a->position, a->size)) && a->interact(*sound_manager_, *level_))
       {
         interacted = true;
         break;
@@ -289,7 +290,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     player_.shooting = player_input.shoot;
   }
 
-  player_.update(*level_);
+  player_.update(*sound_manager_, *level_);
 }
 
 void GameImpl::update_items()
@@ -367,7 +368,7 @@ void GameImpl::update_missile()
     }
   }
 
-  if (missile_.update(*level_))
+  if (missile_.update(*sound_manager_, *level_))
   {
     particles_.emplace_back(new Explosion(missile_.position));
   }
@@ -377,7 +378,7 @@ void GameImpl::update_missile()
   {
     if (num_ammo_ > 0 || player_.godmode || player_.power_tick > 0)
     {
-      missile_.init(player_);
+      missile_.init(*sound_manager_, player_);
 
       if (!player_.godmode && player_.power_tick == 0)
       {
@@ -407,12 +408,12 @@ void GameImpl::update_enemies()
     //       This is applicable for when the player gets hit as well
     //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
     //       for all player and enemy sprite when loading sprites?
-    e->update({player_.position, player_.size}, *level_);
+    e->update(*sound_manager_, {player_.position, player_.size}, *level_);
 
     // Check if enemy died
     if (!e->is_alive())
     {
-      e->on_death(*level_);
+      e->on_death(*sound_manager_, *level_);
 
       // TODO: When an enemy dies there should be another type of explosion
       //       or bones spawning. The explosion/bones should move during animation
@@ -449,7 +450,7 @@ void GameImpl::update_hazards()
   for (auto it = level_->hazards.begin(); it != level_->hazards.end();)
   {
     auto h = it->get();
-    h->update({player_.position, player_.size}, *level_);
+    h->update(*sound_manager_, {player_.position, player_.size}, *level_);
 
     // Check if hazard died
     if (!h->is_alive())
@@ -472,7 +473,7 @@ void GameImpl::update_actors()
   for (auto it = level_->actors.begin(); it != level_->actors.end();)
   {
     auto a = it->get();
-    a->update({player_.position, player_.size}, *level_);
+    a->update(*sound_manager_, {player_.position, player_.size}, *level_);
     // Check if actor died
     if (!a->is_alive())
     {

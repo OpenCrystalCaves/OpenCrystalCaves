@@ -6,7 +6,7 @@
 constexpr decltype(Missile::size) Missile::size;
 constexpr decltype(Missile::speed) Missile::speed;
 
-void Missile::init(const Player& player)
+void Missile::init(AbstractSoundManager& sound_manager, const Player& player)
 {
   alive = true;
   frame = 0;
@@ -21,7 +21,7 @@ void Missile::init(const Player& player)
     right = false;
     position = player.position - geometry::Position(player.size.x() - 2, 0);
   }
-  // TODO: shot sound
+  sound_manager.play_sound(is_power ? SoundType::SOUND_POWER_FIRE : SoundType::SOUND_FIRE);
 }
 
 bool Missile::is_in_cooldown() const
@@ -34,7 +34,7 @@ void Missile::set_cooldown()
   cooldown = 7;
 }
 
-bool Missile::update(const Level& level)
+bool Missile::update(AbstractSoundManager& sound_manager, const Level& level)
 {
   bool explode = false;
   if (alive)
@@ -52,10 +52,10 @@ bool Missile::update(const Level& level)
       if (actor)
       {
         alive = false;
-        actor->on_hit(is_power);
+        actor->on_hit(sound_manager, is_power);
         set_cooldown();
         explode = true;
-        // TODO: sound
+        sound_manager.play_sound(is_power ? SoundType::SOUND_POWER_FIRE : SoundType::SOUND_FIRE);
         break;
       }
 
@@ -64,7 +64,7 @@ bool Missile::update(const Level& level)
       {
         alive = false;
 
-        enemy->on_hit(is_power);
+        enemy->on_hit(sound_manager, is_power);
 
         break;
       }

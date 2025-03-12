@@ -108,12 +108,12 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
   return rects;
 }
 
-bool Lever::interact(Level& level)
+bool Lever::interact(AbstractSoundManager& sound_manager, Level& level)
 {
   if (!level.lever_on.test(static_cast<size_t>(color_)))
   {
     level.lever_on.set(static_cast<size_t>(color_));
-    // TODO: play on sound
+    sound_manager.play_sound(SoundType::SOUND_LEVER);
     return true;
   }
   return false;
@@ -153,10 +153,10 @@ std::vector<std::pair<geometry::Position, Sprite>> Door::get_sprites(const Level
   }
 }
 
-bool Switch::interact(Level& level)
+bool Switch::interact(AbstractSoundManager& sound_manager, Level& level)
 {
   level.switch_flags ^= switch_flag_;
-  // TODO: play on sound
+  sound_manager.play_sound(SoundType::SOUND_SWITCH);
   return true;
 }
 
@@ -165,13 +165,14 @@ std::vector<std::pair<geometry::Position, Sprite>> Switch::get_sprites(const Lev
   return {{position, static_cast<Sprite>(static_cast<int>(sprite_) + static_cast<int>(!!(level.switch_flags & switch_flag_)))}};
 }
 
-bool Chest::interact(Level& level)
+bool Chest::interact(AbstractSoundManager& sound_manager, Level& level)
 {
+  // TODO: auto interact
   if (!level.has_key)
   {
     return false;
   }
-  // TODO: play on sound
+  sound_manager.play_sound(SoundType::SOUND_CHEST);
   return true;
 }
 
@@ -180,7 +181,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Chest::get_sprites([[maybe_un
   return {{position, collected_ ? Sprite::SPRITE_CHEST_OPEN : Sprite::SPRITE_CHEST_CLOSED}};
 }
 
-bool BumpPlatform::interact([[maybe_unused]] Level& level)
+bool BumpPlatform::interact([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
 {
   // TODO: give crystal
   has_crystal_ = false;
@@ -198,7 +199,9 @@ std::vector<std::pair<geometry::Position, Sprite>> BumpPlatform::get_sprites([[m
   return {{position + geometry::Position(0, dy), sprite_}};
 }
 
-void BumpPlatform::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
+void BumpPlatform::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                          [[maybe_unused]] const geometry::Rectangle& player_rect,
+                          [[maybe_unused]] Level& level)
 {
   if (frame_ > 0)
   {
@@ -206,8 +209,8 @@ void BumpPlatform::update([[maybe_unused]] const geometry::Rectangle& player_rec
   }
 }
 
-void ClearBlock::on_hit([[maybe_unused]] const bool power)
+void ClearBlock::on_hit(AbstractSoundManager& sound_manager, [[maybe_unused]] const bool power)
 {
   is_alive_ = false;
-  // TODO: play sound
+  sound_manager.play_sound(SoundType::SOUND_CLEAR_BLOCK);
 }

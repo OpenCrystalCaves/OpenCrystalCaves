@@ -4,6 +4,7 @@
 #include "game_renderer.h"
 #include "graphics.h"
 #include "sdl_wrapper.h"
+#include "soundmgr.h"
 #include "spritemgr.h"
 
 #include "game.h"
@@ -107,7 +108,12 @@ class TitleState : public State
 class GameState : public State
 {
  public:
-  GameState(Game& game, SpriteManager& sprite_manager, Surface& game_surface, Window& window, ExeData& exe_data);
+  GameState(Game& game,
+            SpriteManager& sprite_manager,
+            SoundManager& sound_manager,
+            Surface& game_surface,
+            Window& window,
+            ExeData& exe_data);
 
   virtual void reset() override;
   virtual void update(const Input& input) override;
@@ -118,6 +124,7 @@ class GameState : public State
   Game& game_;
   Surface& game_surface_;
   SpriteManager& sprite_manager_;
+  SoundManager& sound_manager_;
   GameRenderer game_renderer_;
   ExeData& exe_data_;
   bool debug_info_ = false;

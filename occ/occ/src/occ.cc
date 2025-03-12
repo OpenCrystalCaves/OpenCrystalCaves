@@ -92,6 +92,15 @@ int main()
   }
   LOG_INFO("Images loaded");
 
+  // Load sound manager
+  SoundManager sound_manager;
+  if (!sound_manager.load_sounds(episode))
+  {
+    LOG_CRITICAL("Could not load sounds");
+    return 1;
+  }
+  LOG_INFO("Sounds loaded");
+
   // Create Game
   std::unique_ptr<Game> game = Game::create();
   if (!game)
@@ -100,7 +109,7 @@ int main()
     return 1;
   }
   ExeData exe_data{episode};
-  if (!game->init(exe_data, LevelId::INTRO))
+  if (!game->init(sound_manager, exe_data, LevelId::INTRO))
   {
     LOG_CRITICAL("Could not initialize Game");
     return 1;
@@ -116,7 +125,7 @@ int main()
   title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());
   TitleState title{sprite_manager, *game_surface, title_images, *window, exe_data};
   splash.set_next(title);
-  GameState game_state(*game, sprite_manager, *game_surface, *window, exe_data);
+  GameState game_state(*game, sprite_manager, sound_manager, *game_surface, *window, exe_data);
   title.set_next(game_state);
   game_state.set_next(title);
   State* state = &splash;

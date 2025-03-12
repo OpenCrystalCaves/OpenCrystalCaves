@@ -4,6 +4,7 @@
 
 #include "geometry.h"
 #include "level_id.h"
+#include "sound.h"
 #include "vector.h"
 
 enum class HurtType;
@@ -46,7 +47,7 @@ struct Player
   bool godmode = false;
   bool reverse_gravity = false;
 
-  void update(const Level& level);
+  void update(AbstractSoundManager& sound_manager, const Level& level);
   void hurt(const HurtType& hurt_type);
   bool is_flashing() const;
 };

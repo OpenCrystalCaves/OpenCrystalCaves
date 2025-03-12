@@ -2,7 +2,9 @@
 
 #include "level.h"
 
-void AirTank::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
+void AirTank::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                     [[maybe_unused]] const geometry::Rectangle& player_rect,
+                     [[maybe_unused]] Level& level)
 {
   // TODO: check if shot
   frame_++;
@@ -18,17 +20,20 @@ std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites([[maybe_
     position, top_ ? static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_TANK_TOP_1) + frame_) : Sprite::SPRITE_AIR_TANK_BOTTOM)};
 }
 
-void Laser::update(const geometry::Rectangle& player_rect, Level& level)
+void Laser::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   if ((level.switch_flags & SWITCH_FLAG_LASERS) && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
     geometry::Position child_pos = position + geometry::Position(left_ ? -12 : 12, -1);
     child_ = new LaserBeam(child_pos, left_, *this);
     level.hazards.emplace_back(child_);
+    sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
   }
 }
 
-void LaserBeam::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void LaserBeam::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                       [[maybe_unused]] const geometry::Rectangle& player_rect,
+                       Level& level)
 {
   frame_ = 1 - frame_;
   position += geometry::Position(left_ ? -4 : 4, 0);
@@ -39,10 +44,14 @@ void LaserBeam::update([[maybe_unused]] const geometry::Rectangle& player_rect, 
   }
 }
 
-void Thorn::update(const geometry::Rectangle& player_rect, Level& level)
+void Thorn::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   if (geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
+    if (frame_ == 0)
+    {
+      sound_manager.play_sound(SoundType::SOUND_THORN);
+    }
     if (frame_ < 4)
     {
       frame_++;
@@ -54,7 +63,9 @@ void Thorn::update(const geometry::Rectangle& player_rect, Level& level)
   }
 }
 
-void SpiderWeb::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void SpiderWeb::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                       [[maybe_unused]] const geometry::Rectangle& player_rect,
+                       Level& level)
 {
   position += geometry::Position(0, 4);
   if (level.collides_solid(position + geometry::Position(0, -6), geometry::Size(16, 16)))
@@ -62,16 +73,11 @@ void SpiderWeb::update([[maybe_unused]] const geometry::Rectangle& player_rect, 
     alive_ = false;
     parent_.remove_child();
   }
-
-  // TODO: hurt player
 }
 
-void CorpseSlime::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
-{
-  // TODO: hurt player
-}
-
-void Faucet::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void Faucet::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                    [[maybe_unused]] const geometry::Rectangle& player_rect,
+                    Level& level)
 {
   if (child_ == nullptr)
   {
@@ -86,7 +92,9 @@ void Faucet::update([[maybe_unused]] const geometry::Rectangle& player_rect, Lev
   }
 }
 
-void Droplet::update([[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
+void Droplet::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                     [[maybe_unused]] const geometry::Rectangle& player_rect,
+                     Level& level)
 {
   frame_ = 1 - frame_;
   position += geometry::Position(0, 6);
@@ -100,7 +108,9 @@ void Droplet::update([[maybe_unused]] const geometry::Rectangle& player_rect, Le
 }
 
 
-void Hammer::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[maybe_unused]] Level& level)
+void Hammer::update(AbstractSoundManager& sound_manager,
+                    [[maybe_unused]] const geometry::Rectangle& player_rect,
+                    [[maybe_unused]] Level& level)
 {
   constexpr int BOTTOM_FRAMES = 18;
   if (frame_ > 0)
@@ -141,7 +151,7 @@ void Hammer::update([[maybe_unused]] const geometry::Rectangle& player_rect, [[m
     {
       position -= geometry::Position(0, 8);
       frame_ = BOTTOM_FRAMES;
-      // TODO: sound
+      sound_manager.play_sound(SoundType::SOUND_HAMMER);
     }
   }
 }

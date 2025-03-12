@@ -298,11 +298,17 @@ void TitleState::draw(Window& window) const
 }
 
 
-GameState::GameState(Game& game, SpriteManager& sprite_manager, Surface& game_surface, Window& window, ExeData& exe_data)
+GameState::GameState(Game& game,
+                     SpriteManager& sprite_manager,
+                     SoundManager& sound_manager,
+                     Surface& game_surface,
+                     Window& window,
+                     ExeData& exe_data)
   : State(FADE_TICKS, FADE_TICKS, window),
     game_(game),
     game_surface_(game_surface),
     sprite_manager_(sprite_manager),
+    sound_manager_(sound_manager),
     game_renderer_(&game, &sprite_manager, &game_surface, window),
     exe_data_(exe_data),
     panel_(
@@ -342,7 +348,7 @@ void GameState::reset()
   paused_ = false;
   panel_current_ = nullptr;
   panel_next_ = nullptr;
-  if (!game_.init(exe_data_, level_))
+  if (!game_.init(sound_manager_, exe_data_, level_))
   {
     LOG_CRITICAL("Could not initialize Game level %d", static_cast<int>(level_));
     finish();
