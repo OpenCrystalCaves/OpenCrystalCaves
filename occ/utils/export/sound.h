@@ -4,8 +4,8 @@ enum class SoundType : int
 {
   SOUND_JUMP,
   SOUND_UNKNOWN1,
-  SOUND_START_LEVEL,  // TODO: use
-  SOUND_END_LEVEL,
+  SOUND_ENTER_LEVEL,
+  SOUND_EXIT_LEVEL,
   SOUND_DIE,  // TODO: use
   SOUND_ENEMY_DIE,
   SOUND_ENEMY_HURT,      // TODO: some effect is missing, this is too short
@@ -33,8 +33,8 @@ enum class SoundType : int
   SOUND_UNKNOWNS,
   SOUND_UNKNOWNT,
   SOUND_THORN,
-  SOUND_APOGEE,      // TODO: use
-  SOUND_FADE_OUT,    // TODO: use
+  SOUND_APOGEE,
+  SOUND_START_GAME,
   SOUND_HIGH_SCORE,  // TODO: use
   SOUND_PANEL,       // TODO: use
   SOUND_MAIN_LEVEL,  // TODO: use

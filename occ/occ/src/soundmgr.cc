@@ -24,7 +24,7 @@ struct Sound
 std::string to_raw(const Sound& sound, const SDL_AudioSpec spec)
 {
   // Magic number to get the right sound duration
-  const int freq_len = 320;
+  const int freq_len = 320 * 44100 / spec.freq;
   // Bytes per sample (single channel)
   const int bps = (spec.format & 0xFF) / 8;
 
@@ -40,14 +40,15 @@ std::string to_raw(const Sound& sound, const SDL_AudioSpec spec)
   }
   std::string s(src_len * freq_len * spec.channels * bps, '\0');
   Uint8* ptr = (Uint8*)s.data();
-  Uint8 dc = 64;
+  // Magic number for how loud the sound is
+  const Uint8 DC = 32;
+  Uint8 dc = DC;
   for (size_t i = 0; i < src_len; i++)
   {
     // Generate square wave at frequency
     const auto freq = sound.data[i];
-    // Magic numerator to get the right pitch
-    // If you want to adjust this number you gotta have perfect pitch
-    const int freq_interval = freq > 0 ? (22050 / freq) : 0;
+    // Controls pitch given the sound spec frequency
+    const int freq_interval = freq > 0 ? (spec.freq / 2 / freq) : 0;
     for (int j = 0, freq_counter = 0; j < freq_len; j++, freq_counter++)
     {
       Uint8 amp = dc;
@@ -57,7 +58,7 @@ std::string to_raw(const Sound& sound, const SDL_AudioSpec spec)
       }
       else if (freq_counter == freq_interval)
       {
-        dc = 64 - dc;
+        dc = DC - dc;
         amp = dc;
         freq_counter = 0;
       }

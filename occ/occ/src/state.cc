@@ -133,13 +133,24 @@ void SkipState::update(const Input& input)
   }
 }
 
-SplashState::SplashState(std::vector<Surface*>& images, Window& window) : State(FADE_TICKS, 0, window), images_(images) {}
+SplashState::SplashState(SoundManager& sound_manager, std::vector<Surface*>& images, Window& window)
+  : State(FADE_TICKS, 0, window),
+    sound_manager_(sound_manager),
+    images_(images)
+{
+}
 
 void SplashState::draw(Window& window) const
 {
   images_[0]->blit_surface(geometry::Rectangle(0, 0, images_[0]->size()),
                            geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
   State::draw(window);
+}
+
+void SplashState::reset()
+{
+  SkipState::reset();
+  sound_manager_.play_sound(SoundType::SOUND_APOGEE);
 }
 
 #ifdef _MSC_VER
@@ -151,12 +162,14 @@ void SplashState::draw(Window& window) const
 #endif
 
 TitleState::TitleState(SpriteManager& sprite_manager,
+                       SoundManager& sound_manager,
                        Surface& game_surface,
                        std::vector<Surface*>& images,
                        Window& window,
                        ExeData& exe_data)
   : State(FADE_TICKS, FADE_TICKS, window),
     sprite_manager_(sprite_manager),
+    sound_manager_(sound_manager),
     game_surface_(game_surface),
     images_(images),
     panel_(
@@ -194,6 +207,15 @@ TitleState::TitleState(SpriteManager& sprite_manager,
 {
 }
 
+void TitleState::finish()
+{
+  if (fade_out_start_ticks_ == 0)
+  {
+    sound_manager_.play_sound(SoundType::SOUND_START_GAME);
+  }
+  State::finish();
+}
+
 void TitleState::update(const Input& input)
 {
   State::update(input);
@@ -201,7 +223,7 @@ void TitleState::update(const Input& input)
 
   if (panel_current_ == nullptr)
   {
-    if (pinput.jump_pressed || pinput.shoot_pressed || input.escape.pressed())
+    if (fade_out_start_ticks_ == 0 && (pinput.jump_pressed || pinput.shoot_pressed || input.escape.pressed()))
     {
       panel_current_ = &panel_;
     }
@@ -210,7 +232,7 @@ void TitleState::update(const Input& input)
   {
     panel_current_ = nullptr;
   }
-  else
+  else if (panel_current_)
   {
     panel_current_ = panel_current_->update(input);
   }

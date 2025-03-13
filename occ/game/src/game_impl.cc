@@ -141,6 +141,10 @@ void GameImpl::update_level()
         : EntranceState::CLOSED;
       if (entrance.state == EntranceState::OPEN)
       {
+        if (entering_level != static_cast<LevelId>(entrance.level))
+        {
+          sound_manager_->play_sound(SoundType::SOUND_ENTER_LEVEL);
+        }
         entering_level = static_cast<LevelId>(entrance.level);
       }
     }
@@ -157,7 +161,7 @@ void GameImpl::update_level()
       if (level_->exit->open)
       {
         entering_level = static_cast<LevelId>(LevelId::MAIN_LEVEL);
-        sound_manager_->play_sound(SoundType::SOUND_END_LEVEL);
+        sound_manager_->play_sound(SoundType::SOUND_EXIT_LEVEL);
       }
     }
     level_->exit->update();

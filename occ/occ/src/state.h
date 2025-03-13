@@ -30,7 +30,7 @@ class State
   virtual void update(const Input& input);
 
   // Called whenever state should start finishing
-  void finish()
+  virtual void finish()
   {
     if (fade_out_start_ticks_ == 0)
     {
@@ -66,25 +66,32 @@ class SkipState : public virtual State
 class SplashState : public SkipState
 {
  public:
-  // TODO: play sound when entering this state
-  SplashState(std::vector<Surface*>& images, Window& window);
+  SplashState(SoundManager& sound_manager, std::vector<Surface*>& images, Window& window);
 
+  virtual void reset() override;
   virtual void draw(Window& window) const override;
 
  private:
+  SoundManager& sound_manager_;
   std::vector<Surface*>& images_;
 };
 
 class TitleState : public State
 {
  public:
-  TitleState(SpriteManager& sprite_manager, Surface& game_surface, std::vector<Surface*>& images, Window& window, ExeData& exe_data);
+  TitleState(SpriteManager& sprite_manager,
+             SoundManager& sound_manager,
+             Surface& game_surface,
+             std::vector<Surface*>& images,
+             Window& window,
+             ExeData& exe_data);
 
   virtual void reset() override
   {
     panel_current_ = nullptr;
     State::reset();
   }
+  virtual void finish() override;
   virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;
   virtual State* next_state() override
@@ -98,6 +105,7 @@ class TitleState : public State
 
  private:
   SpriteManager& sprite_manager_;
+  SoundManager& sound_manager_;
   Surface& game_surface_;
   std::vector<Surface*>& images_;
   unsigned scroll_ticks_ = 0;

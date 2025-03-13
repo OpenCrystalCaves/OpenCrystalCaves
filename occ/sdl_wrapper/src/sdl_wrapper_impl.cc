@@ -9,7 +9,7 @@
 
 #include "logger.h"
 
-#define SAMPLE_RATE 44100
+#define SAMPLE_RATE 22050
 #define AUDIO_FMT AUDIO_S16
 #define AUDIO_CHANNELS 2
 

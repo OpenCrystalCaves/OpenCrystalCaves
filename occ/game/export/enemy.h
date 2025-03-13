@@ -74,6 +74,7 @@ class Bigfoot : public Enemy
   {
     Enemy::on_hit(sound_manager, power);
     running_ = true;
+    // TODO: turn to face player
   }
   virtual int get_points() const override { return 5000; }
 
