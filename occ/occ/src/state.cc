@@ -221,6 +221,8 @@ void TitleState::update(const Input& input)
   State::update(input);
   const auto pinput = input_to_player_input(input);
 
+  const auto panel_last = panel_current_;
+  const int index_last = panel_current_ ? panel_current_->index() : -1;
   if (panel_current_ == nullptr)
   {
     if (fade_out_start_ticks_ == 0 && (pinput.jump_pressed || pinput.shoot_pressed || input.escape.pressed()))
@@ -259,6 +261,10 @@ void TitleState::update(const Input& input)
   {
     // Don't scroll background if panel shown
     scroll_ticks_ += 1;
+  }
+  if (panel_current_ && (panel_last != panel_current_ || panel_current_->index() != index_last))
+  {
+    sound_manager_.play_sound(SoundType::SOUND_PANEL);
   }
 }
 
@@ -381,6 +387,8 @@ void GameState::update(const Input& input)
 {
   State::update(input);
 
+  const auto panel_last = panel_current_;
+  const int index_last = panel_current_ ? panel_current_->index() : -1;
   if (panel_current_ == nullptr)
   {
     if (input.escape.pressed())
@@ -530,6 +538,11 @@ void GameState::update(const Input& input)
         reset();
       }
     }
+  }
+
+  if (panel_current_ && (panel_last != panel_current_ || panel_current_->index() != index_last))
+  {
+    sound_manager_.play_sound(SoundType::SOUND_PANEL);
   }
 }
 

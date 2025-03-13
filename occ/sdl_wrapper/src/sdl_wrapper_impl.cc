@@ -33,7 +33,7 @@ bool SDLWrapperImpl::init()
     LOG_CRITICAL("Could not initialize SDL: %s", SDL_GetError());
     return false;
   }
-  if (Mix_OpenAudio(SAMPLE_RATE, AUDIO_FMT, AUDIO_CHANNELS, 4096) != 0)
+  if (Mix_OpenAudio(SAMPLE_RATE, AUDIO_FMT, AUDIO_CHANNELS, 1024) != 0)
   {
     LOG_CRITICAL("Could not open audio: %s", SDL_GetError());
     return false;

@@ -24,7 +24,7 @@ struct Sound
 std::string to_raw(const Sound& sound, const SDL_AudioSpec spec)
 {
   // Magic number to get the right sound duration
-  const int freq_len = 320 * 44100 / spec.freq;
+  const int freq_len = 320 * spec.freq / 44100;
   // Bytes per sample (single channel)
   const int bps = (spec.format & 0xFF) / 8;
 

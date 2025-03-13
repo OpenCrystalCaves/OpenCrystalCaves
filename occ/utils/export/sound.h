@@ -36,7 +36,7 @@ enum class SoundType : int
   SOUND_APOGEE,
   SOUND_START_GAME,
   SOUND_HIGH_SCORE,  // TODO: use
-  SOUND_PANEL,       // TODO: use
+  SOUND_PANEL,
   SOUND_MAIN_LEVEL,  // TODO: use
 };
 

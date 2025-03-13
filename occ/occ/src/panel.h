@@ -129,6 +129,7 @@ class Panel
 
   void add_input(char c);
   const std::string& get_input() const { return input_str_; }
+  const int index() const { return index_; }
 
  private:
   PanelType type_;
