@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-
 project(sdl_wrapper)
 
 include_directories(${SDL2_INCLUDE_DIRS})
