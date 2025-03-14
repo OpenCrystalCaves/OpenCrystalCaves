@@ -213,6 +213,7 @@ void TitleState::finish()
   {
     sound_manager_.play_sound(SoundType::SOUND_START_GAME);
   }
+  panel_current_ = nullptr;
   State::finish();
 }
 
@@ -257,12 +258,14 @@ void TitleState::update(const Input& input)
         // TODO: handle other types
     }
   }
-  else
+  else if (fade_out_start_ticks_ == 0)
   {
-    // Don't scroll background if panel shown
+    // Don't scroll background if panel shown or fading out
     scroll_ticks_ += 1;
   }
-  if (panel_current_ && (panel_last != panel_current_ || panel_current_->index() != index_last))
+  if (panel_current_ &&
+      (panel_last != panel_current_ ||
+       (panel_current_->get_type() == PanelType::PANEL_TYPE_PAGES && panel_current_->index() != index_last)))
   {
     sound_manager_.play_sound(SoundType::SOUND_PANEL);
   }
@@ -380,6 +383,10 @@ void GameState::reset()
   {
     LOG_CRITICAL("Could not initialize Game level %d", static_cast<int>(level_));
     finish();
+  }
+  else
+  {
+    sound_manager_.play_sound(SoundType::SOUND_START_LEVEL);
   }
 }
 
@@ -540,7 +547,9 @@ void GameState::update(const Input& input)
     }
   }
 
-  if (panel_current_ && (panel_last != panel_current_ || panel_current_->index() != index_last))
+  if (panel_current_ &&
+      (panel_last != panel_current_ ||
+       (panel_current_->get_type() == PanelType::PANEL_TYPE_PAGES && panel_current_->index() != index_last)))
   {
     sound_manager_.play_sound(SoundType::SOUND_PANEL);
   }
