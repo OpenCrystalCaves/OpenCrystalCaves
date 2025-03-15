@@ -50,6 +50,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Restarting levels            | Menu > Quit Current Game > Main Level, re-enter level                                               | Menu > Restart                                                                                            |
 | Transitions                  | ![](/screenshots/transition_cc.gif?raw=true) Fade by palette color                                  | ![](/screenshots/transition_occ.gif?raw=true) Fade to black                                               |
 | Hammer crush                 | ![](/screenshots/crush_cc.gif?raw=true) Getting hurt normally by hammers                            | ![](/screenshots/crush_occ.gif?raw=true) Getting crushed by hammers                                       |
+| Candle pickup sound          | No sound                                                                                            | Same sound as other similar pickups (shovel, pickaxe)                                                     |
 
 ## Compiling OCC
 

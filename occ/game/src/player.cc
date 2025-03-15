@@ -194,7 +194,6 @@ void Player::hurt(const TouchType& touch_type)
     health_--;
   }
   // TODO: die on 0 health
-  // TODO: sound
   if (touch_type == TouchType::TOUCH_TYPE_CRUSHING && !falling)
   {
     crushed = true;

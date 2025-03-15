@@ -46,7 +46,7 @@ class Actor
   virtual bool interact([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level) { return false; };
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const = 0;
   virtual std::vector<geometry::Rectangle> get_detection_rects([[maybe_unused]] const Level& level) const { return {}; }
-  virtual TouchType on_touch() { return TouchType::TOUCH_TYPE_NONE; }
+  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) { return TouchType::TOUCH_TYPE_NONE; }
   virtual void on_hit([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] const bool power) {}
 
   geometry::Position position;

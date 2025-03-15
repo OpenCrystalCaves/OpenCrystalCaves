@@ -20,7 +20,11 @@ class Enemy : public Actor
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level);
   // Whether this enemy requires the power powerup to hit/kill
   virtual bool is_tough() const { return false; }
-  virtual TouchType on_touch() override { return TouchType::TOUCH_TYPE_HURT; }
+  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
+  {
+    // TODO: play sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
 
   int health;
 

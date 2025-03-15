@@ -438,7 +438,7 @@ void GameImpl::update_actors()
 
 void GameImpl::touch_actor(Actor& actor)
 {
-  const auto touch_type = actor.on_touch();
+  const auto touch_type = actor.on_touch(*sound_manager_);
   switch (touch_type)
   {
     case TouchType::TOUCH_TYPE_NONE:
@@ -449,28 +449,19 @@ void GameImpl::touch_actor(Actor& actor)
 
       // 99 is max ammo
       num_ammo_ = num_ammo_ > MAX_AMMO ? MAX_AMMO : num_ammo_;
-      sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
       break;
     case TouchType::TOUCH_TYPE_SCORE:
       LOG_DEBUG("Player took item with score: %d", actor.get_points());
       score_ += actor.get_points();
-      // TODO: different sounds for different types of items
-      // pickaxe: gun
-      // candle: silent
-      // blue mushroom: blue mushroom
-      // egg: crystal
-      sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
       break;
     case TouchType::TOUCH_TYPE_POWER:
       LOG_DEBUG("Player took item of type power");
       // Last 16 seconds
       player_.power_tick = 16 * FPS / FRAMES_PER_TICK;
-      sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
       break;
     case TouchType::TOUCH_TYPE_KEY:
       LOG_DEBUG("Player took key");
       has_key_ = true;
-      sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
       break;
     case TouchType::TOUCH_TYPE_HURT:
       LOG_DEBUG("Player got hurt");

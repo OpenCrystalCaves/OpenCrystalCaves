@@ -883,13 +883,13 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -11:
             // Shovel
-            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SHOVEL, 800));
-            // TODO: confirm sound
+            level->actors.emplace_back(
+              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SHOVEL, SoundType::SOUND_PICKUP_GUN, 800));
             break;
           case -12:
             // Pickaxe
-            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_PICKAXE, 5000));
-            // TODO: confirm sound
+            level->actors.emplace_back(
+              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_PICKAXE, SoundType::SOUND_PICKUP_GUN, 5000));
             break;
           case -14:
             // Tall Green Monster
@@ -978,12 +978,14 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -86:
             // Blue mushroom
-            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_MUSHROOM_BLUE, 1000));
+            level->actors.emplace_back(
+              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_MUSHROOM_BLUE, SoundType::SOUND_BLUE_MUSHROOM, 1000));
             break;
           case -87:
             // Egg
             // TODO: egg
-            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_EGG, 1000));
+            level->actors.emplace_back(
+              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_EGG, SoundType::SOUND_CRYSTAL, 1000));
             break;
           case -88:
             // Key
@@ -1040,7 +1042,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -117:
             // Candle
-            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CANDLE, 1000));
+            level->actors.emplace_back(
+              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CANDLE, SoundType::SOUND_PICKUP_GUN, 1000));
             break;
           case -119:
             // Pipe in hole (H)

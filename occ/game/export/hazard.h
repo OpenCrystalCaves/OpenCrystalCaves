@@ -100,7 +100,11 @@ class LaserBeam : public Hazard
     return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
   }
   virtual bool is_alive() const override { return alive_; }
-  virtual TouchType on_touch() override { return TouchType::TOUCH_TYPE_HURT; }
+  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  {
+    // TODO: sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
 
  private:
   bool left_;
@@ -134,7 +138,11 @@ class Thorn : public Hazard
   {
     return create_detection_rects(0, -1, level, true);
   }
-  virtual TouchType on_touch() override { return TouchType::TOUCH_TYPE_HURT; }
+  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  {
+    // TODO: sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
 
  private:
   int frame_ = 0;
@@ -166,7 +174,11 @@ class SpiderWeb : public Hazard
     return {std::make_pair(position, Sprite::SPRITE_SPIDER_WEB)};
   }
   virtual bool is_alive() const override { return alive_; }
-  virtual TouchType on_touch() override { return TouchType::TOUCH_TYPE_HURT; }
+  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  {
+    // TODO: sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
 
  private:
   Spider& parent_;
@@ -191,7 +203,11 @@ class CorpseSlime : public Hazard
   {
     return {std::make_pair(position, sprite_)};
   }
-  virtual TouchType on_touch() override { return TouchType::TOUCH_TYPE_HURT; }
+  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  {
+    // TODO: sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
 
  private:
   Sprite sprite_;
@@ -259,7 +275,11 @@ class Droplet : public Hazard
     return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_DROPLET_1 : Sprite::SPRITE_DROPLET_2)};
   }
   virtual bool is_alive() const override { return alive_; }
-  virtual TouchType on_touch() override { return TouchType::TOUCH_TYPE_HURT; }
+  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  {
+    // TODO: sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
 
  private:
   bool left_;
@@ -314,7 +334,11 @@ class Hammer : public Hazard
       std::make_pair(position + +geometry::Position(16, 16), Sprite::SPRITE_HAMMER_4),
     };
   }
-  virtual TouchType on_touch() override { return (rising_ || frame_ > 0) ? TouchType::TOUCH_TYPE_HURT : TouchType::TOUCH_TYPE_CRUSHING; }
+  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  {
+    // TODO: sound
+    return (rising_ || frame_ > 0) ? TouchType::TOUCH_TYPE_HURT : TouchType::TOUCH_TYPE_CRUSHING;
+  }
 
  private:
   bool rising_ = true;

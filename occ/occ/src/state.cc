@@ -492,6 +492,7 @@ void GameState::update(const Input& input)
           panel_next_ = panel_current_;
           panel_current_ = nullptr;
           paused_ = true;
+          sound_manager_.play_sound(SoundType::SOUND_QUIT);
           finish();
           break;
         case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
@@ -623,16 +624,19 @@ void GameState::draw(Window& window) const
 
 State* GameState::next_state()
 {
-  if (panel_next_)
+  if (has_finished())
   {
-    switch (panel_next_->get_type())
+    if (panel_next_)
     {
-      case PanelType::PANEL_TYPE_QUIT_TO_OS:
-        return nullptr;
-      case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
-        break;
-      default:
-        break;
+      switch (panel_next_->get_type())
+      {
+        case PanelType::PANEL_TYPE_QUIT_TO_OS:
+          return nullptr;
+        case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
+          break;
+        default:
+          break;
+      }
     }
   }
   return State::next_state();
