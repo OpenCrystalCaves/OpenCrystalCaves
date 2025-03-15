@@ -8,9 +8,9 @@ enum class SoundType : int
   SOUND_EXIT_LEVEL,
   SOUND_DIE,  // TODO: use
   SOUND_ENEMY_DIE,
-  SOUND_ENEMY_HURT,      // TODO: some effect is missing, this is too short
-  SOUND_CRYSTAL,         // TODO: use
-  SOUND_PICKUP_GUN,      // also P pill; TODO: use
+  SOUND_ENEMY_HURT,  // TODO: some effect is missing, this is too short
+  SOUND_CRYSTAL,
+  SOUND_PICKUP_GUN,
   SOUND_SECRET_CRYSTAL,  // TODO: use
   SOUND_CHEST,
   SOUND_FRUIT,  // TODO: use

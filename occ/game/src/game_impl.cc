@@ -318,6 +318,7 @@ void GameImpl::update_items()
         case ItemType::ITEM_TYPE_CRYSTAL:
           LOG_DEBUG("Player took item of type crystal (%d)", item.get_type());
           score_ += CRYSTAL_SCORE;
+          sound_manager_->play_sound(SoundType::SOUND_CRYSTAL);
           break;
         case ItemType::ITEM_TYPE_AMMO:
           LOG_DEBUG("Player took item of type ammo (%d), amount: %d", item.get_type(), item.get_amount());
@@ -325,23 +326,32 @@ void GameImpl::update_items()
 
           // 99 is max ammo
           num_ammo_ = num_ammo_ > MAX_AMMO ? MAX_AMMO : num_ammo_;
+          sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
           break;
         case ItemType::ITEM_TYPE_SCORE:
           LOG_DEBUG("Player took item of type score (%d), amount: %d", item.get_type(), item.get_amount());
           score_ += item.get_amount();
+          // TODO: different sounds for different types of items
+          // pickaxe: gun
+          // candle: silent
+          // blue mushroom: blue mushroom
+          sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
           break;
         case ItemType::ITEM_TYPE_POWER:
           LOG_DEBUG("Player took item of type power", item.get_type());
           // Last 16 seconds
           player_.power_tick = 16 * FPS / FRAMES_PER_TICK;
+          sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
           break;
         case ItemType::ITEM_TYPE_EGG:
           LOG_DEBUG("Player took egg", item.get_type());
           score_ += item.get_amount();
+          sound_manager_->play_sound(SoundType::SOUND_CRYSTAL);
           break;
         case ItemType::ITEM_TYPE_KEY:
           LOG_DEBUG("Player took key", item.get_type());
           has_key_ = true;
+          sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
           break;
         default:
           LOG_ERROR("unknown item type");

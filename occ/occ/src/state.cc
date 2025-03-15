@@ -10,7 +10,8 @@
 #include "utils.h"
 #include <path.h>
 
-static constexpr int FADE_TICKS = 15;
+static constexpr int FADE_IN_TICKS = 15;
+static constexpr int FADE_OUT_TICKS = 30;
 
 const std::vector<Panel> makeInstructionsPanels(const ExeData& exe_data)
 {
@@ -134,7 +135,7 @@ void SkipState::update(const Input& input)
 }
 
 SplashState::SplashState(SoundManager& sound_manager, std::vector<Surface*>& images, Window& window)
-  : State(FADE_TICKS, 0, window),
+  : State(FADE_IN_TICKS, 0, window),
     sound_manager_(sound_manager),
     images_(images)
 {
@@ -167,7 +168,7 @@ TitleState::TitleState(SpriteManager& sprite_manager,
                        std::vector<Surface*>& images,
                        Window& window,
                        ExeData& exe_data)
-  : State(FADE_TICKS, FADE_TICKS, window),
+  : State(FADE_IN_TICKS, FADE_OUT_TICKS, window),
     sprite_manager_(sprite_manager),
     sound_manager_(sound_manager),
     game_surface_(game_surface),
@@ -209,10 +210,6 @@ TitleState::TitleState(SpriteManager& sprite_manager,
 
 void TitleState::finish()
 {
-  if (fade_out_start_ticks_ == 0)
-  {
-    sound_manager_.play_sound(SoundType::SOUND_START_GAME);
-  }
   panel_current_ = nullptr;
   State::finish();
 }
@@ -244,9 +241,18 @@ void TitleState::update(const Input& input)
     switch (panel_current_->get_type())
     {
       case PanelType::PANEL_TYPE_NEW_GAME:
+        if (fade_out_start_ticks_ == 0)
+        {
+          sound_manager_.play_sound(SoundType::SOUND_START_GAME);
+        }
         finish();
         break;
       case PanelType::PANEL_TYPE_QUIT_TO_OS:
+        if (fade_out_start_ticks_ == 0)
+        {
+          sound_manager_.play_sound(SoundType::SOUND_QUIT);
+        }
+        next_state_ = nullptr;
         finish();
         break;
       case PanelType::PANEL_TYPE_WEBSITE:
@@ -335,7 +341,7 @@ GameState::GameState(Game& game,
                      Surface& game_surface,
                      Window& window,
                      ExeData& exe_data)
-  : State(FADE_TICKS, FADE_TICKS, window),
+  : State(FADE_IN_TICKS, FADE_OUT_TICKS, window),
     game_(game),
     game_surface_(game_surface),
     sprite_manager_(sprite_manager),
