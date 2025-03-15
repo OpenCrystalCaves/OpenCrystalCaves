@@ -29,7 +29,6 @@ class GameImpl : public Game
   int get_tile_height() const override { return level_->height; }
 
   int get_bg_sprite(const int x, const int y) const override;
-  const Item& get_item(int tile_x, int tile_y) const override;
 
   const std::vector<Object>& get_objects() const override { return objects_; }
 
@@ -42,11 +41,11 @@ class GameImpl : public Game
  private:
   void update_level();
   void update_player(const PlayerInput& player_input);
-  void update_items();
   void update_missile();
   void update_enemies();
   void update_hazards();
   void update_actors();
+  void touch_actor(Actor& actor);
 
   AbstractSoundManager* sound_manager_;
   Player player_;

@@ -26,7 +26,6 @@ class GameRenderer
   void render_player() const;
   void render_tiles(bool in_front) const;
   void render_objects() const;
-  void render_items() const;
   void render_statusbar() const;
 
   Game* game_;

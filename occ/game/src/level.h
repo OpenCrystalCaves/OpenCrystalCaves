@@ -33,8 +33,6 @@ struct Level
 
   const Tile& get_tile(const int x, const int y) const;
   int get_bg(const int x, const int y) const;
-  const Item& get_item(const int x, const int y) const;
-  void remove_item(const int x, const int y);
   bool collides_solid(const geometry::Position& position, const geometry::Size& size, const bool is_slime = false) const;
   bool collides_solid_top(const geometry::Position& position, const geometry::Size& size) const;
   Actor* collides_actor(const geometry::Position& position, const geometry::Size& size) const;
@@ -47,7 +45,6 @@ struct Level
 
   std::vector<int> bgs;
   std::vector<Tile> tiles;
-  std::vector<Item> items;
 
   std::vector<std::unique_ptr<Enemy>> enemies;
   std::vector<std::unique_ptr<Hazard>> hazards;

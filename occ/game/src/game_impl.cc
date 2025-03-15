@@ -9,6 +9,9 @@
 #include "logger.h"
 #include "misc.h"
 
+#define MAX_AMMO 99
+#define AMMO_AMOUNT 5
+
 std::unique_ptr<Game> Game::create()
 {
   return std::make_unique<GameImpl>();
@@ -48,7 +51,6 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   update_level();
   update_actors();
   update_player(player_input);
-  update_items();
   update_missile();
   update_enemies();
   update_hazards();
@@ -57,20 +59,16 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   const auto prect = geometry::Rectangle(player_.position, player_.size);
   for (auto&& enemy : level_->enemies)
   {
-    const auto hurt_type = enemy->hurt_type();
-    if (hurt_type != HurtType::HURT_TYPE_NONE && geometry::isColliding(prect, geometry::Rectangle(enemy->position, enemy->size)))
+    if (geometry::isColliding(prect, geometry::Rectangle(enemy->position, enemy->size)))
     {
-      player_.hurt(hurt_type);
-      break;
+      touch_actor(*enemy);
     }
   }
   for (auto&& hazard : level_->hazards)
   {
-    const auto hurt_type = hazard->hurt_type();
-    if (hurt_type != HurtType::HURT_TYPE_NONE && geometry::isColliding(prect, geometry::Rectangle(hazard->position, hazard->size)))
+    if (geometry::isColliding(prect, geometry::Rectangle(hazard->position, hazard->size)))
     {
-      player_.hurt(hurt_type);
-      break;
+      touch_actor(*hazard);
     }
   }
 }
@@ -78,11 +76,6 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
 int GameImpl::get_bg_sprite(const int x, const int y) const
 {
   return level_->get_bg(x, y);
-}
-
-const Item& GameImpl::get_item(int tile_x, int tile_y) const
-{
-  return level_->get_item(tile_x, tile_y);
 }
 
 std::wstring GameImpl::get_debug_info() const
@@ -297,72 +290,6 @@ void GameImpl::update_player(const PlayerInput& player_input)
   player_.update(*sound_manager_, *level_);
 }
 
-void GameImpl::update_items()
-{
-  // Check if player hit an item
-  // Player can cover at maximum 4 items
-  // Check all 4 items, even though we might check the same item multiple times
-  const std::array<geometry::Position, 4> positions = {
-    geometry::Position((player_.position.x() + 0) / SPRITE_W, (player_.position.y() + 0) / SPRITE_H),
-    geometry::Position((player_.position.x() + player_.size.x() - 1) / SPRITE_W, (player_.position.y() + 0) / SPRITE_H),
-    geometry::Position((player_.position.x() + 0) / SPRITE_W, (player_.position.y() + player_.size.y() - 1) / SPRITE_H),
-    geometry::Position((player_.position.x() + player_.size.x() - 1) / SPRITE_W, (player_.position.y() + player_.size.y() - 1) / SPRITE_H)};
-
-  for (const auto& position : positions)
-  {
-    const auto& item = get_item(position.x(), position.y());
-    if (item.valid())
-    {
-      switch (item.get_type())
-      {
-        case ItemType::ITEM_TYPE_CRYSTAL:
-          LOG_DEBUG("Player took item of type crystal (%d)", item.get_type());
-          score_ += CRYSTAL_SCORE;
-          sound_manager_->play_sound(SoundType::SOUND_CRYSTAL);
-          break;
-        case ItemType::ITEM_TYPE_AMMO:
-          LOG_DEBUG("Player took item of type ammo (%d), amount: %d", item.get_type(), item.get_amount());
-          num_ammo_ += item.get_amount();
-
-          // 99 is max ammo
-          num_ammo_ = num_ammo_ > MAX_AMMO ? MAX_AMMO : num_ammo_;
-          sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
-          break;
-        case ItemType::ITEM_TYPE_SCORE:
-          LOG_DEBUG("Player took item of type score (%d), amount: %d", item.get_type(), item.get_amount());
-          score_ += item.get_amount();
-          // TODO: different sounds for different types of items
-          // pickaxe: gun
-          // candle: silent
-          // blue mushroom: blue mushroom
-          sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
-          break;
-        case ItemType::ITEM_TYPE_POWER:
-          LOG_DEBUG("Player took item of type power", item.get_type());
-          // Last 16 seconds
-          player_.power_tick = 16 * FPS / FRAMES_PER_TICK;
-          sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
-          break;
-        case ItemType::ITEM_TYPE_EGG:
-          LOG_DEBUG("Player took egg", item.get_type());
-          score_ += item.get_amount();
-          sound_manager_->play_sound(SoundType::SOUND_CRYSTAL);
-          break;
-        case ItemType::ITEM_TYPE_KEY:
-          LOG_DEBUG("Player took key", item.get_type());
-          has_key_ = true;
-          sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
-          break;
-        default:
-          LOG_ERROR("unknown item type");
-          break;
-      }
-
-      level_->remove_item(position.x(), position.y());
-    }
-  }
-}
-
 void GameImpl::update_missile()
 {
   // Update particles (explosions etc.)
@@ -484,10 +411,15 @@ void GameImpl::update_hazards()
 
 void GameImpl::update_actors()
 {
+  const auto prect = geometry::Rectangle(player_.position, player_.size);
   for (auto it = level_->actors.begin(); it != level_->actors.end();)
   {
     auto a = it->get();
     a->update(*sound_manager_, {player_.position, player_.size}, *level_);
+    if (geometry::isColliding(prect, geometry::Rectangle(a->position, a->size)))
+    {
+      touch_actor(*a);
+    }
     // Check if actor died
     if (!a->is_alive())
     {
@@ -501,5 +433,55 @@ void GameImpl::update_actors()
       }
       it++;
     }
+  }
+}
+
+void GameImpl::touch_actor(Actor& actor)
+{
+  const auto touch_type = actor.on_touch();
+  switch (touch_type)
+  {
+    case TouchType::TOUCH_TYPE_NONE:
+      break;
+    case TouchType::TOUCH_TYPE_AMMO:
+      LOG_DEBUG("Player took ammo");
+      num_ammo_ += AMMO_AMOUNT;
+
+      // 99 is max ammo
+      num_ammo_ = num_ammo_ > MAX_AMMO ? MAX_AMMO : num_ammo_;
+      sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
+      break;
+    case TouchType::TOUCH_TYPE_SCORE:
+      LOG_DEBUG("Player took item with score: %d", actor.get_points());
+      score_ += actor.get_points();
+      // TODO: different sounds for different types of items
+      // pickaxe: gun
+      // candle: silent
+      // blue mushroom: blue mushroom
+      // egg: crystal
+      sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
+      break;
+    case TouchType::TOUCH_TYPE_POWER:
+      LOG_DEBUG("Player took item of type power");
+      // Last 16 seconds
+      player_.power_tick = 16 * FPS / FRAMES_PER_TICK;
+      sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
+      break;
+    case TouchType::TOUCH_TYPE_KEY:
+      LOG_DEBUG("Player took key");
+      has_key_ = true;
+      sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
+      break;
+    case TouchType::TOUCH_TYPE_HURT:
+      LOG_DEBUG("Player got hurt");
+      player_.hurt(touch_type);
+      break;
+    case TouchType::TOUCH_TYPE_CRUSHING:
+      LOG_DEBUG("Player got crushed");
+      player_.hurt(touch_type);
+      break;
+    default:
+      LOG_ERROR("unknown touch type");
+      break;
   }
 }

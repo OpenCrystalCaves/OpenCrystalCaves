@@ -1,40 +1,144 @@
 #pragma once
 
-#include <sprite.h>
+#include "actor.h"
 
-enum class ItemType : int
-{
-  ITEM_TYPE_CRYSTAL = 0,
-  ITEM_TYPE_AMMO = 1,
-  ITEM_TYPE_SCORE = 2,
-  ITEM_TYPE_POWER = 3,
-  ITEM_TYPE_EGG = 4,  // TODO: shootable, spawn BONUS
-  ITEM_TYPE_KEY = 5,
-};
-
-#define CRYSTAL_SCORE 50
-#define MAX_AMMO 99
-#define AMMO_AMOUNT 5
-
-class Item
+class Item : public Actor
 {
  public:
-  Item() : valid_(false), sprite_(Sprite::SPRITE_NONE), type_(ItemType::ITEM_TYPE_CRYSTAL), amount_(0) {}
+  Item(geometry::Position position, Sprite sprite, TouchType touch_type)
+    : Actor(position, geometry::Size(16, 16)),
+      sprite_(sprite),
+      touch_type_(touch_type)
+  {
+  }
 
-  Item(Sprite sprite, ItemType type, int amount) : valid_(true), sprite_(sprite), type_(type), amount_(amount) {}
-
-  bool valid() const { return valid_; }
-  void invalidate() { valid_ = false; }
-
-  Sprite get_sprite() const { return sprite_; }
-  ItemType get_type() const { return type_; }
-  int get_amount() const { return amount_; }
-
-  static const Item INVALID;
+  virtual bool is_alive() const override { return is_alive_; }
+  virtual TouchType on_touch() override
+  {
+    is_alive_ = false;
+    return touch_type_;
+  }
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  {
+    return {{position, sprite_}};
+  }
 
  private:
-  bool valid_;
   Sprite sprite_;
-  ItemType type_;
-  int amount_;
+  bool is_alive_ = true;
+  TouchType touch_type_;
 };
+
+class Crystal : public Item
+{
+  // ⬛⬛⬛⬜⬜⬜⬜⬜⬜⬜⬜⬜🟥⬛⬛⬛
+  // ⬛⬛⬜🚨🟥🚨🚨🟥🟥🚨🟥🚨🚨🟥⬛⬛
+  // ⬛⬜🚨🟥🚨🚨🟥🟥🚨🚨🚨🟥🚨🟥🟥⬛
+  // ⬜🚨⬜🚨⬜🟥⬜⬜⬜⬜⬜🟥🟥🟥🟥🟥
+  // ⬜🚨🚨🚨🚨🟥🚨🚨🚨🚨🚨🟥🟥🚨🟥🟥
+  // ⬛⬜🚨🚨🚨🚨🟥🚨🚨🚨🟥🟥🟥🚨🟥⬛
+  // ⬛⬛⬜🚨🚨🚨🟥🚨🚨🚨🟥🟥🚨🟥⬛⬛
+  // ⬛⬛⬛⬜🚨🚨🚨🟥🚨🚨🟥🚨🟥⬛⬛⬛
+  // ⬛⬛⬛⬛⬜🚨🚨🚨🟥🟥🚨🟥⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬜🚨🚨🟥🚨🟥⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬜🚨🟥🟥⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛⬜🟥⬛⬛⬛⬛⬛⬛⬛
+  // Gives score, need to collect all to finish level
+  // TODO: collect all crystals
+ public:
+  Crystal(geometry::Position position, Sprite sprite) : Item(position, sprite, TouchType::TOUCH_TYPE_SCORE) {}
+
+  virtual int get_points() const override { return 50; }
+};
+
+
+class Ammo : public Item
+{
+  // ⬛⬛⬛🪦🪦🪦🪦🪦🪦🪦🪦🪦🪦⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛🪦⬛⬛🪦⬛⬛⬛⬛⬛⬛
+  // ⬛🩵⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⬛
+  // ⬛⬛🩵⚪⚪⚪⚪⚪⚪⚪⚪🩵🩵🩵🩵⬛
+  // ⬛⬛⬛🩵⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⬛
+  // ⬛⬛⬛🩵⚪⚪🚨🟥⬛🪦🪦🪦🪦🪦🪦⬛
+  // ⬛⬛🩵⚪⚪🪦🚨🟥⬛🪦⬛⬛⬛⬛⬛⬛
+  // ⬛🩵⚪⚪🪦⬛🪦🪦🪦⬛⬛⬛⬛⬛⬛⬛
+  // ⬛🩵⚪🪦⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛🪦⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // Gives ammo
+ public:
+  Ammo(geometry::Position position) : Item(position, Sprite::SPRITE_PISTOL, TouchType::TOUCH_TYPE_AMMO) {}
+};
+
+
+class ScoreItem : public Item
+{
+  // ⬛⬛⬛⬛⬛🟥⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛🟥🚨🟥⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛🟥🚨🟥⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🟥⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⚪⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬜⬜⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⚪⬜⬜⬛⬛⬛⬛🟨🟨🟨⬛⬛
+  // ⬛⬛⬛⬛⚪⬜⬜⬛⬛⬛🟨⬛⬛⬛🟨⬛
+  // ⬛⬛⬛⬛⚪⬜⚪⬛⬛⬛🟨⬛⬛⬛🟠⬛
+  // ⬛⬛⬛⬛⚪⬜⚪⬛⬛⬛⬛⬛🟠🟠⬛⬛
+  // ⬛⬛⬛⚪⬜⬜⚪⚪⬛⬛⬛🟠⬛⬛⬛⬛
+  // ⬛⬜🟨🟨🟨🟨🟨🟨🟨🟨🟠⬛⬛⬛⬛⬛
+  // ⬛⬛⬜🟨🟨🟨🟨🟨🟨🟠⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛🟠🟠🟠🟠🟠🟠⬛⬛⬛⬛⬛⬛⬛
+  // Generic item that gives score
+  // TODO: different sounds
+ public:
+  ScoreItem(geometry::Position position, Sprite sprite, int score) : Item(position, sprite, TouchType::TOUCH_TYPE_SCORE), score_(score) {}
+
+  virtual int get_points() const override { return score_; }
+
+ private:
+  int score_;
+};
+
+class Key : public Item
+{
+  // ⬛⬛⬛⬛⬛⬛🟨🟨🟨🟨⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛🟨🟨🟨🟨⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟨🟨🟨⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟨⬛⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛🟨🟨🟨🟨⬛⬛⬛⬛⬛
+  // Gives player ability to open chests
+ public:
+  Key(geometry::Position position) : Item(position, Sprite::SPRITE_KEY, TouchType::TOUCH_TYPE_KEY) {}
+};
+
+
+class Power : public Item
+{
+  // ⬛⬛⬛⬛⬛⬜⚪⚪⚪⚪🪦⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬜⬜⚪⚪⚪⚪⚪⚪🪦🪦⬛⬛⬛
+  // ⬛⬛⬜⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦⬛⬛
+  // ⬛⬛⬜⚪⚪🟥🟥🟥🟥🟥⚪⚪⚪🪦⬛⬛
+  // ⬛⬜⚪⚪⚪🟥🟥🟥🟥🟥🟥⚪⚪⚪🪦⬛
+  // ⬛⬜⚪⚪⚪🟥🟥⚪⚪🟥🟥⚪⚪⚪🪦⬛
+  // ⬛⬜⚪⚪⚪🟥🟥🟥🟥🟥🟥⚪⚪⚪🪦⬛
+  // ⬛⬜⚪⚪⚪🟥🟥🟥🟥🟥⚪⚪⚪⚪🪦⬛
+  // ⬛⬜⚪⚪⚪🟥🟥⚪⚪⚪⚪⚪⚪⚪🪦⬛
+  // ⬛⬜⚪⚪⚪🟥🟥⚪⚪⚪⚪⚪⚪⚪🪦⬛
+  // ⬛⬛⬜⚪⚪🟥🟥⚪⚪⚪⚪⚪⚪🪦⬛⬛
+  // ⬛⬛⬜⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦⬛⬛
+  // ⬛⬛⬛⬜⬜⚪⚪⚪⚪⚪⚪🪦🪦⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬜⚪⚪⚪⚪🪦⬛⬛⬛⬛⬛
+  // Gives player timed power shots that can kill tough enemies
+ public:
+  Power(geometry::Position position) : Item(position, Sprite::SPRITE_POWER, TouchType::TOUCH_TYPE_POWER) {}
+};
+
+// TODO: egg
+// TODO: gravity

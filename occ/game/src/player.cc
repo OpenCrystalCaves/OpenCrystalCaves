@@ -179,7 +179,7 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
   }
 }
 
-void Player::hurt(const HurtType& hurt_type)
+void Player::hurt(const TouchType& touch_type)
 {
   // Hurt me- you can't get hurt again
   if (hurt_tick > 0)
@@ -195,7 +195,7 @@ void Player::hurt(const HurtType& hurt_type)
   }
   // TODO: die on 0 health
   // TODO: sound
-  if (hurt_type == HurtType::HURT_TYPE_CRUSHING && !falling)
+  if (touch_type == TouchType::TOUCH_TYPE_CRUSHING && !falling)
   {
     crushed = true;
   }

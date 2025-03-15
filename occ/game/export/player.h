@@ -7,7 +7,7 @@
 #include "sound.h"
 #include "vector.h"
 
-enum class HurtType;
+enum class TouchType;
 struct Level;
 
 struct Player
@@ -48,6 +48,6 @@ struct Player
   bool reverse_gravity = false;
 
   void update(AbstractSoundManager& sound_manager, const Level& level);
-  void hurt(const HurtType& hurt_type);
+  void hurt(const TouchType& touch_type);
   bool is_flashing() const;
 };

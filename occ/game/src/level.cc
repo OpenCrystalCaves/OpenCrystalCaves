@@ -20,20 +20,6 @@ int Level::get_bg(const int x, const int y) const
   return bgs[(y * width) + x];
 }
 
-const Item& Level::get_item(const int x, const int y) const
-{
-  if (x < 0 || x >= width || y < 0 || y >= height)
-  {
-    return Item::INVALID;
-  }
-  return items[(y * width) + x];
-}
-
-void Level::remove_item(const int x, const int y)
-{
-  items[(y * width) + x].invalidate();
-}
-
 bool Level::collides_solid(const geometry::Position& position, const geometry::Size& size, const bool is_slime) const
 {
   // Note: this function only works with size x and y <= 16

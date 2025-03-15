@@ -78,7 +78,6 @@ void GameRenderer::render_game() const
   render_objects();
   render_player();
   render_tiles(true);
-  render_items();
   render_statusbar();
   window_.set_render_target(nullptr);
 }
@@ -391,29 +390,6 @@ void GameRenderer::render_objects() const
         const geometry::Rectangle dest_rect{r.position - game_camera_.position, r.size};
         window_.render_rectangle(dest_rect, {255, 255, 0});
       }
-    }
-  }
-}
-
-void GameRenderer::render_items() const
-{
-  const auto start_tile_x = game_camera_.position.x() > 0 ? game_camera_.position.x() / 16 : 0;
-  const auto start_tile_y = game_camera_.position.y() > 0 ? game_camera_.position.y() / 16 : 0;
-  const auto end_tile_x = (game_camera_.position.x() + game_camera_.size.x()) / 16;
-  const auto end_tile_y = (game_camera_.position.y() + game_camera_.size.y()) / 16;
-
-  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
-  {
-    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
-    {
-      const auto& item = game_->get_item(tile_x, tile_y);
-
-      if (!item.valid())
-      {
-        continue;
-      }
-
-      sprite_manager_->render_tile(static_cast<int>(item.get_sprite()), {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
     }
   }
 }

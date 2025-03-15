@@ -240,7 +240,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     int sprite = -1;
     int sprite_count = 1;
     int flags = 0;
-    auto item = Item::INVALID;
     switch (mode)
     {
       case TileMode::BUMPABLE_PLATFORM:
@@ -476,20 +475,20 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
             // Crystals
           case '+':
-            item = Item(Sprite::SPRITE_CRYSTAL_1_Y, ItemType::ITEM_TYPE_CRYSTAL, 0);
+            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_Y));
             break;
           case 'b':
-            item = Item(Sprite::SPRITE_CRYSTAL_1_G, ItemType::ITEM_TYPE_CRYSTAL, 0);
+            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_G));
             break;
           case 'R':
-            item = Item(Sprite::SPRITE_CRYSTAL_1_R, ItemType::ITEM_TYPE_CRYSTAL, 0);
+            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_R));
             break;
           case 'c':
-            item = Item(Sprite::SPRITE_CRYSTAL_1_B, ItemType::ITEM_TYPE_CRYSTAL, 0);
+            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_B));
             break;
             // Ammo
           case 'G':
-            item = Item(Sprite::SPRITE_PISTOL, ItemType::ITEM_TYPE_AMMO, AMMO_AMOUNT);
+            level->actors.emplace_back(new Ammo(geometry::Position{x * 16, y * 16}));
             break;
             // Blocks
           case 'r':
@@ -855,7 +854,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case ']':
             // Power
-            item = Item(Sprite::SPRITE_POWER, ItemType::ITEM_TYPE_POWER, 0);
+            level->actors.emplace_back(new Power(geometry::Position{x * 16, y * 16}));
             break;
           case '/':
             level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}));
@@ -884,11 +883,13 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -11:
             // Shovel
-            item = Item(Sprite::SPRITE_SHOVEL, ItemType::ITEM_TYPE_SCORE, 800);
+            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SHOVEL, 800));
+            // TODO: confirm sound
             break;
           case -12:
             // Pickaxe
-            item = Item(Sprite::SPRITE_PICKAXE, ItemType::ITEM_TYPE_SCORE, 5000);
+            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_PICKAXE, 5000));
+            // TODO: confirm sound
             break;
           case -14:
             // Tall Green Monster
@@ -977,15 +978,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -86:
             // Blue mushroom
-            item = Item(Sprite::SPRITE_MUSHROOM_BLUE, ItemType::ITEM_TYPE_SCORE, 1000);
+            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_MUSHROOM_BLUE, 1000));
             break;
           case -87:
             // Egg
-            item = Item(Sprite::SPRITE_EGG, ItemType::ITEM_TYPE_EGG, 1000);
+            // TODO: egg
+            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_EGG, 1000));
             break;
           case -88:
             // Key
-            item = Item(Sprite::SPRITE_KEY, ItemType::ITEM_TYPE_KEY, 0);
+            level->actors.emplace_back(new Key(geometry::Position{x * 16, y * 16}));
             break;
           case -89:
             // Chest
@@ -1038,7 +1040,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -117:
             // Candle
-            item = Item(Sprite::SPRITE_CANDLE, ItemType::ITEM_TYPE_SCORE, 1000);
+            level->actors.emplace_back(new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CANDLE, 1000));
             break;
           case -119:
             // Pipe in hole (H)
@@ -1069,7 +1071,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     }
     level->tiles.push_back(tile);
     level->bgs.push_back(bg);
-    level->items.push_back(item);
   }
 
   return level;
