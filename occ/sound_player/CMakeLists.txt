@@ -6,8 +6,9 @@ add_executable(sound_player
 target_link_libraries(sound_player
   "utils"
   "sdl_wrapper"
-  SDL2::SDL2
-  SDL2_mixer::SDL2_mixer
+  $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+  $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+  $<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>
 )
 if(APPLE)
 	set_target_properties(sound_player PROPERTIES

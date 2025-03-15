@@ -17,7 +17,12 @@ target_include_directories(sdl_wrapper PUBLIC
   "export"
   ${SDL2_INCLUDE_DIRS}
 )
-target_link_libraries(sdl_wrapper SDL2::SDL2 SDL2_image::SDL2_image SDL2_mixer::SDL2_mixer)
+target_link_libraries(
+  sdl_wrapper
+  $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+  $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+  $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>
+  $<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>)
 
 add_executable(sdl_wrapper_test
   "test/src/stubs/sdl_stub.cc"

@@ -6,7 +6,8 @@ add_executable(sprite_viewer
 target_link_libraries(sprite_viewer
   "utils"
   "sdl_wrapper"
-  SDL2::SDL2
+  $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+  $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
 )
 if(APPLE)
 	set_target_properties(sprite_viewer PROPERTIES

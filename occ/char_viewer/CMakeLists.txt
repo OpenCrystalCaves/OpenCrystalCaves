@@ -6,7 +6,8 @@ add_executable(char_viewer
 target_link_libraries(char_viewer
   "utils"
   "sdl_wrapper"
-  SDL2::SDL2
+  $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+  $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
 )
 if(APPLE)
 	set_target_properties(char_viewer PROPERTIES
