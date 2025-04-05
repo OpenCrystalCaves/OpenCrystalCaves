@@ -65,4 +65,5 @@ struct Input
   Button level_warp = Button();
 
   geometry::Position mouse;
+  Button mouse_left = Button();
 };

@@ -27,8 +27,9 @@ bool Enemy::should_reverse(const Level& level) const
 {
   // Reverse direction if colliding left/right or about to fall
   // Note: falling looks at two points near the left- and right- bottom corners
-  return level.collides_solid(position, size) || !level.collides_solid(position + geometry::Position(1, 1), geometry::Size(1, size.y())) ||
-    !level.collides_solid(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y()));
+  return level.collides_solid_top(position, size) ||
+    !level.collides_solid_top(position + geometry::Position(1, 1), geometry::Size(1, size.y())) ||
+    !level.collides_solid_top(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y()));
 }
 
 void Bigfoot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
@@ -314,7 +315,7 @@ void MineCart::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     if (should_reverse(level))
     {
       position -= d;
-      pause_frame_ = 56;  // TODO: measure
+      pause_frame_ = 56;
       left_ = !left_;
     }
   }
@@ -383,4 +384,59 @@ void Caterpillar::set_child(Caterpillar& child)
   child.rank_ = rank_ + 1;
   // Initialise frame based on rank so we get a ^v^v pattern
   child.frame_ = child.rank_ * 2;
+}
+
+void Snoozer::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                     [[maybe_unused]] const geometry::Rectangle& player_rect,
+                     Level& level)
+{
+  if (pause_frame_ > 0)
+  {
+    pause_frame_--;
+    if (pause_frame_ == 0)
+    {
+      frame_ = 74;  // TODO: run duration seems to be slightly random
+    }
+  }
+  else if (frame_ > 0)
+  {
+    frame_--;
+    if (frame_ == 0)
+    {
+      pause_frame_ = 40;
+    }
+    const auto d = geometry::Position(left_ ? -4 : 4, 0);
+    position += d;
+    if (should_reverse(level))
+    {
+      position -= d;
+      left_ = !left_;
+    }
+  }
+
+  // TODO: shoot at player
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Snoozer::get_sprites([[maybe_unused]] const Level& level) const
+{
+  int frame = static_cast<int>(Sprite::SPRITE_SNOOZER_SLEEP);
+  int dy = 0;
+  if (frame_ > 0)
+  {
+    const int df = 3 - (frame_ / 2) % 4;
+    if (df == 2)
+    {
+      // Correction for off by one sprite dy
+      dy = 1;
+    }
+    frame = static_cast<int>(left_ ? Sprite::SPRITE_SNOOZER_L_1 : Sprite::SPRITE_SNOOZER_R_1) + df;
+  }
+  std::vector<std::pair<geometry::Position, Sprite>> sprites = {
+    std::make_pair(position + geometry::Position{0, dy}, static_cast<Sprite>(frame))};
+  if (pause_frame_ > 0)
+  {
+    const int z_frame = static_cast<int>(Sprite::SPRITE_SNOOZER_Z_1) + ((pause_frame_ / 3) % 4);
+    sprites.push_back(std::make_pair(position - geometry::Position{0, 16}, static_cast<Sprite>(z_frame)));
+  }
+  return sprites;
 }

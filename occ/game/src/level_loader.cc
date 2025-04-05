@@ -891,6 +891,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->actors.emplace_back(
               new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_PICKAXE, SoundType::SOUND_PICKUP_GUN, 5000));
             break;
+          case -13:
+            // Snoozer
+            level->enemies.emplace_back(new Snoozer(geometry::Position{x * 16, y * 16}));
+            break;
           case -14:
             // Tall Green Monster
             level->enemies.emplace_back(new Bigfoot(geometry::Position{x * 16, y * 16}));

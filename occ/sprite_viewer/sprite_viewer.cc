@@ -5,6 +5,9 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include <fstream>
 #include <iostream>
 
+#include <SDL_Clipboard.h>
+#include <SDL_error.h>
+
 #include "../occ/src/spritemgr.h"
 #include "constants.h"
 #include "event.h"
@@ -67,6 +70,18 @@ int main(int argc, char* argv[])
     const geometry::Rectangle rect{{x * SPRITE_W, y * SPRITE_H}, {SPRITE_W, SPRITE_H}};
     window->render_rectangle(rect, {255, 255, 255, 255});
     const int index = x + y * SPRITE_STRIDE;
+    if (input.mouse_left.pressed())
+    {
+      const auto s = std::to_string(index);
+      if (SDL_SetClipboardText(s.c_str()) != 0)
+      {
+        std::cerr << "Failed to set clipboard text: " << SDL_GetError() << "\n";
+      }
+      else
+      {
+        std::cout << "Copied to clipboard: " << s << "\n";
+      }
+    }
     const auto tooltip = L"x: " + std::to_wstring(x) + L"\ny: " + std::to_wstring(y) + L"\nidx: " + std::to_wstring(index);
     const int tooltip_x = std::min(rect.position.x() + rect.size.x(), SPRITE_STRIDE * SPRITE_W - 80);
     const int tooltip_y = std::min(rect.position.y() + rect.size.y(), 22 * SPRITE_H - 16);

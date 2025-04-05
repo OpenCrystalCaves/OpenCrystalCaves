@@ -39,113 +39,127 @@ void EventImpl::poll_event(Input* input)
   input->godmode.tick();
   input->reverse_gravity.tick();
   input->level_warp.tick();
+  input->mouse_left.tick();
 
   // Read
   const auto keys = SDL_GetKeyboardState(nullptr);
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0)
   {
-    if (event.type == SDL_QUIT)
+    switch (event.type)
     {
-      input->escape.set_down(true);
-    }
+      case SDL_QUIT:
+        input->escape.set_down(true);
+        break;
+      case SDL_KEYDOWN:  // fallthrough
+      case SDL_KEYUP:
+        switch (event.key.keysym.sym)
+        {
+          case SDLK_UP:
+            input->up.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-    else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
-    {
-      // TODO: use scancodes
-      switch (event.key.keysym.sym)
-      {
-        case SDLK_UP:
-          input->up.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_DOWN:
+            input->down.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_DOWN:
-          input->down.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_LEFT:
+            input->left.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_LEFT:
-          input->left.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_RIGHT:
+            input->right.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_RIGHT:
-          input->right.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_d:
+            input->d.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_d:
-          input->d.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_z:
+            input->z.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_z:
-          input->z.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_x:
+            input->x.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_x:
-          input->x.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_g:
+            input->reverse_gravity.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_g:
-          input->reverse_gravity.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_1:
+            input->num_1.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_1:
-          input->num_1.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_2:
+            input->num_2.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_2:
-          input->num_2.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_3:
+            input->num_3.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_3:
-          input->num_3.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_4:
+            input->num_4.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_4:
-          input->num_4.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_5:
+            input->num_5.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_5:
-          input->num_5.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_6:
+            input->num_6.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_6:
-          input->num_6.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_7:
+            input->num_7.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_7:
-          input->num_7.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_8:
+            input->num_8.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_8:
-          input->num_8.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_9:
+            input->num_9.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_9:
-          input->num_9.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_0:
+            input->num_0.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_0:
-          input->num_0.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_RETURN:
+            input->enter.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_RETURN:
-          input->enter.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_SPACE:
+            input->space.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_SPACE:
-          input->space.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_ESCAPE:
+            input->escape.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_ESCAPE:
-          input->escape.set_down(event.type == SDL_KEYDOWN);
-          break;
+          case SDLK_BACKSPACE:
+            input->backspace.set_down(event.type == SDL_KEYDOWN);
+            break;
 
-        case SDLK_BACKSPACE:
-          input->backspace.set_down(event.type == SDL_KEYDOWN);
-          break;
-
-        default:
-          break;
-      }
+          default:
+            break;
+        }
+        break;
+      case SDL_MOUSEBUTTONUP:
+      case SDL_MOUSEBUTTONDOWN:  // fallthrough
+        switch (event.button.button)
+        {
+          case 1:
+            input->mouse_left.set_down(event.type == SDL_MOUSEBUTTONDOWN);
+            break;
+          default:
+            break;
+        }
+        break;
+      default:
+        break;
     }
   }
   input->noclip.down = keys[SDL_SCANCODE_I] && keys[SDL_SCANCODE_L] && keys[SDL_SCANCODE_M];
