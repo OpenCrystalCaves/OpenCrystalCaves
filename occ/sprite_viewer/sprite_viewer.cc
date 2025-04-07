@@ -5,8 +5,7 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include <fstream>
 #include <iostream>
 
-#include <SDL_Clipboard.h>
-#include <SDL_error.h>
+#include <SDL.h>
 
 #include "../occ/src/spritemgr.h"
 #include "constants.h"
