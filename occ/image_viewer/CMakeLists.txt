@@ -8,7 +8,6 @@ target_link_libraries(image_viewer
   "sdl_wrapper"
   $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
   $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
-  $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>
 )
 if(APPLE)
 	set_target_properties(image_viewer PROPERTIES

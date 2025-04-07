@@ -30,7 +30,6 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/build)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/build)
 
 find_package(SDL2 CONFIG REQUIRED)
-find_package(SDL2_image CONFIG REQUIRED)
 find_package(SDL2_mixer CONFIG REQUIRED)
 
 if(MSVC)
@@ -208,7 +207,7 @@ elseif(APPLE)
   # TODO: icon
 
 	# copy SDL frameworks
-	set(LIBS SDL2 SDL2_image)
+	set(LIBS SDL2 SDL2_mixer)
   foreach(LIB ${LIBS})
     install(DIRECTORY /Library/Frameworks/${LIB}.framework
       DESTINATION ${INSTALL_PREFIX}/Frameworks
@@ -223,11 +222,10 @@ else()
 	# debian specific
 	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "OpenCrystalCaves Team")
 	set(CPACK_DEBIAN_PACKAGE_SECTION Games)
-	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libsdl2-image libsdl2-mixer")
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libsdl2-mixer")
 
 	# fedora/suse specific
 	set(CPACK_RPM_PACKAGE_LICENSE "MIT")
-	set(CPACK_RPM_PACKAGE_REQUIRES "sdl_image >= 2")
 	set(CPACK_RPM_PACKAGE_REQUIRES "sdl_mixer >= 2")
 
 endif()

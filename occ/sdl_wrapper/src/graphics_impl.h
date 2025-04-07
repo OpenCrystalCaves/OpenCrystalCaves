@@ -6,7 +6,6 @@
 #include <utility>
 
 #include <SDL.h>
-#include <SDL_image.h>
 
 #include "geometry.h"
 
@@ -46,7 +45,10 @@ class SurfaceImpl : public Surface
   int width() const override { return w_; }
   int height() const override { return h_; }
 
-	void blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest, const bool flip = false, const Color color = {0xff, 0xff, 0xff}) const override;
+  void blit_surface(const geometry::Rectangle& source,
+                    const geometry::Rectangle& dest,
+                    const bool flip = false,
+                    const Color color = {0xff, 0xff, 0xff}) const override;
   void blit_surface() const override;
   void set_render_target();
   void set_alpha(const uint8_t alpha) override;

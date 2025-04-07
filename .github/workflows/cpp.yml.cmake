@@ -41,21 +41,21 @@ jobs:
       if: startsWith(matrix.os, 'ubuntu')
       run: |
         sudo apt-get update
-        sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev
+        sudo apt install libsdl2-dev libsdl2-mixer-dev
     - name: Set up Homebrew (macOS)
       id: set-up-homebrew
       if: matrix.os == 'macos-latest'
       uses: Homebrew/actions/setup-homebrew@master
     - name: Install SDL via homebrew (macOS)
       if: matrix.os == 'macos-latest'
-      run: brew install sdl2 sdl2_image sdl2_mixer
+      run: brew install sdl2 sdl2_mixer
     - name: Install packages (macOS)
       if: matrix.os == 'macos-latest'
       run: |
         build/macosx/install-sdl2.sh
     - name: Install dependencies (Windows)
       if: matrix.os == 'windows-latest'
-      run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 sdl2-image sdl2-mixer --recurse
+      run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 sdl2-mixer --recurse
     - name: Configure CMake
       if: matrix.os != 'windows-latest'
       run: |
@@ -77,14 +77,6 @@ jobs:
         file-name: 'sdl2.zip'
         location: './${{ matrix.build_type }}/dll'
 
-    - name: Download SDL2_image DLLs on tags (Windows)
-      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
-      uses: carlosperate/download-file-action@v2
-      with:
-        file-url: 'https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.8.1-win32-x64.zip'
-        file-name: 'sdl2_image.zip'
-        location: './${{ matrix.build_type }}/dll'
-
     - name: Download SDL2_mixer DLLs on tags (Windows)
       if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
       uses: carlosperate/download-file-action@v2
@@ -98,7 +90,6 @@ jobs:
       run: |
         cd ${{ matrix.build_type }}/dll
         7z x -y sdl2.zip
-        7z x -y sdl2_image.zip
         7z x -y sdl2_mixer.zip
         copy .\optional\*.dll .
 

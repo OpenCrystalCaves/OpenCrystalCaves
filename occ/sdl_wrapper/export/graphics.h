@@ -43,6 +43,7 @@ class Surface
  public:
   static std::unique_ptr<Surface> from_bmp(const std::filesystem::path& filename, Window& window);
   static std::unique_ptr<Surface> from_image(const std::filesystem::path& filename, Window& window);
+  static std::unique_ptr<Surface> from_pcx_image(const std::filesystem::path& filename, Window& window);
   static std::unique_ptr<Surface> from_pixels(const int w, const int h, const uint32_t* pixels, Window& window);
 
   virtual ~Surface() = default;
@@ -52,6 +53,9 @@ class Surface
   geometry::Size size() const { return geometry::Size(width(), height()); }
   virtual void set_alpha(const uint8_t alpha) = 0;
 
-	virtual void blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest, const bool flip = false, const Color color = {0xff, 0xff, 0xff}) const = 0;
+  virtual void blit_surface(const geometry::Rectangle& source,
+                            const geometry::Rectangle& dest,
+                            const bool flip = false,
+                            const Color color = {0xff, 0xff, 0xff}) const = 0;
   virtual void blit_surface() const = 0;
 };

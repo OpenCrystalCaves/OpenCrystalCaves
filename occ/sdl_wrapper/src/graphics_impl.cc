@@ -5,9 +5,79 @@
 #include <cstdlib>
 #include <utility>
 
+#define DR_PCX_IMPLEMENTATION
+#include "dr_pcx.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include "logger.h"
 #include "misc.h"
 #include "occ_math.h"
+
+#include <SDL2/SDL.h>
+#include <iostream>
+
+SDL_Surface* load_image_to_surface(const std::filesystem::path& filename)
+{
+  int width, height, channels;
+  unsigned char* data = stbi_load(filename.string().c_str(), &width, &height, &channels, 0);
+  if (!data)
+  {
+    LOG_ERROR("could not load image %s: %s", filename.string().c_str(), stbi_failure_reason());
+    return nullptr;
+  }
+
+  if (channels != 3 && channels != 4)
+  {
+    LOG_ERROR("unsupported number of image channels %d, expected 3 or 4", channels);
+    stbi_image_free(data);
+    return nullptr;
+  }
+
+  const Uint32 amask = channels == 3 ? 0 : 0xFF000000;
+  SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(data, width, height, channels * 8, width * channels, 0x0000FF, 0x00FF00, 0xFF0000, amask);
+
+  if (!surface)
+  {
+    LOG_ERROR("error creating surface: %s", SDL_GetError());
+    stbi_image_free(data);
+    return nullptr;
+  }
+
+  stbi_image_free(data);
+  return surface;
+}
+
+SDL_Surface* load_pcx_image_to_surface(const std::filesystem::path& filename)
+{
+  int width, height, channels;
+  drpcx_uint8* data = drpcx_load_file(filename.string().c_str(), DRPCX_FALSE, &width, &height, &channels, 0);
+  if (data == NULL)
+  {
+    LOG_ERROR("could not load PCX image %s", filename.string().c_str());
+    return nullptr;
+  }
+
+  if (channels != 3 && channels != 4)
+  {
+    LOG_ERROR("unsupported number of image channels %d, expected 3 or 4", channels);
+    drpcx_free(data);
+    return nullptr;
+  }
+
+  const Uint32 amask = channels == 3 ? 0 : 0xFF000000;
+  SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(data, width, height, channels * 8, width * channels, 0x0000FF, 0x00FF00, 0xFF0000, amask);
+
+  if (!surface)
+  {
+    LOG_ERROR("error creating surface: %s", SDL_GetError());
+    drpcx_free(data);
+    return nullptr;
+  }
+
+  drpcx_free(data);
+  return surface;
+}
 
 SDL_Rect to_sdl_rect(const geometry::Rectangle& rect)
 {
@@ -22,7 +92,7 @@ std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size 
   {
     return nullptr;
   }
-  auto icon = IMG_Load(icon_path.string().c_str());
+  auto icon = load_image_to_surface(icon_path);
   if (!icon)
   {
     LOG_ERROR("could not load icon file %s", icon_path.string().c_str());
@@ -143,7 +213,13 @@ std::unique_ptr<Surface> Surface::from_bmp(const std::filesystem::path& filename
 
 std::unique_ptr<Surface> Surface::from_image(const std::filesystem::path& filename, Window& window)
 {
-  auto sdl_surface = IMG_Load(filename.string().c_str());
+  auto sdl_surface = load_image_to_surface(filename);
+  return create_surface(sdl_surface, window);
+}
+
+std::unique_ptr<Surface> Surface::from_pcx_image(const std::filesystem::path& filename, Window& window)
+{
+  auto sdl_surface = load_pcx_image_to_surface(filename);
   return create_surface(sdl_surface, window);
 }
 
@@ -177,22 +253,22 @@ SurfaceImpl::SurfaceImpl(const int w,
 
 void SurfaceImpl::blit_surface(const geometry::Rectangle& source, const geometry::Rectangle& dest, const bool flip, const Color tint) const
 {
-	if (SDL_SetTextureColorMod(sdl_texture_.get(), tint.red, tint.green, tint.blue) != 0)
-	{
-		LOG_ERROR("Could not set texture color mod: %s", SDL_GetError());
-	}
+  if (SDL_SetTextureColorMod(sdl_texture_.get(), tint.red, tint.green, tint.blue) != 0)
+  {
+    LOG_ERROR("Could not set texture color mod: %s", SDL_GetError());
+  }
   const auto src_rect = to_sdl_rect(source);
   auto dest_rect = to_sdl_rect(dest);
   const SDL_RendererFlip sdl_flip = flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
   if (SDL_RenderCopyEx(&sdl_renderer_, sdl_texture_.get(), &src_rect, &dest_rect, 0.0, nullptr, sdl_flip) != 0)
   {
-	  LOG_ERROR("Could not render texture: %s", SDL_GetError());
+    LOG_ERROR("Could not render texture: %s", SDL_GetError());
   }
-	// reset tint
-	if (SDL_SetTextureColorMod(sdl_texture_.get(), 0xff, 0xff, 0xff) != 0)
-	{
-		LOG_ERROR("Could not reset texture color mod: %s", SDL_GetError());
-	}
+  // reset tint
+  if (SDL_SetTextureColorMod(sdl_texture_.get(), 0xff, 0xff, 0xff) != 0)
+  {
+    LOG_ERROR("Could not reset texture color mod: %s", SDL_GetError());
+  }
 }
 
 void SurfaceImpl::blit_surface() const
