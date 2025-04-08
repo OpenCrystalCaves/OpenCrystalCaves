@@ -85,4 +85,4 @@ The Visual Studio project will be available at `OpenCrystalCaves/build`
 
 ## Running OCC
 
-OCC requires data files from the original Crystal Caves (any episode). Either install it via Steam or GoG, or copy the game data to the `media` folder in the occ package (such as `CC1.GFX`).
+OCC includes the shareware episode for convenience, but for the other episodes requires data files from the original Crystal Caves (any episode). Either install it via Steam or GoG, or copy the game data to the `media` folder in the occ package (such as `CC1.GFX`).
