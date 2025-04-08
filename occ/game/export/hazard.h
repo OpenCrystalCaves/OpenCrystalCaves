@@ -334,7 +334,7 @@ class Hammer : public Hazard
       std::make_pair(position + +geometry::Position(16, 16), Sprite::SPRITE_HAMMER_4),
     };
   }
-  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return (rising_ || frame_ > 0) ? TouchType::TOUCH_TYPE_HURT : TouchType::TOUCH_TYPE_CRUSHING;

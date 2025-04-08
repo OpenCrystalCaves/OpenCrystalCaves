@@ -27,9 +27,11 @@ bool Enemy::should_reverse(const Level& level) const
 {
   // Reverse direction if colliding left/right or about to fall
   // Note: falling looks at two points near the left- and right- bottom corners
-  return level.collides_solid_top(position, size) ||
-    !level.collides_solid_top(position + geometry::Position(1, 1), geometry::Size(1, size.y())) ||
-    !level.collides_solid_top(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y()));
+  return level.collides_solid(position, size) ||
+    (!level.collides_solid(position + geometry::Position(1, 1), geometry::Size(1, size.y())) &&
+     !level.collides_solid_top(position + geometry::Position(1, 1), geometry::Size(1, size.y()))) ||
+    (!level.collides_solid(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y())) &&
+     !level.collides_solid_top(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y())));
 }
 
 void Bigfoot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
