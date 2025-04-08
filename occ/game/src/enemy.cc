@@ -395,7 +395,8 @@ void Snoozer::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     pause_frame_--;
     if (pause_frame_ == 0)
     {
-      frame_ = 74;  // TODO: run duration seems to be slightly random
+      // Roll for a random time
+      frame_ = misc::random<int>(50, 100);
     }
   }
   else if (frame_ > 0)
@@ -403,7 +404,7 @@ void Snoozer::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     frame_--;
     if (frame_ == 0)
     {
-      pause_frame_ = 40;
+      pause_frame_ = 35;
     }
     const auto d = geometry::Position(left_ ? -4 : 4, 0);
     position += d;
