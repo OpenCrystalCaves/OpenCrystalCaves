@@ -74,7 +74,7 @@ Or in Windows (with [vcpkg](https://vcpkg.io)):
 
 ```
 # In vcpkg dir
-./vcpkg install --triplet x64-windows sdl2 --recurse
+./vcpkg install --triplet x64-windows sdl2 sdl2-mixer --recurse
 # In your projects dir
 git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
 cd OpenCrystalCaves
