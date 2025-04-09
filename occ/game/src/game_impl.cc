@@ -388,15 +388,15 @@ void GameImpl::update_enemies()
 
 void GameImpl::update_hazards()
 {
-  for (auto it = level_->hazards.begin(); it != level_->hazards.end();)
+  for (int i = 0; i < level_->hazards.size();)
   {
-    auto h = it->get();
+    auto h = level_->hazards[i].get();
     h->update(*sound_manager_, {player_.position, player_.size}, *level_);
 
     // Check if hazard died
     if (!h->is_alive())
     {
-      it = level_->hazards.erase(it);
+      level_->hazards.erase(level_->hazards.begin() + i);
     }
     else
     {
@@ -404,7 +404,7 @@ void GameImpl::update_hazards()
       {
         objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
       }
-      it++;
+      i++;
     }
   }
 }

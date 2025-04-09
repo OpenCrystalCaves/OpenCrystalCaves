@@ -138,7 +138,7 @@ class Thorn : public Hazard
   {
     return create_detection_rects(0, -1, level, true);
   }
-  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
@@ -174,7 +174,7 @@ class SpiderWeb : public Hazard
     return {std::make_pair(position, Sprite::SPRITE_SPIDER_WEB)};
   }
   virtual bool is_alive() const override { return alive_; }
-  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
@@ -203,7 +203,7 @@ class CorpseSlime : public Hazard
   {
     return {std::make_pair(position, sprite_)};
   }
-  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
@@ -275,14 +275,13 @@ class Droplet : public Hazard
     return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_DROPLET_1 : Sprite::SPRITE_DROPLET_2)};
   }
   virtual bool is_alive() const override { return alive_; }
-  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
   }
 
  private:
-  bool left_;
   int frame_ = 0;
   Faucet& parent_;
   bool alive_ = true;
