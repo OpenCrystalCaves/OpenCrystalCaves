@@ -152,6 +152,7 @@ enum class TileMode
   HAMMER,
   GLASS_BALL,
   CATERPILLAR,
+  TRICERATOPS,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -450,6 +451,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           break;
           default:
             break;
+        }
+        break;
+      case TileMode::TRICERATOPS:
+        if (level->tile_ids[i + 1] != 'n')
+        {
+          mode = TileMode::NONE;
         }
         break;
       default:
@@ -782,11 +789,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case '[':
             switch (level->tile_ids[i + 1])
             {
-                // [4n = winners drugs sign
               case '4':
+                // [4n = winners drugs sign
                 sprite = static_cast<int>(Sprite::SPRITE_WINNERS_1);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::SIGN;
+                break;
+              case '=':
+                // [=n - triceratops
+                level->enemies.emplace_back(new Triceratops(geometry::Position{x * 16, y * 16}));
+                mode = TileMode::TRICERATOPS;
                 break;
               case 'b':
                 // [bnn = Yellow/green crate, 4x2

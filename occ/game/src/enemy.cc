@@ -443,3 +443,28 @@ std::vector<std::pair<geometry::Position, Sprite>> Snoozer::get_sprites([[maybe_
   }
   return sprites;
 }
+
+void Triceratops::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                         [[maybe_unused]] const geometry::Rectangle& player_rect,
+                         Level& level)
+{
+  // TODO: shoot at the player
+  // TODO: face player once hit
+  frame_++;
+  const auto d = geometry::Position(left_ ? -2 : 2, 0);
+  position += d;
+  if (should_reverse(level))
+  {
+    position -= d;
+    left_ = !left_;
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Triceratops::get_sprites([[maybe_unused]] const Level& level) const
+{
+  int frame = static_cast<int>(left_ ? Sprite::SPRITE_TRICERATOPS_HEAD_L_1 : Sprite::SPRITE_TRICERATOPS_TAIL_R_1) + ((frame_ / 2) % 4);
+  int df = left_ ? 4 : -4;
+  return {std::make_pair(position, static_cast<Sprite>(frame)),
+          std::make_pair(position + geometry::Position{16, 0}, static_cast<Sprite>(frame + df)),
+          std::make_pair(position + geometry::Position{32, 0}, static_cast<Sprite>(frame + df * 2))};
+}
