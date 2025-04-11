@@ -14,6 +14,33 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include "logger.h"
 #include "sdl_wrapper.h"
 
+void draw(Window& window, const Surface& surface, int x, int y, Input& input, SpriteManager& sprite_manager)
+{
+  window.fill_rect(geometry::Rectangle(0, 0, surface.size()), {33u, 33u, 33u});
+  surface.blit_surface();
+  // Show hovered sprite and draw its index
+  const geometry::Rectangle rect{{x * SPRITE_W, y * SPRITE_H}, {SPRITE_W, SPRITE_H}};
+  window.render_rectangle(rect, {255, 255, 255, 255});
+  const int index = x + y * SPRITE_STRIDE;
+  if (input.mouse_left.pressed())
+  {
+    const auto s = std::to_string(index);
+    if (SDL_SetClipboardText(s.c_str()) != 0)
+    {
+      std::cerr << "Failed to set clipboard text: " << SDL_GetError() << "\n";
+    }
+    else
+    {
+      std::cout << "Copied to clipboard: " << s << "\n";
+    }
+  }
+  const auto tooltip = L"x: " + std::to_wstring(x) + L"\ny: " + std::to_wstring(y) + L"\nidx: " + std::to_wstring(index);
+  const int tooltip_x = std::min(rect.position.x() + rect.size.x(), SPRITE_STRIDE * SPRITE_W - 80);
+  const int tooltip_y = std::min(rect.position.y() + rect.size.y(), 22 * SPRITE_H - 16);
+  sprite_manager.render_text(tooltip, geometry::Position{tooltip_x, tooltip_y});
+  window.refresh();
+}
+
 int main(int argc, char* argv[])
 {
   int episode = 1;
@@ -54,6 +81,8 @@ int main(int argc, char* argv[])
   }
 
   Input input;
+  int last_mx = -1;
+  int last_my = -1;
   while (true)
   {
     event->poll_event(&input);
@@ -61,31 +90,15 @@ int main(int argc, char* argv[])
     {
       break;
     }
-    window->fill_rect(geometry::Rectangle(0, 0, surface->size()), {33u, 33u, 33u});
-    surface->blit_surface();
-    // Show hovered sprite and draw its index
-    const int x = input.mouse.x() / SPRITE_W;
-    const int y = input.mouse.y() / SPRITE_H;
-    const geometry::Rectangle rect{{x * SPRITE_W, y * SPRITE_H}, {SPRITE_W, SPRITE_H}};
-    window->render_rectangle(rect, {255, 255, 255, 255});
-    const int index = x + y * SPRITE_STRIDE;
-    if (input.mouse_left.pressed())
+
+    const int mx = input.mouse.x() / SPRITE_W;
+    const int my = input.mouse.y() / SPRITE_H;
+    if (mx != last_mx || my != last_my)
     {
-      const auto s = std::to_string(index);
-      if (SDL_SetClipboardText(s.c_str()) != 0)
-      {
-        std::cerr << "Failed to set clipboard text: " << SDL_GetError() << "\n";
-      }
-      else
-      {
-        std::cout << "Copied to clipboard: " << s << "\n";
-      }
+      draw(*window, *surface, mx, my, input, sprite_manager);
+      last_mx = mx;
+      last_my = my;
     }
-    const auto tooltip = L"x: " + std::to_wstring(x) + L"\ny: " + std::to_wstring(y) + L"\nidx: " + std::to_wstring(index);
-    const int tooltip_x = std::min(rect.position.x() + rect.size.x(), SPRITE_STRIDE * SPRITE_W - 80);
-    const int tooltip_y = std::min(rect.position.y() + rect.size.y(), 22 * SPRITE_H - 16);
-    sprite_manager.render_text(tooltip, geometry::Position{tooltip_x, tooltip_y});
-    window->refresh();
     sdl->delay(10);
   }
 
