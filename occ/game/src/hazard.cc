@@ -155,3 +155,39 @@ void Hammer::update(AbstractSoundManager& sound_manager,
     }
   }
 }
+
+constexpr int FLAME_FRAME_TOTAL = 84;
+constexpr int FLAME_OFF_FRAMES = 28;
+
+void Flame::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                   [[maybe_unused]] const geometry::Rectangle& player_rect,
+                   [[maybe_unused]] Level& level)
+{
+  frame_++;
+  if (frame_ == FLAME_FRAME_TOTAL)
+  {
+    frame_ = 0;
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Flame::get_sprites([[maybe_unused]] const Level& level) const
+{
+  if (!is_on())
+    return {std::make_pair(position, Sprite::SPRITE_FLAME_0)};
+  const int d = (frame_ - FLAME_OFF_FRAMES) / 2;
+  int sprite = static_cast<int>(Sprite::SPRITE_FLAME_4) + (d % 4);
+  if (d <= 2)
+  {
+    sprite = static_cast<int>(Sprite::SPRITE_FLAME_1) + d;
+  }
+  else if (d >= (FLAME_FRAME_TOTAL - FLAME_OFF_FRAMES) / 2 - 3)
+  {
+    sprite = static_cast<int>(Sprite::SPRITE_FLAME_1) + ((FLAME_FRAME_TOTAL - FLAME_OFF_FRAMES) / 2 - d);
+  }
+  return {std::make_pair(position, static_cast<Sprite>(sprite))};
+}
+
+bool Flame::is_on() const
+{
+  return frame_ >= FLAME_OFF_FRAMES;
+}

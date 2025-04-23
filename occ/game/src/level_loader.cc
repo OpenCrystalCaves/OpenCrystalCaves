@@ -534,6 +534,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(block_sprite) + 4;  // SW
             flags |= TILE_SOLID;
             break;
+          case 'F':
+            level->hazards.emplace_back(new Flame(geometry::Position{x * 16, y * 16}));
+            break;
           case 'g':
             sprite = static_cast<int>(block_sprite) + 5;  // S
             flags |= TILE_SOLID;
@@ -568,6 +571,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'I':
             // Thorn
             level->hazards.emplace_back(new Thorn(geometry::Position{x * 16, y * 16}));
+            break;
+          case 'J':
+            // Flame spout
+            sprite = static_cast<int>(Sprite::SPRITE_FLAME_SPOUT);
+            flags |= TILE_SOLID;
             break;
           case 'k':
             sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_V);

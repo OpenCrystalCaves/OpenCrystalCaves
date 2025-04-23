@@ -343,3 +343,38 @@ class Hammer : public Hazard
   bool rising_ = true;
   int frame_ = 0;
 };
+
+class Flame : public Hazard
+{
+  // ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🟥⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛⬛🟥⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛🟥⬛⬛⬛🟥🟥⬛⬛⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛🟥🟥🟥🟥⬛⬛🟥⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛🟥🟥🟥🟥🟥⬛⬛⬛⬛⬛
+  // ⬛⬛⬛⬛⬛⬛🟥🟥🟥🟥🟥⬛⬛⬛⬛⬛
+  // ⬛⬛⬛🟨⬛🟥🟥🟥🚨🟥🟥⬛🟨⬛⬛⬛
+  // ⬛⬛⬛⬛⬛🟥🟥🟥🚨🟥🟥🟥⬛⬛⬛⬛
+  // ⬛⬛⬛⬛🟥🟥🚨🚨🚨🚨🟥🟥🟥⬛⬛⬛
+  // ⬛⬛⬛🟥🟥🚨🚨🚨🚨🚨🚨🟥🟥⬛⬛⬛
+  // 🟥⬛⬛🟥🟥🚨🚨🟨🟨🚨🚨🟥🟥🟥⬛🟥
+  // ⬛⬛🟥🟥🟥🚨🟨🟨🟨🟨🚨🟥🟥🟥⬛⬛
+  // ⬛⬛🟥🟥🚨🚨🟨⬜🟨🟨🚨🚨🟥🟥⬛🟥
+  // ⬛⬛🟥🚨🚨🟨🟨⬜⬜🟨🟨🚨🟥🟥⬛⬛
+  // ⬛🟥🟥🚨🚨🟨🟨⬜⬜🟨🟨🚨🟥🟥⬛⬛
+  // ⬛🟥🚨🚨🟨🟨⬜⬜⬜⬜🟨🟨🚨🟥⬛⬛
+  // Hurts player when turned on
+ public:
+  Flame(geometry::Position position) : Hazard(position) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
+  {
+    // TODO: sound
+    return is_on() ? TouchType::TOUCH_TYPE_HURT : TouchType::TOUCH_TYPE_NONE;
+  }
+
+ private:
+  bool is_on() const;
+  int frame_ = 48;
+};
