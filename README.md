@@ -52,6 +52,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Hammer crush                 | ![](/screenshots/crush_cc.gif?raw=true) Getting hurt normally by hammers                            | ![](/screenshots/crush_occ.gif?raw=true) Getting crushed by hammers                                       |
 | Candle pickup sound          | No sound                                                                                            | Same sound as other similar pickups (shovel, pickaxe)                                                     |
 | Snoozer roll animation       | ![](/screenshots/roll_cc.gif?raw=true) Third frame has slight Y offset                              | ![](/screenshots/roll_occ.gif?raw=true) No irregular Y offsets                                            |
+| Flame on/off animation       | ![](/screenshots/flame_cc.gif?raw=true) Transition in but not out                                   | ![](/screenshots/flame_occ.gif?raw=true) Transition both in and out                                       |
 
 ## Compiling OCC
 
