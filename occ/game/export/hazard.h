@@ -103,7 +103,7 @@ class LaserBeam : public Hazard
     return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
   }
   virtual bool is_alive() const override { return alive_; }
-  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
@@ -141,7 +141,7 @@ class Thorn : public Hazard
   {
     return create_detection_rects(0, -1, level, true);
   }
-  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
@@ -177,7 +177,7 @@ class SpiderWeb : public Hazard
     return {std::make_pair(position, Sprite::SPRITE_SPIDER_WEB)};
   }
   virtual bool is_alive() const override { return alive_; }
-  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
@@ -206,7 +206,7 @@ class CorpseSlime : public Hazard
   {
     return {std::make_pair(position, sprite_)};
   }
-  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
@@ -278,7 +278,7 @@ class Droplet : public Hazard
     return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_DROPLET_1 : Sprite::SPRITE_DROPLET_2)};
   }
   virtual bool is_alive() const override { return alive_; }
-  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
@@ -336,7 +336,7 @@ class Hammer : public Hazard
       std::make_pair(position + +geometry::Position(16, 16), Sprite::SPRITE_HAMMER_4),
     };
   }
-  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return (rising_ || frame_ > 0) ? TouchType::TOUCH_TYPE_HURT : TouchType::TOUCH_TYPE_CRUSHING;
@@ -371,7 +371,7 @@ class Flame : public Hazard
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
-  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager) override
   {
     // TODO: sound
     return is_on() ? TouchType::TOUCH_TYPE_HURT : TouchType::TOUCH_TYPE_NONE;

@@ -27,6 +27,7 @@ enum class TouchType
 };
 
 struct Level;
+struct Player;
 
 class Actor
 {
@@ -46,7 +47,10 @@ class Actor
   virtual bool interact([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level) { return false; };
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const = 0;
   virtual std::vector<geometry::Rectangle> get_detection_rects([[maybe_unused]] const Level& level) const { return {}; }
-  virtual TouchType on_touch([[maybe_unused]] AbstractSoundManager& sound_manager) { return TouchType::TOUCH_TYPE_NONE; }
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager)
+  {
+    return TouchType::TOUCH_TYPE_NONE;
+  }
   virtual void on_hit([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] const bool power) {}
 
   geometry::Position position;
@@ -258,4 +262,39 @@ class ClearBlock : public Actor
 
  private:
   bool is_alive_ = true;
+};
+
+class HiddenBlock : public Actor
+{
+  // ⬛⬛🟩🟩🟩🟩🟩🟩🦚🟩🦚🟩🟩🟩⬛⬛
+  // ⬛🟩🦚🦚🟩🟩🦚🟩🦚🦚🦚🟩🦚🦚🟩⬛
+  // ⬛🟩🦚🟩🦚🦚🦚🟩⬛🟩🦚🟩🦚⬛🦚⬛
+  // ⬛🟩⬛🟩🦚⬛🦚⬛⬛🦚⬛⬛🦚⬛🦚⬛
+  // ⬛⬛⬛🟩⬛🪦⬛🪦⬛🦚⬛🪦⬛🪦⬛⬛
+  // ⬛⚪⚪⬛🪦🪦🪦🪦🪦⬛🪦🪦🪦🪦🪦⬛
+  // ⬛⬜⬜🪦🪦⚪🪦⚪🪦🪦🪦⚪⚪🪦🪦⬛
+  // ⬛⬜⬜⚪⚪⚪⚪⚪⚪🪦⚪⚪⚪⚪🪦⬛
+  // ⬛⬜⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦⬛
+  // ⬛⬜⬜⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦⚪⬛
+  // ⬛⚪⬜⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦🪦⬛
+  // ⬛⬜⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦⚪⬛
+  // ⬛⬜⬜⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦🪦⬛
+  // ⬛⬛⚪⬜⚪⚪⚪⚪⚪⚪⚪⚪🪦🪦⬛⬛
+  // Hidden block, shown when player jumps into it
+ public:
+  HiddenBlock(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
+
+  virtual bool is_solid([[maybe_unused]] const Level& level) const override { return !is_hidden_; }
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    if (is_hidden_)
+    {
+      return {};
+    }
+    return {std::make_pair(position, Sprite::SPRITE_HIDDEN_BLOCK)};
+  }
+  virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager) override;
+
+ private:
+  bool is_hidden_ = true;
 };

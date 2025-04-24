@@ -438,7 +438,7 @@ void GameImpl::update_actors()
 
 void GameImpl::touch_actor(Actor& actor)
 {
-  const auto touch_type = actor.on_touch(*sound_manager_);
+  const auto touch_type = actor.on_touch(player_, *sound_manager_);
   switch (touch_type)
   {
     case TouchType::TOUCH_TYPE_NONE:

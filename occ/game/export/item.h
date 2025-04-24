@@ -14,7 +14,7 @@ class Item : public Actor
   }
 
   virtual bool is_alive() const override { return is_alive_; }
-  virtual TouchType on_touch(AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, AbstractSoundManager& sound_manager) override
   {
     is_alive_ = false;
     sound_manager.play_sound(sound_);

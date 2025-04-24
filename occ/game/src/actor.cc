@@ -1,6 +1,7 @@
 #include "actor.h"
 
 #include "level.h"
+#include "player.h"
 
 std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
                                                                const int dy,
@@ -213,4 +214,14 @@ void ClearBlock::on_hit(AbstractSoundManager& sound_manager, [[maybe_unused]] co
 {
   is_alive_ = false;
   sound_manager.play_sound(SoundType::SOUND_CLEAR_BLOCK);
+}
+
+TouchType HiddenBlock::on_touch(const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager)
+{
+  if (player.jumping)
+  {
+    // TODO: player gets stuck, need to bump them away
+    is_hidden_ = false;
+  }
+  return TouchType::TOUCH_TYPE_NONE;
 }

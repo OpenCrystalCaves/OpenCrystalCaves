@@ -1004,6 +1004,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
             flags |= TILE_SOLID;
             break;
+          case -80:
+            // Hidden block
+            level->actors.emplace_back(new HiddenBlock(geometry::Position{x * 16, y * 16}));
+            break;
           case -86:
             // Blue mushroom
             level->actors.emplace_back(

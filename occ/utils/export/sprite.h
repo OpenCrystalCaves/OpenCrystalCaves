@@ -3,6 +3,7 @@
 enum class Sprite : int
 {
   SPRITE_NONE = -1,
+  SPRITE_HIDDEN_BLOCK = 2,
   SPRITE_CANDLE = 3,
   SPRITE_CLEAR_BLOCK = 6,
   SPRITE_PICKAXE = 8,
