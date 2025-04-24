@@ -29,6 +29,16 @@ void Laser::update(AbstractSoundManager& sound_manager, const geometry::Rectangl
     level.hazards.emplace_back(child_);
     sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
   }
+  if (moving_)
+  {
+    int dy = down_ ? 2 : -2;
+    if (level.collides_solid(position + geometry::Position{0, dy}, size))
+    {
+      down_ = !down_;
+      dy = -dy;
+    }
+    position += geometry::Position{0, dy};
+  }
 }
 
 void LaserBeam::update([[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -37,6 +47,8 @@ void LaserBeam::update([[maybe_unused]] AbstractSoundManager& sound_manager,
 {
   frame_ = 1 - frame_;
   position += geometry::Position(left_ ? -4 : 4, 0);
+  // TODO: reduce hitbox
+  // TODO: kill outside window
   if (level.collides_solid(position + geometry::Position(0, 1), geometry::Size(16, 16)))
   {
     alive_ = false;

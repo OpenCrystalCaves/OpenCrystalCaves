@@ -722,6 +722,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'N':
             level->has_moon = true;
             break;
+          case 's':
+            // Moving laser
+            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false, true));
+            break;
           case 'S':
             // Snake
             level->enemies.emplace_back(new Snake(geometry::Position{x * 16, y * 16}));

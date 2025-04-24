@@ -64,8 +64,9 @@ class Laser : public Hazard
   // ⚫🔴🟥🪦🪦⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫
   // ⚫🪦🪦⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫
   // Faces left/right, fires slow laser at player when they enter line
+  // Optionally moves up/down
  public:
-  Laser(geometry::Position position, bool left) : Hazard(position), left_(left) {}
+  Laser(geometry::Position position, bool left, bool moving = false) : Hazard(position), left_(left), moving_(moving) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
@@ -80,6 +81,8 @@ class Laser : public Hazard
 
  private:
   bool left_;
+  bool moving_;
+  bool down_ = false;
   LaserBeam* child_ = nullptr;
 };
 
