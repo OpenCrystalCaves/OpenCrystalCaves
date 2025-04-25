@@ -20,6 +20,7 @@ enum SwitchFlag
 {
   SWITCH_FLAG_MOVING_PLATFORMS = 1,
   SWITCH_FLAG_LASERS = 2,
+  SWITCH_FLAG_LIGHTS = 3,
 };
 
 struct Level
@@ -54,7 +55,7 @@ struct Level
   std::unique_ptr<Exit> exit;
   bool has_earth = false;
   bool has_moon = false;
-  int switch_flags = SWITCH_FLAG_LASERS;
+  int switch_flags = SWITCH_FLAG_LASERS | SWITCH_FLAG_LIGHTS;
   bool has_key = false;
   std::bitset<3> lever_on = {0};
 };

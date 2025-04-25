@@ -8,6 +8,7 @@
 
 // TODO: Rename files to sprite_manager.cc/h ?
 #define SPRITE_STRIDE 52
+#define SPRITE_TOTAL (SPRITE_STRIDE * 23)
 
 #define CHAR_W 8
 #define CHAR_H 8
@@ -56,6 +57,8 @@ class SpriteManager
   geometry::Rectangle get_rect_for_icon(const int idx) const;
   void render_icon(const Icon icon, const geometry::Position& pos, const bool flip = false, const Color tint = {0xff, 0xff, 0xff}) const;
   void render_cones(const geometry::Position& pos, const geometry::Position camera_position = {0, 0}) const;
+
+  bool remaster = false;
 
  private:
   std::unique_ptr<Surface> sprite_surface_;

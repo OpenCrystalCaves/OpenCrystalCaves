@@ -19,5 +19,6 @@ PlayerInput input_to_player_input(const Input& input)
   pi.ammo_pressed = input.ammo.pressed();
   pi.godmode_pressed = input.godmode.pressed();
   pi.reverse_gravity_pressed = input.reverse_gravity.pressed();
+  pi.remaster_pressed = input.space.pressed();
   return pi;
 }

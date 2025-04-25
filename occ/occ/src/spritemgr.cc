@@ -74,17 +74,17 @@ const std::unordered_map<uint32_t, uint32_t> blue_night = {
   {0xFF555555, 0xFF050526},
   {0xFFAAAAAA, 0xFF12073e},
   {0xFFFFFFFF, 0xFF4576a3},
-  {0xFF0000AA, 0xFF050526},
+  {0xFF0000AA, 0xFF000000},
   {0xFF5555FF, 0xFF12073e},
-  {0xFF00AA00, 0xFF12073e},
+  {0xFF00AA00, 0xFF000000},
   {0xFF55FF55, 0xFF201254},
-  {0xFF00AAAA, 0xFF201254},
+  {0xFF00AAAA, 0xFF000000},
   {0xFF55FFFF, 0xFF241b67},
-  {0xFFAA0000, 0xFF201254},
+  {0xFFAA0000, 0xFF000000},
   {0xFFFF5555, 0xFF241b67},
-  {0xFFAA00AA, 0xFF201254},
+  {0xFFAA00AA, 0xFF000000},
   {0xFFFF55FF, 0xFF242472},
-  {0xFFAA5500, 0xFF241b67},
+  {0xFFAA5500, 0xFF000000},
   {0xFFFFFF55, 0xFF242472},
 };
 
@@ -350,7 +350,10 @@ void SpriteManager::render_tile(const int sprite, const geometry::Position& pos,
     render_cones(pos, camera_position);
     return;
   }
-  const auto src_rect = get_rect_for_tile(sprite);
+  
+  // Use alternate dark sprites for remaster gfx
+  const int sprite_remaster = remaster && sprite >= SPRITE_TOTAL ? sprite + SPRITE_TOTAL : sprite;
+  const auto src_rect = get_rect_for_tile(sprite_remaster);
   const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), SPRITE_W, SPRITE_H};
   get_surface()->blit_surface(src_rect, dest_rect);
 }

@@ -100,7 +100,7 @@ void GameRenderer::render_background() const
       const auto sprite_id = game_->get_bg_sprite(tile_x, tile_y);
       if (sprite_id != -1)
       {
-        sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
+        render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H});
       }
     }
   }
@@ -124,11 +124,11 @@ void GameRenderer::render_background() const
       // Moon is behind earth, render moon first
       if (geometry::isColliding(game_camera_, moon_rect))
       {
-        sprite_manager_->render_tile(moon_sprite, moon_rect.position, game_camera_.position);
+        render_tile(moon_sprite, moon_rect.position);
       }
       if (geometry::isColliding(game_camera_, earth_rect))
       {
-        sprite_manager_->render_tile(static_cast<int>(Sprite::SPRITE_EARTH), earth_rect.position, game_camera_.position);
+        render_tile(static_cast<int>(Sprite::SPRITE_EARTH), earth_rect.position);
       }
     }
     else
@@ -136,11 +136,11 @@ void GameRenderer::render_background() const
       // Earth is behind moon, render earth first
       if (geometry::isColliding(game_camera_, earth_rect))
       {
-        sprite_manager_->render_tile(static_cast<int>(Sprite::SPRITE_EARTH), earth_rect.position, game_camera_.position);
+        render_tile(static_cast<int>(Sprite::SPRITE_EARTH), earth_rect.position);
       }
       if (geometry::isColliding(game_camera_, moon_rect))
       {
-        sprite_manager_->render_tile(moon_sprite, moon_rect.position, game_camera_.position);
+        render_tile(moon_sprite, moon_rect.position);
       }
     }
   }
@@ -171,12 +171,12 @@ void GameRenderer::render_background() const
       if (start_tile_x <= 29 && end_tile_x >= 29)
       {
         const auto sprite_id = 752 + ((game_tick_ - volcano_tick_start) / 3) % 4;
-        sprite_manager_->render_tile(sprite_id, {29 * SPRITE_W, 2 * SPRITE_H}, game_camera_.position);
+        render_tile(sprite_id, {29 * SPRITE_W, 2 * SPRITE_H});
       }
       if (start_tile_x <= 30 && end_tile_x >= 30)
       {
         const auto sprite_id = 748 + ((game_tick_ - volcano_tick_start) / 3) % 4;
-        sprite_manager_->render_tile(sprite_id, {30 * SPRITE_W, 2 * SPRITE_H}, game_camera_.position);
+        render_tile(sprite_id, {30 * SPRITE_W, 2 * SPRITE_H});
       }
     }
   }
@@ -197,7 +197,7 @@ void GameRenderer::render_player() const
 
   static constexpr std::array<int, 12> sprite_walking_dy = {0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1};
 
-  const geometry::Rectangle src_rect = [this]()
+  const int sprite = [this]()
   {
     const auto& player = game_->get_player();
     int sprite = 0;
@@ -273,18 +273,19 @@ void GameRenderer::render_player() const
     {
       sprite += 104;
     }
-    return sprite_manager_->get_rect_for_tile(sprite);
+    return sprite;
   }();
-  const auto player_render_pos = game_->get_player().position - game_camera_.position;
-
   // Note: player size is 12x16 but the sprite is 16x16 so we need to adjust where
   // the player is rendered
-  const geometry::Rectangle dest_rect{player_render_pos.x() - 2, player_render_pos.y(), 16, 16};
+  const auto player_render_pos = game_->get_player().position - geometry::Position{2, 0};
+
+  const geometry::Rectangle dest_rect{player_render_pos - game_camera_.position, 16, 16};
   if (game_->get_player().crushed)
   {
     // only render the hat and the feet
     constexpr int feet_h = 2;
     constexpr int hat_h = 3;
+    const auto src_rect = sprite_manager_->get_rect_for_tile(sprite);
     const geometry::Rectangle feet_src_rect{src_rect.position.x(), src_rect.position.y() + 16 - feet_h, src_rect.size.x(), feet_h};
     const geometry::Rectangle feet_dest_rect{dest_rect.position.x(), dest_rect.position.y() + 16 - feet_h, dest_rect.size.x(), feet_h};
     sprite_manager_->get_surface()->blit_surface(feet_src_rect, feet_dest_rect);
@@ -301,7 +302,7 @@ void GameRenderer::render_player() const
   }
   else
   {
-    sprite_manager_->get_surface()->blit_surface(src_rect, dest_rect);
+    render_tile(sprite, game_->get_player().position);
   }
 
   if (debug_)
@@ -351,7 +352,7 @@ void GameRenderer::render_tiles(bool in_front) const
           return tile.get_sprite();
         }
       }(game_tick_);
-      sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, game_camera_.position);
+      render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H});
     }
   }
 }
@@ -364,7 +365,7 @@ void GameRenderer::render_objects() const
     if (geometry::isColliding(geometry::Rectangle(object.position, object_size), game_camera_))
     {
       const auto sprite_id = object.get_sprite(game_tick_);
-      sprite_manager_->render_tile(sprite_id, object.position, game_camera_.position);
+      render_tile(sprite_id, object.position);
 
       if (debug_)
       {
@@ -427,5 +428,17 @@ void GameRenderer::render_statusbar() const
     sprite_manager_->render_number(game_->get_player().power_tick * FRAMES_PER_TICK / FPS,
                                    statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
     sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
+  }
+}
+
+void GameRenderer::render_tile(const int sprite, const geometry::Position& pos) const
+{
+  if (!(game_->get_level().switch_flags & SWITCH_FLAG_LIGHTS))
+  {
+    sprite_manager_->render_tile(sprite + SPRITE_TOTAL, pos, game_camera_.position);
+  }
+  else
+  {
+    sprite_manager_->render_tile(sprite + SPRITE_TOTAL, pos, game_camera_.position);
   }
 }

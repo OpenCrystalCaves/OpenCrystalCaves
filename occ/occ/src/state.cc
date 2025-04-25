@@ -400,6 +400,11 @@ void GameState::update(const Input& input)
 {
   State::update(input);
 
+  if (input.space.pressed())
+  {
+    sprite_manager_.remaster = !sprite_manager_.remaster;
+  }
+
   const auto panel_last = panel_current_;
   const int index_last = panel_current_ ? panel_current_->index() : -1;
   if (panel_current_ == nullptr)
