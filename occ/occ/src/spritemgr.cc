@@ -68,6 +68,25 @@ const std::unordered_map<uint32_t, uint32_t> cga_dark = {
   {0xFFAA5500, 0xFF000000},
   {0xFFFFFF55, 0xFFAA5500},
 };
+// Blue night palette https://lospec.com/palette-list/blue-night
+const std::unordered_map<uint32_t, uint32_t> blue_night = {
+  {0xFF000000, 0xFF000000},
+  {0xFF555555, 0xFF050526},
+  {0xFFAAAAAA, 0xFF12073e},
+  {0xFFFFFFFF, 0xFF4576a3},
+  {0xFF0000AA, 0xFF050526},
+  {0xFF5555FF, 0xFF12073e},
+  {0xFF00AA00, 0xFF12073e},
+  {0xFF55FF55, 0xFF201254},
+  {0xFF00AAAA, 0xFF201254},
+  {0xFF55FFFF, 0xFF241b67},
+  {0xFFAA0000, 0xFF201254},
+  {0xFFFF5555, 0xFF241b67},
+  {0xFFAA00AA, 0xFF201254},
+  {0xFFFF55FF, 0xFF242472},
+  {0xFFAA5500, 0xFF241b67},
+  {0xFFFFFF55, 0xFF242472},
+};
 
 int read_sprite_count(std::ifstream& input, const int filler)
 {
@@ -215,8 +234,9 @@ std::unique_ptr<Surface> load_surface(const std::filesystem::path& path,
   // The surfaces are now stacked vetically:
   // - normal
   // - CGA dark
-  const auto all_pixels = one_pixels + swap_pixels(one_pixels, cga_dark);
-  sheet_h *= 2;
+  // - Blue Night
+  const auto all_pixels = one_pixels + swap_pixels(one_pixels, cga_dark) + swap_pixels(one_pixels, blue_night);
+  sheet_h *= 3;
   auto surface = Surface::from_pixels(sheet_w, sheet_h, (uint32_t*)all_pixels.data(), window);
   if (!surface)
   {
