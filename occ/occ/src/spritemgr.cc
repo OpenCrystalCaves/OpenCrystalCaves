@@ -6,7 +6,7 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include <filesystem>
 #include <format>
 #include <fstream>
-#include <map>
+#include <unordered_map>
 
 #include "constants.h"
 #include "logger.h"
@@ -46,8 +46,27 @@ const uint32_t colors[] = {
   0xFF55FFFF,  // "🐬",
   0xFFFF5555,  // "🟥",
   0xFFFF55FF,  // "🟪",
-  0xFFFFFFAA,  // "🟨",
+  0xFFFFFF55,  // "🟨",
   0xFFFFFFFF,  // "⬜",
+};
+// Map all light colours to dark, and darks/greys to black
+const std::unordered_map<uint32_t, uint32_t> cga_dark = {
+  {0xFF000000, 0xFF000000},
+  {0xFF555555, 0xFF000000},
+  {0xFFAAAAAA, 0xFF000000},
+  {0xFFFFFFFF, 0xFFAAAAAA},
+  {0xFF0000AA, 0xFF000000},
+  {0xFF5555FF, 0xFF0000AA},
+  {0xFF00AA00, 0xFF000000},
+  {0xFF55FF55, 0xFF00AA00},
+  {0xFF00AAAA, 0xFF000000},
+  {0xFF55FFFF, 0xFF00AAAA},
+  {0xFFAA0000, 0xFF000000},
+  {0xFFFF5555, 0xFFAA0000},
+  {0xFFAA00AA, 0xFF000000},
+  {0xFFFF55FF, 0xFFAA00AA},
+  {0xFFAA5500, 0xFF000000},
+  {0xFFFFFF55, 0xFFAA5500},
 };
 
 int read_sprite_count(std::ifstream& input, const int filler)
@@ -152,6 +171,28 @@ std::string load_pixels(const std::filesystem::path& path,
   return all_pixels;
 }
 
+std::string swap_pixels(const std::string& in, const std::unordered_map<uint32_t, uint32_t>& mapping)
+{
+  // Palette swap pixels
+  std::string out(in.length(), '\0');
+  for (int i = 0; i < in.length() / sizeof(uint32_t); i++)
+  {
+    const uint32_t pixel_in = reinterpret_cast<const uint32_t*>(in.data())[i];
+    uint32_t* pixel_out = &reinterpret_cast<uint32_t*>(out.data())[i];
+    const int a = pixel_in & 0xff000000;
+    const auto mapped = mapping.find(pixel_in);
+    if (a == 0 || mapped == mapping.end())
+    {
+      *pixel_out = 0;
+    }
+    else
+    {
+      *pixel_out = mapped->second;
+    }
+  }
+  return out;
+}
+
 std::unique_ptr<Surface> load_surface(const std::filesystem::path& path,
                                       Window& window,
                                       const int sprite_w,
@@ -165,11 +206,17 @@ std::unique_ptr<Surface> load_surface(const std::filesystem::path& path,
     return nullptr;
   }
   int sheet_w = 0, sheet_h = 0;
-  const auto all_pixels = load_pixels(path, sprite_w, sprite_h, stride, filler, sheet_w, sheet_h);
-  if (all_pixels.empty())
+  const auto one_pixels = load_pixels(path, sprite_w, sprite_h, stride, filler, sheet_w, sheet_h);
+  if (one_pixels.empty())
   {
     return nullptr;
   }
+  // Duplicate the pixels and recolour/map them
+  // The surfaces are now stacked vetically:
+  // - normal
+  // - CGA dark
+  const auto all_pixels = one_pixels + swap_pixels(one_pixels, cga_dark);
+  sheet_h *= 2;
   auto surface = Surface::from_pixels(sheet_w, sheet_h, (uint32_t*)all_pixels.data(), window);
   if (!surface)
   {

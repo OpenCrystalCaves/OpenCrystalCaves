@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     LOG_CRITICAL("Could not initialize SDLWrapper");
     return 1;
   }
-  auto window = Window::create("OpenCrystalCaves", geometry::Size(10, 10), "");
+  auto window = Window::create("OpenCrystalCaves", geometry::Size(832, 368), "");
   if (!window)
   {
     LOG_CRITICAL("Could not create Window");
