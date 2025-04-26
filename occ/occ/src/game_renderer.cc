@@ -439,6 +439,6 @@ void GameRenderer::render_tile(const int sprite, const geometry::Position& pos) 
   }
   else
   {
-    sprite_manager_->render_tile(sprite + SPRITE_TOTAL, pos, game_camera_.position);
+    sprite_manager_->render_tile(sprite, pos, game_camera_.position);
   }
 }

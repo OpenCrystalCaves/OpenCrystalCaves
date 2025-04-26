@@ -20,7 +20,7 @@ enum SwitchFlag
 {
   SWITCH_FLAG_MOVING_PLATFORMS = 1,
   SWITCH_FLAG_LASERS = 2,
-  SWITCH_FLAG_LIGHTS = 3,
+  SWITCH_FLAG_LIGHTS = 4,
 };
 
 struct Level

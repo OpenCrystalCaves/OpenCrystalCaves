@@ -1027,6 +1027,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Chest
             level->actors.emplace_back(new Chest(geometry::Position{x * 16, y * 16}));
             break;
+          case -90:
+            // Light switch
+            level->actors.emplace_back(new Switch(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_LIGHT_SWITCH_OFF, SWITCH_FLAG_LIGHTS));
+            // Light switch implies level is dark
+            level->switch_flags &= ~SWITCH_FLAG_LIGHTS;
+            break;
           case -91:
             // Top of blue door
             level->actors.emplace_back(new Door(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_B));
