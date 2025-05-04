@@ -6,6 +6,8 @@ Display Crystal Caves levels
 #include <fstream>
 #include <iostream>
 
+#include <SDL.h>
+
 #include "../game/src/level.h"
 #include "../game/src/level_loader.h"
 #include "../occ/src/spritemgr.h"
@@ -19,7 +21,7 @@ Display Crystal Caves levels
 static constexpr geometry::Size WIN_SIZE = geometry::Size(40 * SPRITE_W, 25 * SPRITE_H);
 
 
-void draw(Window& window, Level& level, SpriteManager& sprite_manager, const int mx, const int my)
+void draw(Window& window, Level& level, SpriteManager& sprite_manager, const int mx, const int my, const Input& input)
 {
   window.fill_rect(geometry::Rectangle(0, 0, WIN_SIZE), {33u, 33u, 33u});
   for (int y = 0; y < level.height; y++)
@@ -88,6 +90,18 @@ void draw(Window& window, Level& level, SpriteManager& sprite_manager, const int
     const int tooltip_x = std::min(rect.position.x() + rect.size.x(), level.width * SPRITE_W - 128);
     const int tooltip_y = std::min(rect.position.y() + rect.size.y(), 22 * SPRITE_H - 16);
     sprite_manager.render_text(tooltip, geometry::Position{tooltip_x, tooltip_y});
+    if (input.mouse_left.pressed())
+    {
+      const auto s = std::to_string(mi);
+      if (SDL_SetClipboardText(s.c_str()) != 0)
+      {
+        std::cerr << "Failed to set clipboard text: " << SDL_GetError() << "\n";
+      }
+      else
+      {
+        std::cout << "Copied to clipboard: " << s << "\n";
+      }
+    }
   }
   window.refresh();
 }
@@ -169,7 +183,7 @@ int main(int argc, char* argv[])
     const int my = input.mouse.y() / SPRITE_H;
     if (index != last_index || mx != last_mx || my != last_my)
     {
-      draw(*window, *levels[index], sprite_manager, mx, my);
+      draw(*window, *levels[index], sprite_manager, mx, my, input);
       last_index = index;
       last_mx = mx;
       last_my = my;

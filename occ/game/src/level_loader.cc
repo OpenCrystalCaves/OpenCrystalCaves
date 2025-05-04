@@ -887,6 +887,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_PLATFORM_BLUE);
             flags |= TILE_SOLID_TOP;
             break;
+          case '~':
+            // Bat
+            level->enemies.emplace_back(new Bat(geometry::Position{x * 16, y * 16}));
+            break;
           case -5:
             sprite = static_cast<int>(Sprite::SPRITE_BARREL_BROKEN);
             flags |= TILE_SOLID_TOP;

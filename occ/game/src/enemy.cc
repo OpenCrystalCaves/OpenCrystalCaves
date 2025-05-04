@@ -25,13 +25,20 @@ void Enemy::on_death(AbstractSoundManager& sound_manager, [[maybe_unused]] Level
 
 bool Enemy::should_reverse(const Level& level) const
 {
-  // Reverse direction if colliding left/right or about to fall
+  // Reverse direction if colliding left/right or about to fall (non-flying)
   // Note: falling looks at two points near the left- and right- bottom corners
-  return level.collides_solid(position, size) ||
-    (!level.collides_solid(position + geometry::Position(1, 1), geometry::Size(1, size.y())) &&
-     !level.collides_solid_top(position + geometry::Position(1, 1), geometry::Size(1, size.y()))) ||
-    (!level.collides_solid(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y())) &&
-     !level.collides_solid_top(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y())));
+  if (level.collides_solid(position, size))
+  {
+    return true;
+  }
+  if (!flying())
+  {
+    return (!level.collides_solid(position + geometry::Position(1, 1), geometry::Size(1, size.y())) &&
+            !level.collides_solid_top(position + geometry::Position(1, 1), geometry::Size(1, size.y()))) ||
+      (!level.collides_solid(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y())) &&
+       !level.collides_solid_top(position + geometry::Position(size.x() - 1, 1), geometry::Size(1, size.y())));
+  }
+  return false;
 }
 
 void Bigfoot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
@@ -467,4 +474,30 @@ std::vector<std::pair<geometry::Position, Sprite>> Triceratops::get_sprites([[ma
   return {std::make_pair(position, static_cast<Sprite>(frame)),
           std::make_pair(position + geometry::Position{16, 0}, static_cast<Sprite>(frame + df)),
           std::make_pair(position + geometry::Position{32, 0}, static_cast<Sprite>(frame + df * 2))};
+}
+
+void Bat::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                 [[maybe_unused]] const geometry::Rectangle& player_rect,
+                 Level& level)
+{
+  frame_++;
+  if (frame_ == 10)
+  {
+    frame_ = 0;
+  }
+  const auto d = geometry::Position(left_ ? -2 : 2, 0);
+  position += d;
+  if (next_reverse_ == 0 || should_reverse(level))
+  {
+    left_ = !left_;
+    position -= d;
+    // Change directions every 1-10 seconds
+    next_reverse_ = 17 * (1 + static_cast<int>(rand() % 10));
+  }
+  next_reverse_--;
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Bat::get_sprites([[maybe_unused]] const Level& level) const
+{
+  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_BAT_1) + frame_))};
 }

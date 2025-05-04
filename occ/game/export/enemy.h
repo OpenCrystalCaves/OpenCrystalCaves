@@ -25,6 +25,7 @@ class Enemy : public Actor
     // TODO: play sound
     return TouchType::TOUCH_TYPE_HURT;
   }
+  virtual bool flying() const { return false; }
 
   int health;
 
@@ -362,4 +363,25 @@ class Triceratops : public Enemy
  private:
   bool left_ = false;
   int frame_ = 0;
+};
+
+class Bat : public Enemy
+{
+  // ⬛⚫⚫⚫⚫⬛🟨⚫⚫🟨⬛⚫⚫⚫⚫⬛
+  // ⚫⚫⚫⬛⚫⚫⚫⚫⚫⚫⚫⚫⬛⚫⚫⚫
+  // ⚫⚫⬛⬛⬛⬛⚫⚫⚫⚫⬛⬛⬛⬛⚫⚫
+  // ⚫⬛⬛⬛⬛⬛⬛⚫⚫⬛⬛⬛⬛⬛⬛⚫
+  // Moves left and right erratically, flies
+ public:
+  Bat(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual int get_points() const override { return 100; }
+  virtual bool flying() const { return true; }
+
+ private:
+  bool left_ = false;
+  int frame_ = 0;
+  int next_reverse_ = 0;
 };

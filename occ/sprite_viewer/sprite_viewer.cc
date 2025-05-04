@@ -14,7 +14,7 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include "logger.h"
 #include "sdl_wrapper.h"
 
-void draw(Window& window, const Surface& surface, int x, int y, Input& input, SpriteManager& sprite_manager)
+void draw(Window& window, const Surface& surface, int x, int y, const Input& input, SpriteManager& sprite_manager)
 {
   window.fill_rect(geometry::Rectangle(0, 0, surface.size()), {33u, 33u, 33u});
   surface.blit_surface();

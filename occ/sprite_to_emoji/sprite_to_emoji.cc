@@ -17,8 +17,9 @@ struct Header
   uint8_t height;
 };
 
+const std::string blank = "⬛";
 const std::string colors[] = {
-  "⬛",
+  "⚫",
   "🇪🇺",
   "🦚",
   "📘",
@@ -67,7 +68,7 @@ int main()
               const bool t = (t_plane >> bit) & 1;
               if (!t)
               {
-                std::cout << colors[0];
+                std::cout << blank;
               }
               else
               {
