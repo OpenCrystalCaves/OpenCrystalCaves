@@ -54,6 +54,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Snoozer roll animation       | ![](/screenshots/roll_cc.gif?raw=true) Third frame has slight Y offset                              | ![](/screenshots/roll_occ.gif?raw=true) No irregular Y offsets                                            |
 | Flame on/off animation       | ![](/screenshots/flame_cc.gif?raw=true) Transition in but not out                                   | ![](/screenshots/flame_occ.gif?raw=true) Transition both in and out                                       |
 | Lights off                   | ![](/screenshots/dark_cc.png?raw=true) EGA palette swapped                                          | ![](/screenshots/dark_occ.png?raw=true) Option to use blue monochrome dark palette                        |
+| Level complete indicator     | ![](/screenshots/complete_cc.gif?raw=true) Green overscan (invisible in dosbox)                     | ![](/screenshots/complete_occ.gif?raw=true) Flashing green screen border                                  |
 
 ## Compiling OCC
 
