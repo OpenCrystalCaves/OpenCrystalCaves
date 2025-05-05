@@ -216,7 +216,7 @@ void ClearBlock::on_hit(AbstractSoundManager& sound_manager, [[maybe_unused]] co
   sound_manager.play_sound(SoundType::SOUND_CLEAR_BLOCK);
 }
 
-TouchType HiddenBlock::on_touch(const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager)
+TouchType HiddenBlock::on_touch(const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
 {
   if (player.jumping)
   {

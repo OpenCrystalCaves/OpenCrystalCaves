@@ -47,7 +47,9 @@ class Actor
   virtual bool interact([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level) { return false; };
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const = 0;
   virtual std::vector<geometry::Rectangle> get_detection_rects([[maybe_unused]] const Level& level) const { return {}; }
-  virtual TouchType on_touch([[maybe_unused]] const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager)
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             [[maybe_unused]] AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level)
   {
     return TouchType::TOUCH_TYPE_NONE;
   }
@@ -293,7 +295,7 @@ class HiddenBlock : public Actor
     }
     return {std::make_pair(position, Sprite::SPRITE_HIDDEN_BLOCK)};
   }
-  virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager) override;
+  virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
 
  private:
   bool is_hidden_ = true;

@@ -150,7 +150,9 @@ void GameImpl::update_level()
   {
     if (!level_->exit->open)
     {
-      level_->exit->open = geometry::isColliding({player_.position, player_.size}, {level_->exit->position, SPRITE_W, 2 * SPRITE_H});
+      const bool can_exit = !level_->has_crystals || level_->crystals <= 0;
+      level_->exit->open =
+        can_exit && geometry::isColliding({player_.position, player_.size}, {level_->exit->position, SPRITE_W, 2 * SPRITE_H});
       if (level_->exit->open)
       {
         entering_level = static_cast<LevelId>(LevelId::MAIN_LEVEL);
@@ -438,7 +440,7 @@ void GameImpl::update_actors()
 
 void GameImpl::touch_actor(Actor& actor)
 {
-  const auto touch_type = actor.on_touch(player_, *sound_manager_);
+  const auto touch_type = actor.on_touch(player_, *sound_manager_, *level_);
   switch (touch_type)
   {
     case TouchType::TOUCH_TYPE_NONE:

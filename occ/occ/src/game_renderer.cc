@@ -34,6 +34,15 @@ void GameRenderer::update(unsigned game_tick)
   game_tick_diff_ = game_tick - game_tick_;
   game_tick_ = game_tick;
 
+  if (!game_->get_level().has_crystals || game_->get_level().crystals > 0)
+  {
+    game_complete_ticks_ = 20;
+  }
+  else if (game_->get_level().has_crystals && game_complete_ticks_ > 0)
+  {
+    game_complete_ticks_--;
+  }
+
   // Update game camera
   // Note: this isn't exactly how the Crystal Caves camera work, but it's good enough
   const geometry::Position player_camera_relative_position{(game_->get_player().position + (game_->get_player().size / 2)) -
@@ -78,6 +87,7 @@ void GameRenderer::render_game() const
   render_objects();
   render_player();
   render_tiles(true);
+  render_complete_border();
   render_statusbar();
   window_.set_render_target(nullptr);
 }
@@ -392,6 +402,15 @@ void GameRenderer::render_objects() const
         window_.render_rectangle(dest_rect, {255, 255, 0});
       }
     }
+  }
+}
+
+void GameRenderer::render_complete_border() const
+{
+  if ((game_complete_ticks_ % 8) < 4)
+  {
+    const auto statusbar_rect = geometry::Rectangle(0, 0, game_camera_.size.x() - 1, game_camera_.size.y() - 1);
+    window_.render_rectangle(statusbar_rect, {0u, 255u, 0u});
   }
 }
 

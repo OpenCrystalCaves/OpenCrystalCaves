@@ -26,6 +26,7 @@ class GameRenderer
   void render_player() const;
   void render_tiles(bool in_front) const;
   void render_objects() const;
+  void render_complete_border() const;
   void render_statusbar() const;
   void render_tile(const int sprite, const geometry::Position& pos) const;
 
@@ -38,6 +39,7 @@ class GameRenderer
 
   unsigned game_tick_;
   unsigned game_tick_diff_;
+  unsigned game_complete_ticks_ = 20;
 
   bool debug_;
 };

@@ -14,7 +14,9 @@ class Item : public Actor
   }
 
   virtual bool is_alive() const override { return is_alive_; }
-  virtual TouchType on_touch([[maybe_unused]] const Player& player, AbstractSoundManager& sound_manager) override
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level) override
   {
     is_alive_ = false;
     sound_manager.play_sound(sound_);
@@ -51,6 +53,7 @@ class Crystal : public Item
  public:
   Crystal(geometry::Position position, Sprite sprite) : Item(position, sprite, SoundType::SOUND_CRYSTAL, TouchType::TOUCH_TYPE_SCORE) {}
 
+  virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
   virtual int get_points() const override { return 50; }
 };
 

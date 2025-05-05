@@ -9,7 +9,7 @@
 #include "level.h"
 #include "logger.h"
 
-static const std::unordered_set<LevelId> completedLevels{LevelId::LEVEL_2, LevelId::LEVEL_4};
+static const std::unordered_set<LevelId> completedLevels{LevelId::LEVEL_1, LevelId::LEVEL_2, LevelId::LEVEL_4};
 
 namespace LevelLoader
 {
@@ -483,15 +483,23 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Crystals
           case '+':
             level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_Y));
+            level->crystals++;
+            level->has_crystals = true;
             break;
           case 'b':
             level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_G));
+            level->crystals++;
+            level->has_crystals = true;
             break;
           case 'R':
             level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_R));
+            level->crystals++;
+            level->has_crystals = true;
             break;
           case 'c':
             level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_B));
+            level->crystals++;
+            level->has_crystals = true;
             break;
             // Ammo
           case 'G':
