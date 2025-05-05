@@ -17,7 +17,7 @@ struct Header
   uint8_t height;
 };
 
-const std::string blank = "⬛";
+const std::string blank = "➖";
 const std::string colors[] = {
   "⚫",
   "🇪🇺",
