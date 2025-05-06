@@ -395,3 +395,46 @@ class Flame : public Hazard
   bool is_on() const;
   int frame_ = 48;
 };
+
+class Stalactite : public Hazard
+{
+  // ⚫🟨🟠🟠🟠🟠🟠⚫⬛🟨🟠🟠🟠🟠🟠⬛
+  // ⚫🟠🟠🟠🟠🟠🟥⬛⚫🟠🟨🟠🟠🟠🟥⚫
+  // ⚫🟨🟠🟠🟠🟠🟠⚫⬛🟠🟠🟠🟠🟠🟠⬛
+  // ⬛⚫🟠🟠🟠🟥⚫⬛⚫🟠🟠🟠🟠🟠🟠⚫
+  // ⬛⚫🟠🟨🟠🟠⚫⬛⬛⚫🟠🟨🟠🟥⚫⬛
+  // ⬛⚫🟨🟠🟠🟥⚫⬛⬛⚫🟨🟠🟠🟠⚫⬛
+  // ⬛⚫🟠🟠🟠🟠⚫⬛⬛⚫🟠🟨🟠🟥⚫⬛
+  // ⬛⬛⚫🟠🟨🟠⚫⬛⬛⚫🟠🟠🟠🟠⚫⬛
+  // ⬛⬛⚫🟨🟠🟥⚫⬛⬛⚫🟠🟠🟠🟠⚫⬛
+  // ⬛⬛⚫🟠🟠🟠⚫⬛⬛⚫🟨🟠🟥⚫⬛⬛
+  // ⬛⬛⚫🟠🟨🟠⚫⬛⬛⚫🟠🟠🟠⚫⬛⬛
+  // ⬛⬛⬛⚫🟠⚫⬛⬛⬛⚫🟨🟠🟥⚫⬛⬛
+  // ⬛⬛⬛⚫🟨⚫⬛⬛⬛⚫🟠🟨🟠⚫⬛⬛
+  // ⬛⬛⬛⬛⚫⬛⬛⬛⬛⚫🟠🟠🟠⚫⬛⬛
+  // ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⚫🟠⚫⬛⬛⬛
+  // Falls if player gets under
+ public:
+  Stalactite(geometry::Position position) : Hazard(position) {}
+
+  virtual bool is_alive() const override { return position.y() < 1000; }
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {std::make_pair(position, Sprite::SPRITE_STALACTITE_1)};
+  }
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             [[maybe_unused]] AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level) override
+  {
+    // TODO: sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(0, 1, level);
+  }
+
+ private:
+  bool asleep_ = true;
+};

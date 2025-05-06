@@ -895,6 +895,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_PLATFORM_BLUE);
             flags |= TILE_SOLID_TOP;
             break;
+          case '|':
+            // Stalactite
+            level->hazards.emplace_back(new Stalactite(geometry::Position{x * 16, y * 16}));
+            break;
           case '~':
             // Bat
             level->enemies.emplace_back(new Bat(geometry::Position{x * 16, y * 16}));
@@ -995,6 +999,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -67:
             sprite = static_cast<int>(Sprite::SPRITE_LEDGE_R);
             flags |= TILE_SOLID_TOP;
+            break;
+          case -69:
+            sprite = static_cast<int>(Sprite::SPRITE_PURPLE_MUSHROOM);
+            flags |= TILE_RENDER_IN_FRONT;
             break;
           case -70:
             sprite = static_cast<int>(Sprite::SPRITE_PILLAR_2);

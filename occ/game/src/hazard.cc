@@ -203,3 +203,17 @@ bool Flame::is_on() const
 {
   return frame_ >= FLAME_OFF_FRAMES;
 }
+
+void Stalactite::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
+{
+  if (asleep_ && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+  {
+    asleep_ = false;
+    sound_manager.play_sound(SoundType::SOUND_STALACTITE_FALL);
+  }
+  if (!asleep_)
+  {
+    // TODO: see if we can kill on collision
+    position += geometry::Position{0, 8};
+  }
+}
