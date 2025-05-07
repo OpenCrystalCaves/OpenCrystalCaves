@@ -220,7 +220,6 @@ TouchType HiddenBlock::on_touch(const Player& player, [[maybe_unused]] AbstractS
 {
   if (player.jumping)
   {
-    // TODO: player gets stuck, need to bump them away
     is_hidden_ = false;
   }
   return TouchType::TOUCH_TYPE_NONE;

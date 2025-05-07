@@ -17,6 +17,7 @@ struct Player
   static constexpr geometry::Size size = geometry::Size(12, 16);
 
   geometry::Position position = geometry::Position(0, 0);
+  geometry::Position position_last = geometry::Position(0, 0);
   Vector<int> velocity = Vector<int>(0, 0);
   enum class Direction
   {

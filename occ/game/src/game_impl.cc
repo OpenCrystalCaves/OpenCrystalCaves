@@ -170,11 +170,7 @@ void GameImpl::update_level()
 void GameImpl::update_player(const PlayerInput& player_input)
 {
   /**
-   * Updating the player is done in these steps:
-   * 1. Update player information based on input
-   * 2. Update player velocity based on player information
-   * 3. Update player position based on player velocity
-   * 4. Update player information based on collision
+   * Update player information based on input
    */
 
   if (entering_level != level_->level_id)

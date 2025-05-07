@@ -18,6 +18,17 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
    * 4. Update player information based on collision
    */
 
+  // Warp player back to last known good position if they are currently colliding
+  // This is to allow them to jump into hidden blocks that solidify
+  if (level.collides_solid(position, size))
+  {
+    position = position_last;
+  }
+  else
+  {
+    position_last = position;
+  }
+
   /**
    * 2. Update player velocity based on player information
    */
