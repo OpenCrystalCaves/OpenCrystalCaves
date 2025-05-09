@@ -438,3 +438,38 @@ class Stalactite : public Hazard
  private:
   bool asleep_ = true;
 };
+
+class AirPipe : public Hazard
+{
+  // ⚫🟨🟨⬜🟨🟨🟨🟠🟨⚫➖➖⚫⚫⚫➖
+  // ⚫🟨🟨⬜🟨🟨🟨🟠🟨⚫➖⚫🟨🟨🟨⚫
+  // ⚫🟨🟨🟨🟨🟨🟨🟨🟨⚫⚫🟨🟠⚫🟠🟨
+  // ⚫🟨🟨⬜🟨🟨🟨🟠🟨🟨🟨🟨🟠⚫🟠🟨
+  // ⚫🟨🟨⬜🟨🟨🟨🟨🟨🟨🟠🟠🟠⚫🟠🟨➖➖⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜➖➖➖➖
+  // ⚫🟨🟨🟨🟨🟨🟨🟨🟠🟠🟨🟨🟠⚫🟠🟨
+  // ⚫🟨🟨⬜🟨🟨🟨🟨🟨🟨🟨🟨🟠⚫🟠🟨
+  // ➖⚫🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟠⚫🟠🟨➖➖⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜➖➖
+  // ➖⚫🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟠⚫🟠🟨
+  // ➖➖⚫🟨🟨🟨🟨🟨🟨🟨🟨🟨🟠⚫🟠🟨
+  // ➖➖➖⚫🟨🟨⬜⬜🟨🟨🟨🟨🟠⚫🟠🟨➖➖⬜⬜⬜⬜⬜⬜⬜⬜➖➖➖➖➖➖
+  // ➖➖➖➖⚫🟨🟨🟨⬜⬜🟨🟨🟠⚫🟠🟨
+  // ➖➖➖➖➖⚫⚫🟨🟨🟨⬜🟨🟠⚫🟠🟨
+  // ➖➖➖➖➖➖➖⚫⚫🟨🟨🟨🟠⚫🟠🟨
+  // ➖➖➖➖➖➖➖➖➖⚫⚫⚫🟨🟨🟨⚫
+  // ➖➖➖➖➖➖➖➖➖➖➖➖⚫⚫⚫➖
+  // Sucks in player and kills them on touch
+ public:
+  AirPipe(geometry::Position position, bool is_left) : Hazard(position), is_left_(is_left) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(is_left_ ? -1 : 1, 0, level);
+  }
+
+ private:
+  bool is_left_;
+  int frame_ = 0;
+};

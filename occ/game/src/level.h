@@ -60,4 +60,5 @@ struct Level
   int crystals = 0;
   bool has_crystals = false;
   std::bitset<3> lever_on = {0};
+  geometry::Position dv;
 };

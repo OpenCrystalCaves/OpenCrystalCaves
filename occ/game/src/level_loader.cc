@@ -770,6 +770,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'w':
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
             break;
+          case 'W':
+            // Air Pipe
+            // WL = left facing, WR = right facing
+            level->hazards.emplace_back(new AirPipe(geometry::Position{x * 16, y * 16}, level->tile_ids[i + 1] == 'L'));
+            // TODO: skip next tile
+            break;
           case 'x':
             // TODO: remember completion state
             // Show levels under construction with cones

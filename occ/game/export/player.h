@@ -51,4 +51,5 @@ struct Player
   void update(AbstractSoundManager& sound_manager, const Level& level);
   void hurt(const TouchType& touch_type);
   bool is_flashing() const;
+  geometry::Rectangle rect() const { return {position, size}; }
 };

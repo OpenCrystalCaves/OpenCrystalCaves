@@ -58,7 +58,7 @@ class SpriteManager
   void render_icon(const Icon icon, const geometry::Position& pos, const bool flip = false, const Color tint = {0xff, 0xff, 0xff}) const;
   void render_cones(const geometry::Position& pos, const geometry::Position camera_position = {0, 0}) const;
 
-  bool remaster = false;
+  bool remaster = true;
 
  private:
   std::unique_ptr<Surface> sprite_surface_;

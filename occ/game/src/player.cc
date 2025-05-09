@@ -90,6 +90,9 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
     velocity = Vector<int>(0, velocity.y());
   }
 
+  // Add level velocity to player
+  velocity += level.dv;
+
   /**
    * 3. Update player position based on player velocity
    */

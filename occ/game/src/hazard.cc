@@ -1,6 +1,7 @@
 #include "hazard.h"
 
 #include "level.h"
+#include "player.h"
 
 void AirTank::update([[maybe_unused]] AbstractSoundManager& sound_manager,
                      [[maybe_unused]] const geometry::Rectangle& player_rect,
@@ -216,4 +217,66 @@ void Stalactite::update(AbstractSoundManager& sound_manager, const geometry::Rec
     // TODO: see if we can kill on collision
     position += geometry::Position{0, 8};
   }
+}
+
+void AirPipe::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
+{
+  frame_++;
+  if (frame_ == 6)
+  {
+    frame_ = 0;
+  }
+  if (geometry::is_any_colliding(get_detection_rects(level), player_rect))
+  {
+    level.dv = geometry::Position{is_left_ ? 1 : -1, 0};
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> AirPipe::get_sprites([[maybe_unused]] const Level& level) const
+{
+  if (is_left_)
+  {
+    return {
+      std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_L_1) + (frame_ % 3))),
+      std::make_pair(position + geometry::Position(16, 0),
+                     static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_PIPE_L_1) + (frame_ % 2))),
+    };
+  }
+  else
+  {
+    return {
+      std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_PIPE_R_1) + (frame_ % 2))),
+      std::make_pair(position + geometry::Position(16, 0), static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_R_1) + (frame_ % 3))),
+    };
+  }
+}
+
+TouchType AirPipe::on_touch(const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager, Level& level)
+{
+  geometry::Rectangle soft_attract;
+  geometry::Rectangle hard_attract;
+  int dx;
+  if (is_left_)
+  {
+    dx = 1;
+    soft_attract = geometry::Rectangle{position, geometry::Size{16, 16}};
+    hard_attract = geometry::Rectangle{position + geometry::Position{16, 0}, geometry::Size{16, 16}};
+  }
+  else
+  {
+    dx = -1;
+    soft_attract = geometry::Rectangle{position + geometry::Position{16, 0}, geometry::Size{16, 16}};
+    hard_attract = geometry::Rectangle{position, geometry::Size{16, 16}};
+  }
+
+  if (geometry::isColliding(player.rect(), hard_attract))
+  {
+    level.dv = {dx * 6, 0};
+  }
+  else if (geometry::isColliding(player.rect(), soft_attract))
+  {
+    level.dv = {dx * 3, 0};
+  }
+  // TODO: suck/kill player
+  return TouchType::TOUCH_TYPE_NONE;
 }

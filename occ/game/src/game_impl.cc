@@ -50,7 +50,6 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   // TODO: don't update enemies off screen
   update_level();
   update_actors();
-  update_player(player_input);
   update_missile();
   update_enemies();
   update_hazards();
@@ -71,6 +70,9 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
       touch_actor(*hazard);
     }
   }
+
+  // Update actor last as they may be affected by touch/hazards
+  update_player(player_input);
 }
 
 int GameImpl::get_bg_sprite(const int x, const int y) const
@@ -97,6 +99,8 @@ std::wstring GameImpl::get_debug_info() const
 
 void GameImpl::update_level()
 {
+  level_->dv = geometry::Position();
+
   // Update all MovingPlatforms
   for (auto& platform : level_->moving_platforms)
   {
@@ -347,7 +351,7 @@ void GameImpl::update_enemies()
     //       This is applicable for when the player gets hit as well
     //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
     //       for all player and enemy sprite when loading sprites?
-    e->update(*sound_manager_, {player_.position, player_.size}, *level_);
+    e->update(*sound_manager_, player_.rect(), *level_);
 
     // Check if enemy died
     if (!e->is_alive())
@@ -389,7 +393,7 @@ void GameImpl::update_hazards()
   for (int i = 0; i < level_->hazards.size();)
   {
     auto h = level_->hazards[i].get();
-    h->update(*sound_manager_, {player_.position, player_.size}, *level_);
+    h->update(*sound_manager_, player_.rect(), *level_);
 
     // Check if hazard died
     if (!h->is_alive())
@@ -413,7 +417,7 @@ void GameImpl::update_actors()
   for (auto it = level_->actors.begin(); it != level_->actors.end();)
   {
     auto a = it->get();
-    a->update(*sound_manager_, {player_.position, player_.size}, *level_);
+    a->update(*sound_manager_, player_.rect(), *level_);
     if (geometry::isColliding(prect, geometry::Rectangle(a->position, a->size)))
     {
       touch_actor(*a);
