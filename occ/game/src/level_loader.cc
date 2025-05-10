@@ -153,6 +153,7 @@ enum class TileMode
   GLASS_BALL,
   CATERPILLAR,
   TRICERATOPS,
+  AIR_PIPE,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -458,6 +459,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         {
           mode = TileMode::NONE;
         }
+        break;
+      case TileMode::AIR_PIPE:
+        // Skip this tile
+        mode = TileMode::NONE;
         break;
       default:
         switch (tile_id)
@@ -774,7 +779,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Air Pipe
             // WL = left facing, WR = right facing
             level->hazards.emplace_back(new AirPipe(geometry::Position{x * 16, y * 16}, level->tile_ids[i + 1] == 'L'));
-            // TODO: skip next tile
+            mode = TileMode::AIR_PIPE;
             break;
           case 'x':
             // TODO: remember completion state
@@ -1033,6 +1038,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -80:
             // Hidden block
             level->actors.emplace_back(new HiddenBlock(geometry::Position{x * 16, y * 16}));
+            break;
+          case -85:
+            // Red mushroom
+            level->actors.emplace_back(new RedMushroom(geometry::Position{x * 16, y * 16}));
             break;
           case -86:
             // Blue mushroom

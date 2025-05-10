@@ -1,7 +1,7 @@
-#ifndef GAME_RENDERER_H_
-#define GAME_RENDERER_H_
+#pragma once
 
 #include "geometry.h"
+#include "graphics.h"
 
 class Game;
 class SpriteManager;
@@ -28,7 +28,7 @@ class GameRenderer
   void render_objects() const;
   void render_complete_border() const;
   void render_statusbar() const;
-  void render_tile(const int sprite, const geometry::Position& pos) const;
+  void render_tile(const int sprite, const geometry::Position& pos, const Color color = {0xff, 0xff, 0xff}) const;
 
   Game* game_;
   SpriteManager* sprite_manager_;
@@ -43,5 +43,3 @@ class GameRenderer
 
   bool debug_;
 };
-
-#endif  // GAME_RENDERER_H_

@@ -312,7 +312,15 @@ void GameRenderer::render_player() const
   }
   else
   {
-    render_tile(sprite, game_->get_player().position);
+    // Render tough player as red tinted
+    const int period = FPS / 8;
+    float d = sprite_manager_->remaster ? (float)(game_->get_player().tough_tick % period) / period : 0;
+    if (d > 0.5f)
+    {
+      d = 1 - d;
+    }
+    const std::uint8_t gb = 0xff - static_cast<std::uint8_t>(d * 2 * 0xff);
+    render_tile(sprite, game_->get_player().position, {0xff, gb, gb});
   }
 
   if (debug_)
@@ -440,7 +448,8 @@ void GameRenderer::render_statusbar() const
   {
     sprite_manager_->render_icon(Icon::ICON_KEY, statusbar_rect.position + geometry::Position(23 * CHAR_W, dy));
   }
-  // Timer
+  // Timers
+  // TODO: how to handle/allow multiple timed powerups
   if (game_->get_player().power_tick > 0)
   {
     sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(27 * CHAR_W, dy));
@@ -448,16 +457,23 @@ void GameRenderer::render_statusbar() const
                                    statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
     sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
   }
+  else if (game_->get_player().tough_tick > 0)
+  {
+    sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(27 * CHAR_W, dy));
+    sprite_manager_->render_number(game_->get_player().tough_tick * FRAMES_PER_TICK / FPS,
+                                   statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
+    sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
+  }
 }
 
-void GameRenderer::render_tile(const int sprite, const geometry::Position& pos) const
+void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, const Color color) const
 {
   if (!(game_->get_level().switch_flags & SWITCH_FLAG_LIGHTS))
   {
-    sprite_manager_->render_tile(sprite + SPRITE_TOTAL, pos, game_camera_.position);
+    sprite_manager_->render_tile(sprite + SPRITE_TOTAL, pos, game_camera_.position, color);
   }
   else
   {
-    sprite_manager_->render_tile(sprite, pos, game_camera_.position);
+    sprite_manager_->render_tile(sprite, pos, game_camera_.position, color);
   }
 }

@@ -24,6 +24,7 @@ enum class TouchType
   TOUCH_TYPE_KEY,
   TOUCH_TYPE_HURT,
   TOUCH_TYPE_CRUSHING,
+  TOUCH_TYPE_RED_MUSHROOM,
 };
 
 struct Level;

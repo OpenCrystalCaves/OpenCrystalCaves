@@ -41,6 +41,7 @@ struct Player
   bool crushed = false;
 
   unsigned power_tick = 0u;
+  unsigned tough_tick = 0u;
   unsigned hurt_tick = 0u;
   unsigned health_ = 3u;
 

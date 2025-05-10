@@ -343,19 +343,22 @@ geometry::Rectangle SpriteManager::get_rect_for_tile(const int sprite) const
           SPRITE_H};
 }
 
-void SpriteManager::render_tile(const int sprite, const geometry::Position& pos, const geometry::Position camera_position) const
+void SpriteManager::render_tile(const int sprite,
+                                const geometry::Position& pos,
+                                const geometry::Position camera_position,
+                                const Color color) const
 {
   if (sprite == static_cast<int>(Sprite::SPRITE_CONES))
   {
     render_cones(pos, camera_position);
     return;
   }
-  
+
   // Use alternate dark sprites for remaster gfx
   const int sprite_remaster = remaster && sprite >= SPRITE_TOTAL ? sprite + SPRITE_TOTAL : sprite;
   const auto src_rect = get_rect_for_tile(sprite_remaster);
   const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), SPRITE_W, SPRITE_H};
-  get_surface()->blit_surface(src_rect, dest_rect);
+  get_surface()->blit_surface(src_rect, dest_rect, false, color);
 }
 
 const Surface* SpriteManager::get_char_surface() const

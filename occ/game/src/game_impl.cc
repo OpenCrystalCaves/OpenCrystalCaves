@@ -61,6 +61,10 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
     if (geometry::isColliding(prect, geometry::Rectangle(enemy->position, enemy->size)))
     {
       touch_actor(*enemy);
+      if (player_.tough_tick > 0)
+      {
+        enemy->on_hit(*sound_manager_, true);
+      }
     }
   }
   for (auto&& hazard : level_->hazards)
@@ -472,6 +476,11 @@ void GameImpl::touch_actor(Actor& actor)
     case TouchType::TOUCH_TYPE_CRUSHING:
       LOG_DEBUG("Player got crushed");
       player_.hurt(touch_type);
+      break;
+    case TouchType::TOUCH_TYPE_RED_MUSHROOM:
+      LOG_DEBUG("Player ate red mushroom");
+      // Last 16 seconds
+      player_.tough_tick = 16 * FPS / FRAMES_PER_TICK;
       break;
     default:
       LOG_ERROR("unknown touch type");

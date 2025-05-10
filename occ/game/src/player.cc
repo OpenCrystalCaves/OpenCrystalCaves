@@ -20,7 +20,7 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
 
   // Warp player back to last known good position if they are currently colliding
   // This is to allow them to jump into hidden blocks that solidify
-  if (level.collides_solid(position, size))
+  if (level.collides_solid(position, size) && !noclip)
   {
     position = position_last;
   }
@@ -35,6 +35,11 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
   if (power_tick > 0)
   {
     power_tick--;
+  }
+
+  if (tough_tick > 0)
+  {
+    tough_tick--;
   }
 
   if (hurt_tick > 0)
@@ -195,6 +200,11 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
 
 void Player::hurt(const TouchType& touch_type)
 {
+  if (tough_tick > 0)
+  {
+    return;
+  }
+
   // Hurt me- you can't get hurt again
   if (hurt_tick > 0)
   {

@@ -48,7 +48,10 @@ class SpriteManager
   bool load_tilesets(Window& window, const int episode);
   const Surface* get_surface() const;
   geometry::Rectangle get_rect_for_tile(const int sprite) const;
-  void render_tile(const int sprite, const geometry::Position& pos, const geometry::Position camera_position = {0, 0}) const;
+  void render_tile(const int sprite,
+                   const geometry::Position& pos,
+                   const geometry::Position camera_position = {0, 0},
+                   const Color color = {0xff, 0xff, 0xff}) const;
   const Surface* get_char_surface() const;
   geometry::Rectangle get_rect_for_char(const wchar_t ch) const;
   geometry::Position render_text(const std::wstring& text, const geometry::Position& pos, const Color tint = {0xff, 0xff, 0xff}) const;
