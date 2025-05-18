@@ -1039,6 +1039,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Hidden block
             level->actors.emplace_back(new HiddenBlock(geometry::Position{x * 16, y * 16}));
             break;
+          case -84:
+            // Green mushroom
+            level->actors.emplace_back(new GreenMushroom(geometry::Position{x * 16, y * 16}));
+            break;
           case -85:
             // Red mushroom
             level->actors.emplace_back(new RedMushroom(geometry::Position{x * 16, y * 16}));

@@ -24,6 +24,8 @@ enum class TouchType
   TOUCH_TYPE_KEY,
   TOUCH_TYPE_HURT,
   TOUCH_TYPE_CRUSHING,
+  TOUCH_TYPE_DIE,
+  TOUCH_TYPE_GREEN_MUSHROOM,
   TOUCH_TYPE_RED_MUSHROOM,
 };
 
@@ -58,6 +60,7 @@ class Actor
 
   geometry::Position position;
   geometry::Size size;
+  geometry::Rectangle rect() const { return {position, size}; }
 
  protected:
   std::vector<geometry::Rectangle> create_detection_rects(const int dx,

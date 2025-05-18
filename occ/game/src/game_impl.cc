@@ -477,6 +477,16 @@ void GameImpl::touch_actor(Actor& actor)
       LOG_DEBUG("Player got crushed");
       player_.hurt(touch_type);
       break;
+    case TouchType::TOUCH_TYPE_DIE:
+      LOG_DEBUG("Player died");
+      player_.health_ = 0;
+      break;
+    case TouchType::TOUCH_TYPE_GREEN_MUSHROOM:
+      LOG_DEBUG("Player ate green mushroom");
+      // TODO: message
+      // TODO: death type
+      player_.health_ = 0;
+      break;
     case TouchType::TOUCH_TYPE_RED_MUSHROOM:
       LOG_DEBUG("Player ate red mushroom");
       // Last 16 seconds

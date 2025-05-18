@@ -150,6 +150,31 @@ class Power : public Item
   Power(geometry::Position position) : Item(position, Sprite::SPRITE_POWER, SoundType::SOUND_PICKUP_GUN, TouchType::TOUCH_TYPE_POWER) {}
 };
 
+class GreenMushroom : public Item
+{
+  // ➖➖➖➖➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖
+  // ➖➖➖➖⚫⬜🟩🦚🚨🟥🟥⚫➖➖➖➖
+  // ➖➖➖⚫⬜🚨🟩🟩🦚🚨🚨🚨⚫➖➖➖
+  // ➖➖⚫⬜🚨🚨🟩🟩🟩🦚🦚🦚🦚⚫➖➖
+  // ➖➖⚫⬜🚨🟩🟩🟩🟩🚨🚨🦚🦚⚫➖➖
+  // ➖⚫⬜🟨🟩🟩🟩🟩🚨🟥🟥🚨🦚🦚⚫➖
+  // ➖⚫⬜🟩🟩🟩🟩🟩🚨🟥🟥🚨🦚🦚⚫➖
+  // ➖⚫⬜🟩🟩🟩🟩🟩🟩🚨🚨🟩🦚🦚⚫➖
+  // ➖⚫⬜🟩🟩🟩🟩🟩🟩🟩🟩🦚🦚🦚⚫➖
+  // ➖➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖
+  // ➖➖➖➖➖⚫⬜🟩🦚🦚⚫➖➖➖➖➖
+  // ➖➖➖➖➖➖⚫⬜🟩🟩🦚⚫➖➖➖➖
+  // ➖➖➖➖🟩➖⚫🪦🟩⚫🦚🪦🦚➖➖➖
+  // ➖➖➖⚫🦚⚫⚫🦚🟩🟩⚫🦚⚫⚫➖➖
+  // ➖➖⚫🟩🦚🦚🪦🦚🦚⚫🦚🦚🦚🦚⚫➖
+  // Kills player
+ public:
+  GreenMushroom(geometry::Position position)
+    : Item(position, Sprite::SPRITE_MUSHROOM_GREEN, SoundType::SOUND_POISONED, TouchType::TOUCH_TYPE_GREEN_MUSHROOM)
+  {
+  }
+};
+
 class RedMushroom : public Item
 {
   // ➖➖➖➖➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖

@@ -251,7 +251,7 @@ std::vector<std::pair<geometry::Position, Sprite>> AirPipe::get_sprites([[maybe_
   }
 }
 
-TouchType AirPipe::on_touch(const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager, Level& level)
+TouchType AirPipe::on_touch(const Player& player, AbstractSoundManager& sound_manager, Level& level)
 {
   geometry::Rectangle soft_attract;
   geometry::Rectangle hard_attract;
@@ -272,11 +272,12 @@ TouchType AirPipe::on_touch(const Player& player, [[maybe_unused]] AbstractSound
   if (geometry::isColliding(player.rect(), hard_attract))
   {
     level.dv = {dx * 6, 0};
+    sound_manager.play_sound(SoundType::SOUND_DIE);
+    return TouchType::TOUCH_TYPE_DIE;
   }
   else if (geometry::isColliding(player.rect(), soft_attract))
   {
     level.dv = {dx * 3, 0};
   }
-  // TODO: suck/kill player
   return TouchType::TOUCH_TYPE_NONE;
 }
