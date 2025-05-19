@@ -41,6 +41,7 @@ struct Player
   bool crushed = false;
 
   unsigned power_tick = 0u;
+  unsigned gravity_tick = 0u;
   unsigned tough_tick = 0u;
   unsigned hurt_tick = 0u;
   unsigned health_ = 3u;
@@ -53,4 +54,6 @@ struct Player
   void hurt(const TouchType& touch_type);
   bool is_flashing() const;
   geometry::Rectangle rect() const { return {position, size}; }
+  // Get the effective reverse gravity w.r.t. powerups and cheat mode
+  bool is_reverse_gravity() const { return (gravity_tick > 0) ^ reverse_gravity; }
 };

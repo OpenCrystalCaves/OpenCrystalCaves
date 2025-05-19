@@ -1117,6 +1117,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               volcano_sprite = sprite + 1;
             }
             break;
+          case -116:
+            // Gravity
+            level->actors.emplace_back(new Gravity(geometry::Position{x * 16, y * 16}));
+            break;
           case -117:
             // Candle
             level->actors.emplace_back(

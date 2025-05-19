@@ -465,6 +465,11 @@ void GameImpl::touch_actor(Actor& actor)
       // Last 16 seconds
       player_.power_tick = 16 * FPS / FRAMES_PER_TICK;
       break;
+    case TouchType::TOUCH_TYPE_GRAVITY:
+      LOG_DEBUG("Player took item of type gravity");
+      // Last 11 seconds
+      player_.gravity_tick = 11 * FPS / FRAMES_PER_TICK;
+      break;
     case TouchType::TOUCH_TYPE_KEY:
       LOG_DEBUG("Player took key");
       has_key_ = true;

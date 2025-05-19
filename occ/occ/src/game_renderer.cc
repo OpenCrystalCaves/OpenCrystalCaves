@@ -279,7 +279,7 @@ void GameRenderer::render_player() const
         }
       }
     }
-    if (player.reverse_gravity)
+    if (player.is_reverse_gravity())
     {
       sprite += 104;
     }
@@ -454,6 +454,13 @@ void GameRenderer::render_statusbar() const
   {
     sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(27 * CHAR_W, dy));
     sprite_manager_->render_number(game_->get_player().power_tick * FRAMES_PER_TICK / FPS,
+                                   statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
+    sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
+  }
+  else if (game_->get_player().gravity_tick > 0)
+  {
+    sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(27 * CHAR_W, dy));
+    sprite_manager_->render_number(game_->get_player().gravity_tick * FRAMES_PER_TICK / FPS,
                                    statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
     sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
   }

@@ -128,7 +128,6 @@ class Key : public Item
   Key(geometry::Position position) : Item(position, Sprite::SPRITE_KEY, SoundType::SOUND_PICKUP_GUN, TouchType::TOUCH_TYPE_KEY) {}
 };
 
-
 class Power : public Item
 {
   // ⬛⬛⬛⬛⬛⬜⚪⚪⚪⚪🪦⬛⬛⬛⬛⬛
@@ -148,6 +147,32 @@ class Power : public Item
   // Gives player timed power shots that can kill tough enemies
  public:
   Power(geometry::Position position) : Item(position, Sprite::SPRITE_POWER, SoundType::SOUND_PICKUP_GUN, TouchType::TOUCH_TYPE_POWER) {}
+};
+
+class Gravity : public Item
+{
+  // ➖➖➖➖➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖
+  // ➖➖➖⚫⚫⬜⚪⚪⚪⚪🪦⚫⚫➖➖➖
+  // ➖➖⚫⬜⬜⚪⚪⚪⚪⚪⚪🪦🪦⚫➖➖
+  // ➖⚫⬜⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦⚫➖
+  // ➖⚫⬜⚪⚪🟥🟥🟥🟥🟥🟥⚪⚪🪦⚫➖
+  // ⚫⬜⚪⚪🟥🟥🟥🟥🟥🟥🟥⚪⚪⚪🪦⚫
+  // ⚫⬜⚪⚪🟥🟥⚪⚪⚪⚪⚪⚪⚪⚪🪦⚫
+  // ⚫⬜⚪⚪🟥🟥⚪⚪🟥🟥🟥🟥⚪⚪🪦⚫
+  // ⚫⬜⚪⚪🟥🟥⚪⚪🟥🟥🟥🟥⚪⚪🪦⚫
+  // ⚫⬜⚪⚪🟥🟥⚪⚪⚪⚪🟥🟥⚪⚪🪦⚫
+  // ⚫⬜⚪⚪🟥🟥🟥🟥🟥🟥🟥🟥⚪⚪🪦⚫
+  // ➖⚫⬜⚪⚪🟥🟥🟥🟥🟥🟥⚪⚪🪦⚫➖
+  // ➖⚫⬜⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪🪦⚫➖
+  // ➖➖⚫⬜⬜⚪⚪⚪⚪⚪⚪🪦🪦⚫➖➖
+  // ➖➖➖⚫⚫⬜⚪⚪⚪⚪🪦⚫⚫➖➖➖
+  // ➖➖➖➖➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖
+  // Reverses gravity for a limited time
+ public:
+  // TODO: confirm sound
+  Gravity(geometry::Position position) : Item(position, Sprite::SPRITE_GRAVITY, SoundType::SOUND_PICKUP_GUN, TouchType::TOUCH_TYPE_GRAVITY)
+  {
+  }
 };
 
 class GreenMushroom : public Item
@@ -202,7 +227,3 @@ class RedMushroom : public Item
   {
   }
 };
-
-
-// TODO: egg
-// TODO: gravity
