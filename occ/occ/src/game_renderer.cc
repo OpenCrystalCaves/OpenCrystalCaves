@@ -464,6 +464,13 @@ void GameRenderer::render_statusbar() const
                                    statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
     sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
   }
+  else if (game_->get_player().stop_tick > 0)
+  {
+    sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(27 * CHAR_W, dy));
+    sprite_manager_->render_number(game_->get_player().stop_tick * FRAMES_PER_TICK / FPS,
+                                   statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
+    sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(30 * CHAR_W, dy));
+  }
   else if (game_->get_player().tough_tick > 0)
   {
     sprite_manager_->render_text(L"*", statusbar_rect.position + geometry::Position(27 * CHAR_W, dy));

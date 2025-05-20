@@ -56,22 +56,25 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
 
   // Hurt player when colliding enemy/hazards
   const auto prect = geometry::Rectangle(player_.position, player_.size);
-  for (auto&& enemy : level_->enemies)
+  if (player_.stop_tick == 0)
   {
-    if (geometry::isColliding(prect, geometry::Rectangle(enemy->position, enemy->size)))
+    for (auto&& enemy : level_->enemies)
     {
-      touch_actor(*enemy);
-      if (player_.tough_tick > 0)
+      if (geometry::isColliding(prect, geometry::Rectangle(enemy->position, enemy->size)))
       {
-        enemy->on_hit(*sound_manager_, true);
+        touch_actor(*enemy);
+        if (player_.tough_tick > 0)
+        {
+          enemy->on_hit(*sound_manager_, true);
+        }
       }
     }
-  }
-  for (auto&& hazard : level_->hazards)
-  {
-    if (geometry::isColliding(prect, geometry::Rectangle(hazard->position, hazard->size)))
+    for (auto&& hazard : level_->hazards)
     {
-      touch_actor(*hazard);
+      if (geometry::isColliding(prect, geometry::Rectangle(hazard->position, hazard->size)))
+      {
+        touch_actor(*hazard);
+      }
     }
   }
 
@@ -350,12 +353,15 @@ void GameImpl::update_enemies()
   for (auto it = level_->enemies.begin(); it != level_->enemies.end();)
   {
     auto e = it->get();
-    // TODO: When enemy getting hit and not dying the enemy sprite should turn white for
-    //       some time. All colors except black in the sprite should become white.
-    //       This is applicable for when the player gets hit as well
-    //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
-    //       for all player and enemy sprite when loading sprites?
-    e->update(*sound_manager_, player_.rect(), *level_);
+    if (player_.stop_tick == 0)
+    {
+      // TODO: When enemy getting hit and not dying the enemy sprite should turn white for
+      //       some time. All colors except black in the sprite should become white.
+      //       This is applicable for when the player gets hit as well
+      //       Modify the sprite on the fly / some kind of filter, or pre-create white sprites
+      //       for all player and enemy sprite when loading sprites?
+      e->update(*sound_manager_, player_.rect(), *level_);
+    }
 
     // Check if enemy died
     if (!e->is_alive())
@@ -397,7 +403,10 @@ void GameImpl::update_hazards()
   for (int i = 0; i < level_->hazards.size();)
   {
     auto h = level_->hazards[i].get();
-    h->update(*sound_manager_, player_.rect(), *level_);
+    if (player_.stop_tick == 0)
+    {
+      h->update(*sound_manager_, player_.rect(), *level_);
+    }
 
     // Check if hazard died
     if (!h->is_alive())
@@ -469,6 +478,11 @@ void GameImpl::touch_actor(Actor& actor)
       LOG_DEBUG("Player took item of type gravity");
       // Last 11 seconds
       player_.gravity_tick = 11 * FPS / FRAMES_PER_TICK;
+      break;
+    case TouchType::TOUCH_TYPE_STOP:
+      LOG_DEBUG("Player took item of type stop");
+      // Last 21 seconds
+      player_.stop_tick = 21 * FPS / FRAMES_PER_TICK;
       break;
     case TouchType::TOUCH_TYPE_KEY:
       LOG_DEBUG("Player took key");

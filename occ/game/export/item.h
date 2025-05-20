@@ -227,3 +227,27 @@ class RedMushroom : public Item
   {
   }
 };
+
+class StopSign : public Item
+{
+  // ➖➖➖➖➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖
+  // ➖➖➖➖⚫🟥🟥🟥🟥🟥🟥⚫➖➖➖➖
+  // ➖➖➖⚫🟥🟥🟥🟥🟥🟥🟥🟥⚫➖➖➖
+  // ➖➖⚫🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥⚫➖➖
+  // ➖⚫🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥⚫➖
+  // ⚫🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥⚫
+  // ⚫🟨🟨🟥🟨🟨🟨🟥🟨🟨🟨🟥🟨🟨🟨⚫
+  // ⚫🟨🟥🟥🟥🟨🟥🟥🟨🟥🟨🟥🟨🟥🟨⚫
+  // ⚫🟨🟨🟥🟥🟨🟥🟥🟨🟥🟨🟥🟨🟨🟨⚫
+  // ⚫🟥🟨🟥🟥🟨🟥🟥🟨🟥🟨🟥🟨🟥🟥⚫
+  // ⚫🟨🟨🟥🟥🟨🟥🟥🟨🟨🟨🟥🟨🟥🟥⚫
+  // ➖⚫🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥⚫➖
+  // ➖➖⚫🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥⚫➖➖
+  // ➖➖➖⚫🟥🟥🟥🟥🟥🟥🟥🟥⚫➖➖➖
+  // ➖➖➖➖⚫🟥🟥🟥🟥🟥🟥⚫➖➖➖➖
+  // ➖➖➖➖➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖
+  // Stops time temporarily for all enemies and hazards,
+  // preventing them from updating or interacting with the player
+ public:
+  StopSign(geometry::Position position) : Item(position, Sprite::SPRITE_STOP_SIGN, SoundType::SOUND_STOP, TouchType::TOUCH_TYPE_STOP) {}
+};

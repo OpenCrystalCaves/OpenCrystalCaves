@@ -581,6 +581,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'H':
             level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, true, false});
             break;
+          case 'i':
+            // Stop sign
+            level->actors.emplace_back(new StopSign(geometry::Position{x * 16, y * 16}));
+            break;
           case 'I':
             // Thorn
             level->hazards.emplace_back(new Thorn(geometry::Position{x * 16, y * 16}));
@@ -655,6 +659,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               case 'b':
                 // Bottom of crate
                 sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
+                break;
+              case 'i':
+                // Stop sign pole
+                sprite = static_cast<int>(Sprite::SPRITE_STOP_POLE);
                 break;
               case 'n':
                 // Keep looking left to see what we're continuing from
@@ -735,6 +743,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'N':
             level->has_moon = true;
             break;
+          case 'q':
+            // Left laser
+            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
+            break;
           case 's':
             // Moving laser
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false, true));
@@ -773,6 +785,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, false});
             break;
           case 'w':
+            // Right laser
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
             break;
           case 'W':
@@ -1135,6 +1148,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_HOLE_PIPE_V);
             break;
           case -126:
+            // Right laser
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
             break;
           default:

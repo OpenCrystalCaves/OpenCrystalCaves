@@ -42,6 +42,7 @@ struct Player
 
   unsigned power_tick = 0u;
   unsigned gravity_tick = 0u;
+  unsigned stop_tick = 0u;
   unsigned tough_tick = 0u;
   unsigned hurt_tick = 0u;
   unsigned health_ = 3u;

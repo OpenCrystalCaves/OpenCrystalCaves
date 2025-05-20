@@ -40,6 +40,10 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
   {
     gravity_tick--;
   }
+  if (stop_tick > 0)
+  {
+    stop_tick--;
+  }
   if (tough_tick > 0)
   {
     tough_tick--;
