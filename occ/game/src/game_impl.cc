@@ -389,10 +389,6 @@ void GameImpl::update_enemies()
     }
     else
     {
-      for (const auto& sprite_pos : e->get_sprites(*level_))
-      {
-        objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
-      }
       it++;
     }
   }

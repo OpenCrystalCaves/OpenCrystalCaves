@@ -77,7 +77,7 @@ void GameRenderer::update(unsigned game_tick)
   }
 }
 
-void GameRenderer::render_game() const
+void GameRenderer::render_game(unsigned game_tick) const
 {
   window_.set_render_target(game_surface_);
   // Clear game surface (background now)
@@ -85,6 +85,7 @@ void GameRenderer::render_game() const
   render_background();
   render_tiles(false);
   render_objects();
+  render_enemies(game_tick);
   render_player();
   render_tiles(true);
   render_complete_border();
@@ -402,7 +403,33 @@ void GameRenderer::render_objects() const
         window_.render_rectangle(dest_rect, {255, 255, 0});
       }
     }
-    for (const auto& enemy : game_->get_level().enemies)
+  }
+}
+
+void GameRenderer::render_enemies(unsigned game_tick) const
+{
+  for (const auto& enemy : game_->get_level().enemies)
+  {
+    if (geometry::isColliding(enemy->rect(), game_camera_))
+    {
+      for (const auto& sprite_pos : enemy->get_sprites(game_->get_level()))
+      {
+        // Blink if time is stopped
+        // Blink faster when the effect is about to wear off
+        if (game_->get_player().stop_tick == 0 ||
+            (game_->get_player().stop_tick < 2 * FPS / FRAMES_PER_TICK ? (game_tick % 4) < 3 : (game_tick % 10) < 7))
+        {
+          render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
+        }
+
+        if (debug_)
+        {
+          const geometry::Rectangle dest_rect{enemy->position - game_camera_.position, enemy->size};
+          window_.render_rectangle(dest_rect, {255, 0, 0});
+        }
+      }
+    }
+    if (debug_)
     {
       for (const auto r : enemy->get_detection_rects(game_->get_level()))
       {

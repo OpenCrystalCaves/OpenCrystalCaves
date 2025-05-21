@@ -56,6 +56,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Lights off                   | ![](/screenshots/dark_cc.png?raw=true) EGA palette swapped                                          | ![](/screenshots/dark_occ.png?raw=true) Option to use blue monochrome dark palette                        |
 | Level complete indicator     | ![](/screenshots/complete_cc.gif?raw=true) Green overscan (invisible in dosbox)                     | ![](/screenshots/complete_occ.gif?raw=true) Flashing green screen border                                  |
 | Red mushroom                 | ![](/screenshots/tough_cc.gif?raw=true) Timer in status bar                                         | ![](/screenshots/tough_occ.gif?raw=true) Player pulses red                                                |
+| Stopped enemies              | ![](/screenshots/stop_cc.gif?raw=true) Stopped bar                                                  | ![](/screenshots/stop_occ.gif?raw=true) Stopped and blinking red                                          |
 
 ## Compiling OCC
 

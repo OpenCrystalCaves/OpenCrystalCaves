@@ -14,7 +14,7 @@ class GameRenderer
   GameRenderer(Game* game, SpriteManager* sprite_manager, Surface* game_surface, Window& window);
 
   void update(unsigned game_tick);
-  void render_game() const;
+  void render_game(unsigned game_tick) const;
 
   const geometry::Rectangle& get_game_camera() const { return game_camera_; }
 
@@ -26,6 +26,7 @@ class GameRenderer
   void render_player() const;
   void render_tiles(bool in_front) const;
   void render_objects() const;
+  void render_enemies(unsigned game_tick) const;
   void render_complete_border() const;
   void render_statusbar() const;
   void render_tile(const int sprite, const geometry::Position& pos, const Color color = {0xff, 0xff, 0xff}) const;

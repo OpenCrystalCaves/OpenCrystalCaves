@@ -580,7 +580,7 @@ void GameState::draw(Window& window) const
   window.fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), {33u, 33u, 33u});
 
   // Render game
-  game_renderer_.render_game();
+  game_renderer_.render_game(game_tick_);
 
   // Render game surface to window surface, centered and scaled
   game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
