@@ -209,6 +209,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
   bool is_horizon_row = false;
   auto mode = TileMode::NONE;
   int volcano_sprite = -1;
+  int sprite_concrete = static_cast<int>(Sprite::SPRITE_CONCRETE);
   int entrance_level = static_cast<int>(LevelId::LEVEL_1);
   Caterpillar* caterpillar = nullptr;
   for (int i = 0; i < static_cast<int>(level->tile_ids.size()); i++)
@@ -577,6 +578,19 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'A':
             // Green slime
             level->enemies.emplace_back(new Slime(geometry::Position{x * 16, y * 16}));
+            break;
+          case 'C':
+            // Cycle through concrete sprites
+            sprite = sprite_concrete;
+            if (sprite_concrete == static_cast<int>(Sprite::SPRITE_CONCRETE))
+            {
+              sprite_concrete = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
+            }
+            else
+            {
+              sprite_concrete--;
+            }
+            flags |= TILE_SOLID;
             break;
           case 'H':
             level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, true, false});
