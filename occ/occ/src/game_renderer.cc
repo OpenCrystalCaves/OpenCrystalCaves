@@ -321,7 +321,7 @@ void GameRenderer::render_player() const
       d = 1 - d;
     }
     const std::uint8_t gb = 0xff - static_cast<std::uint8_t>(d * 2 * 0xff);
-    render_tile(sprite, game_->get_player().position, {0xff, gb, gb});
+    render_tile(sprite, player_render_pos, {0xff, gb, gb});
   }
 
   if (debug_)
