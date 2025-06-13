@@ -65,7 +65,7 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
         touch_actor(*enemy);
         if (player_.tough_tick > 0)
         {
-          enemy->on_hit(*sound_manager_, true);
+          enemy->on_hit(*sound_manager_, *level_, true);
         }
       }
     }

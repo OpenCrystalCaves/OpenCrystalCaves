@@ -16,7 +16,7 @@ class Enemy : public Actor
   virtual ~Enemy() = default;
 
   virtual bool is_alive() const override { return health > 0; }
-  virtual void on_hit(AbstractSoundManager& sound_manager, const bool power) override;
+  virtual bool on_hit(AbstractSoundManager& sound_manager, const Level& level, const bool power) override;
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level);
   // Whether this enemy requires the power powerup to hit/kill
   virtual bool is_tough() const { return false; }
@@ -77,11 +77,11 @@ class Bigfoot : public Enemy
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
   }
-  virtual void on_hit(AbstractSoundManager& sound_manager, const bool power) override
+  virtual bool on_hit(AbstractSoundManager& sound_manager, const Level& level, const bool power) override
   {
-    Enemy::on_hit(sound_manager, power);
     running_ = true;
     // TODO: turn to face player
+    return Enemy::on_hit(sound_manager, level, power);
   }
   virtual int get_points() const override { return 5000; }
 

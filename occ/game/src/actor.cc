@@ -210,10 +210,11 @@ void BumpPlatform::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-void ClearBlock::on_hit(AbstractSoundManager& sound_manager, [[maybe_unused]] const bool power)
+bool ClearBlock::on_hit(AbstractSoundManager& sound_manager, [[maybe_unused]] const Level& level, [[maybe_unused]] const bool power)
 {
   is_alive_ = false;
   sound_manager.play_sound(SoundType::SOUND_CLEAR_BLOCK);
+  return true;
 }
 
 TouchType HiddenBlock::on_touch(const Player& player, [[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)

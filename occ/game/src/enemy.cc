@@ -4,11 +4,11 @@
 #include "level.h"
 
 
-void Enemy::on_hit(AbstractSoundManager& sound_manager, const bool power)
+bool Enemy::on_hit(AbstractSoundManager& sound_manager, [[maybe_unused]] const Level& level, const bool power)
 {
   if (is_tough() && !power)
   {
-    return;
+    return true;
   }
   health -= power ? health : 1;
   // TODO: if hurt, enter flashing state
@@ -16,6 +16,7 @@ void Enemy::on_hit(AbstractSoundManager& sound_manager, const bool power)
   {
     sound_manager.play_sound(SoundType::SOUND_ENEMY_HURT);
   }
+  return true;
 }
 
 void Enemy::on_death(AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
