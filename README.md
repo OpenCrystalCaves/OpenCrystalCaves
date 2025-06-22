@@ -67,13 +67,13 @@ Steps to compile (Linux, macOS):
 ```
 git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
 cd OpenCrystalCaves
-mkdir debug
+mkdir -p debug
 cmake -Bdebug -DCMAKE_BUILD_TYPE=debug occ
 cd debug
 make
 ```
 
-The binary will be available at `OpenCrystalCaves/build/occ`
+The binary will be available at `OpenCrystalCaves/debug/build/occ`
 
 Or in Windows (with [vcpkg](https://vcpkg.io)):
 
