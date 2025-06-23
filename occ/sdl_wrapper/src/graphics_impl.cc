@@ -19,8 +19,14 @@
 
 SDL_Surface* load_image_to_surface(const std::filesystem::path& filename)
 {
+  if (filename.string().size() == 0)
+  {
+    LOG_ERROR("trying to load empty filename");
+    return nullptr;
+  }
   int width, height, channels;
   unsigned char* data = stbi_load(filename.string().c_str(), &width, &height, &channels, 0);
+  LOG_DEBUG("loading image to surface %s, %dx%d %dch", filename.string().c_str(), width, height, channels);
   if (!data)
   {
     LOG_ERROR("could not load image %s: %s", filename.string().c_str(), stbi_failure_reason());
