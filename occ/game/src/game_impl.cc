@@ -65,7 +65,7 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
         touch_actor(*enemy);
         if (player_.tough_tick > 0)
         {
-          enemy->on_hit(*sound_manager_, *level_, true);
+          enemy->on_hit(*sound_manager_, prect, *level_, true);
         }
       }
     }
@@ -318,7 +318,7 @@ void GameImpl::update_missile()
     }
   }
 
-  if (missile_.update(*sound_manager_, *level_))
+  if (missile_.update(*sound_manager_, player_.rect(), *level_))
   {
     particles_.emplace_back(new Explosion(missile_.position));
   }

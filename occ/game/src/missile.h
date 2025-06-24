@@ -22,7 +22,7 @@ struct Missile
   bool is_in_cooldown() const;
   void set_cooldown();
   // Returns whether it exploded
-  bool update(AbstractSoundManager& sound_manager, const Level& level);
+  bool update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, const Level& level);
   int get_sprite() const;
   int get_num_sprites() const;
 

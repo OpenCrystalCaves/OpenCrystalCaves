@@ -4,7 +4,10 @@
 #include "level.h"
 
 
-bool Enemy::on_hit(AbstractSoundManager& sound_manager, [[maybe_unused]] const Level& level, const bool power)
+bool Enemy::on_hit(AbstractSoundManager& sound_manager,
+                   [[maybe_unused]] const geometry::Rectangle& player_rect,
+                   [[maybe_unused]] const Level& level,
+                   const bool power)
 {
   if (is_tough() && !power)
   {
@@ -63,6 +66,17 @@ void Bigfoot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const
   {
     running_ = true;
   }
+}
+
+bool Bigfoot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, const Level& level, const bool power)
+{
+  running_ = true;
+  // Turn to face player
+  if (left_ ^ (player_rect.position.x() < position.x()))
+  {
+    left_ = !left_;
+  }
+  return Enemy::on_hit(sound_manager, player_rect, level, power);
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites([[maybe_unused]] const Level& level) const

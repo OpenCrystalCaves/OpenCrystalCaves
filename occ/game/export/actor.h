@@ -59,7 +59,10 @@ class Actor
     return TouchType::TOUCH_TYPE_NONE;
   }
   // Returns whether the actor is hittable
-  virtual bool on_hit([[maybe_unused]] AbstractSoundManager& sound_manager, const Level& level, [[maybe_unused]] const bool power)
+  virtual bool on_hit([[maybe_unused]] AbstractSoundManager& sound_manager,
+                      [[maybe_unused]] const geometry::Rectangle& player_rect,
+                      const Level& level,
+                      [[maybe_unused]] const bool power)
   {
     return is_solid(level);
   }
@@ -270,7 +273,10 @@ class ClearBlock : public Actor
   {
     return {std::make_pair(position, Sprite::SPRITE_CLEAR_BLOCK)};
   }
-  virtual bool on_hit(AbstractSoundManager& sound_manager, const Level& level, const bool power) override;
+  virtual bool on_hit(AbstractSoundManager& sound_manager,
+                      const geometry::Rectangle& player_rect,
+                      const Level& level,
+                      const bool power) override;
 
  private:
   bool is_alive_ = true;

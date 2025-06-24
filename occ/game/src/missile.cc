@@ -34,7 +34,7 @@ void Missile::set_cooldown()
   cooldown = 7;
 }
 
-bool Missile::update(AbstractSoundManager& sound_manager, const Level& level)
+bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, const Level& level)
 {
   bool explode = false;
   if (alive)
@@ -49,7 +49,7 @@ bool Missile::update(AbstractSoundManager& sound_manager, const Level& level)
 
       // Check colliding solid actors (closed doors)
       auto actor = level.collides_actor(collision_position, size);
-      if (actor && actor->on_hit(sound_manager, level, is_power))
+      if (actor && actor->on_hit(sound_manager, player_rect, level, is_power))
       {
         alive = false;
         set_cooldown();
@@ -59,7 +59,7 @@ bool Missile::update(AbstractSoundManager& sound_manager, const Level& level)
       }
 
       auto enemy = level.collides_enemy(collision_position, size);
-      if (enemy && enemy->on_hit(sound_manager, level, is_power))
+      if (enemy && enemy->on_hit(sound_manager, player_rect, level, is_power))
       {
         alive = false;
         break;
