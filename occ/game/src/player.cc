@@ -67,10 +67,6 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
     if (jumping)
     {
       velocity = Vector<int>(velocity.x(), jump_velocity[jump_tick]);
-      if (jump_tick == 0)
-      {
-        sound_manager.play_sound(SoundType::SOUND_JUMP);
-      }
     }
     else
     {
@@ -194,6 +190,10 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
       // and this isn't the first tick in the jump, so we can consider the jump to have
       // ended here
       jumping = false;
+    }
+    else if (jump_tick == 0)
+    {
+      sound_manager.play_sound(SoundType::SOUND_JUMP);
     }
   }
 
