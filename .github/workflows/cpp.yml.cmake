@@ -94,7 +94,7 @@ jobs:
         copy .\optional\*.dll .
 
     - name: Make package on tags
-      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'windows-latest'
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
       run: |
         cd ${{ matrix.build_type }}
         cpack -C ${{ matrix.build_type }}
@@ -104,7 +104,7 @@ jobs:
         ls ${{ github.workspace }}/${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
     - name: Upload a Build Artifact
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'windows-latest'
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
       with:
         files: ${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
         fail_on_unmatched_files: true
@@ -117,14 +117,14 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
       run: butler -V
 
-    # - name: Publish to itch.io (Linux)
-    #   if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && startsWith(matrix.os, 'ubuntu')
-    #   env:
-    #     # Create a key at https://itch.io/user/settings/api-keys
-    #     # And add the key as a Repository secret to https://github.com/gurka/OpenCrystalCaves/settings/secrets/actions
-    #     BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-    #   run: |
-    #     ./butler push ${{ matrix.build_type }}/OpenCrystalCaves-*-Linux*.tar.gz congusbongus/opencrystalcaves:linux --userversion $VERSION
+    - name: Publish to itch.io (Linux)
+      if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && startsWith(matrix.os, 'ubuntu')
+      env:
+        # Create a key at https://itch.io/user/settings/api-keys
+        # And add the key as a Repository secret to https://github.com/gurka/OpenCrystalCaves/settings/secrets/actions
+        BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      run: |
+        ./butler push ${{ matrix.build_type }}/OpenCrystalCaves-*-Linux*.tar.gz congusbongus/opencrystalcaves:linux --userversion $VERSION
     - name: Publish to itch.io (macOS)
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'macos-latest'
       env:
