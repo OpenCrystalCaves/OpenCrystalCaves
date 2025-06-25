@@ -95,12 +95,12 @@ class LaserBeam : public Hazard
   // ⬛⬛⬛⬛⬛🚨⬛⬛⬛⬛⬛⬛🚨🚨⬛⬛
   // Moves left/right, disappear on collide or out of frame
  public:
-  LaserBeam(geometry::Position position, bool left, Laser& parent) : Hazard(position), left_(left), parent_(parent) {}
+  LaserBeam(geometry::Position position, bool left, Laser& parent) : Hazard(position, {8, 8}), left_(left), parent_(parent) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
+    return {std::make_pair(position - geometry::Size(4, 4), frame_ == 0 ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
   }
   virtual bool is_alive() const override { return alive_; }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,

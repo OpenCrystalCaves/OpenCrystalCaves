@@ -25,7 +25,7 @@ void Laser::update(AbstractSoundManager& sound_manager, const geometry::Rectangl
 {
   if ((level.switch_flags & SWITCH_FLAG_LASERS) && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
-    geometry::Position child_pos = position + geometry::Position(left_ ? -12 : 12, -1);
+    geometry::Position child_pos = position + geometry::Position((left_ ? -6 : 6) + 4, 3);
     child_ = new LaserBeam(child_pos, left_, *this);
     level.hazards.emplace_back(child_);
     sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);

@@ -199,16 +199,19 @@ void GameImpl::update_player(const PlayerInput& player_input)
     player_.noclip = !player_.noclip;
     player_.falling = true;
     player_.velocity = Vector<int>(0, 0);
+    sound_manager_->play_sound(SoundType::SOUND_STALACTITE_FALL);
     LOG_DEBUG("Player noclip %s", player_.noclip ? "ON" : "OFF");
   }
   if (player_input.ammo_pressed)
   {
     num_ammo_ = 40;
+    sound_manager_->play_sound(SoundType::SOUND_PICKUP_GUN);
     LOG_DEBUG("Extra ammo");
   }
   if (player_input.godmode_pressed)
   {
     player_.godmode = !player_.godmode;
+    sound_manager_->play_sound(SoundType::SOUND_POWER_FIRE);
     LOG_DEBUG("God mode %s", player_.godmode ? "ON" : "OFF");
     if (!player_.godmode && player_.reverse_gravity)
     {
@@ -219,6 +222,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   if (player_input.reverse_gravity_pressed && player_.godmode)
   {
     player_.reverse_gravity = !player_.reverse_gravity;
+    sound_manager_->play_sound(SoundType::SOUND_SWITCH);
     LOG_DEBUG("Reverse gravity %s", player_.reverse_gravity ? "ON" : "OFF");
   }
 

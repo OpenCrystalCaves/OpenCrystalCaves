@@ -219,7 +219,7 @@ void Player::hurt(const TouchType& touch_type)
 
   hurt_tick = 24;
 
-  if (health_ > 0)
+  if (health_ > 0 && !godmode)
   {
     health_--;
   }

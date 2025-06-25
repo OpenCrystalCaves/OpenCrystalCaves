@@ -397,6 +397,7 @@ void GameRenderer::render_objects() const
   {
     for (const auto& hazard : game_->get_level().hazards)
     {
+      window_.render_rectangle({hazard->position - game_camera_.position, hazard->size}, {255, 128, 0});
       for (const auto r : hazard->get_detection_rects(game_->get_level()))
       {
         const geometry::Rectangle dest_rect{r.position - game_camera_.position, r.size};
