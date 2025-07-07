@@ -73,10 +73,7 @@ class Laser : public Hazard
   {
     return {std::make_pair(position, left_ ? Sprite::SPRITE_LASER_L : Sprite::SPRITE_LASER_R)};
   }
-  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
-  {
-    return create_detection_rects(left_ ? -1 : 1, 0, level);
-  }
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override;
   void remove_child() { child_ = nullptr; }
 
  private:

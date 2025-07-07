@@ -42,6 +42,48 @@ void Laser::update(AbstractSoundManager& sound_manager, const geometry::Rectangl
   }
 }
 
+std::vector<geometry::Rectangle> Laser::get_detection_rects(const Level& level) const
+{
+  // Create a detection line centered vertically
+  std::vector<geometry::Rectangle> rects;
+  const int y = position.y() + size.y() / 2;
+  if (left_)
+  {
+    geometry::Rectangle r{position.x(), y, 0, 0};
+    for (;;)
+    {
+      auto r_new = r;
+      r_new.position -= geometry::Position{16, 0};
+      r_new.size += geometry::Size{16, 0};
+      if (level.collides_solid(r_new.position, r_new.size) ||
+          !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)))
+      {
+        rects.push_back(r);
+        break;
+      }
+      r = r_new;
+    }
+  }
+  else if (left_)
+  {
+    geometry::Rectangle r{position.x() + size.x(), y, 0, 0};
+    for (;;)
+    {
+      auto r_new = r;
+      r_new.size += geometry::Size{16, 0};
+      // TODO: check camera for inside
+      if (level.collides_solid(r_new.position, r_new.size) ||
+          !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)))
+      {
+        rects.push_back(r);
+        break;
+      }
+      r = r_new;
+    }
+  }
+  return rects;
+}
+
 void LaserBeam::update([[maybe_unused]] AbstractSoundManager& sound_manager,
                        [[maybe_unused]] const geometry::Rectangle& player_rect,
                        Level& level)

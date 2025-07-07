@@ -18,7 +18,7 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
     for (int remain = size.y(); remain > 0; remain -= 16)
     {
       const int h = std::min(remain, 16);
-      geometry::Rectangle r{position.x() + (include_self ? 0 : 16), y, 0, h};
+      geometry::Rectangle r{position.x() + (include_self ? 0 : size.x()), y, 0, h};
       y += h;
       for (;;)
       {
@@ -42,7 +42,7 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
     for (int remain = size.y(); remain > 0; remain -= 16)
     {
       const int h = std::min(remain, 16);
-      geometry::Rectangle r{position.x() + (include_self ? 16 : 0), y, 0, h};
+      geometry::Rectangle r{position.x() + (include_self ? size.x() : 0), y, 0, h};
       y += h;
       for (;;)
       {
