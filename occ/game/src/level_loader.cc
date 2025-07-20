@@ -524,8 +524,27 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(block_sprite) + 2;  // NE
             flags |= TILE_SOLID;
             break;
+          case '2':
+            if (level->tile_ids[i + level->width] != '6')
+            {
+              // TODO: falling rocks?
+              sprite = static_cast<int>(block_sprite) + 5;  // S
+            }
+            else
+            {
+              sprite = static_cast<int>(block_sprite) + 9;  // MID
+            }
+            flags |= TILE_SOLID;
+            break;
           case '4':
-            sprite = static_cast<int>(block_sprite) + 8;  // W
+            if (level->tile_ids[i - 1] != '2')
+            {
+              sprite = static_cast<int>(block_sprite) + 8;  // W
+            }
+            else
+            {
+              sprite = static_cast<int>(block_sprite) + 9;  // MID
+            }
             flags |= TILE_SOLID;
             break;
           case '5':
