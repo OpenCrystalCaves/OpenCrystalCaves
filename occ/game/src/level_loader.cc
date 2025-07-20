@@ -648,129 +648,142 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case 'n':
             // Check tile above for continuation tile
-            if (i < level->width)
+            if (i >= level->width)
             {
-              break;
-            }
-            switch (level->tile_ids[i - level->width])
-            {
-              case '[':
-                switch (level->tile_ids[i - level->width + 1])
-                {
-                  case '#':
-                    // Bottom left of grille
-                    sprite = static_cast<int>(Sprite::SPRITE_GRILLE_3);
-                    break;
-                  case '*':
-                    // Bottom left of gear
-                    sprite = static_cast<int>(Sprite::SPRITE_GEAR_3);
-                    break;
-                  case 'b':
-                    // Bottom left of crate
-                    sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
-                    break;
-                  case 'y':
-                    // Bottom left of crate
-                    sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
-                    break;
-                  default:
-                    break;
-                }
-                break;
-              case '#':
-                // Bottom right of grille
-                sprite = static_cast<int>(Sprite::SPRITE_GRILLE_4);
-                break;
-              case '*':
-                // Bottom right of gear
-                sprite = static_cast<int>(Sprite::SPRITE_GEAR_4);
-                break;
-              case '$':
-                // Air tank (bottom)
-                level->hazards.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, false));
-                break;
-              case 'b':
-                // Bottom of crate
-                sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
-                break;
-              case 'i':
-                // Stop sign pole
-                sprite = static_cast<int>(Sprite::SPRITE_STOP_POLE);
-                break;
-              case 'n':
-                // Keep looking left to see what we're continuing from
-                for (int ci = i - level->width - 1; ci >= 0; ci--)
-                {
-                  switch (level->tile_ids[ci])
+              switch (level->tile_ids[i - level->width])
+              {
+                case '[':
+                  switch (level->tile_ids[i - level->width + 1])
                   {
-                    case 'b':
-                      if (level->tile_ids[i + 1] == 'n')
-                      {
-                        // Bottom of crate
-                        sprite = static_cast<int>(Sprite::SPRITE_CRATE_D2);
-                      }
-                      else
-                      {
-                        // Bottom right of crate
-                        sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
-                      }
+                    case '#':
+                      // Bottom left of grille
+                      sprite = static_cast<int>(Sprite::SPRITE_GRILLE_3);
                       break;
-                    case 'X':
-                      // Bottom-right of exit
-                      sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
-                      flags |= TILE_ANIMATED;
-                      sprite_count = 4;
+                    case '*':
+                      // Bottom left of gear
+                      sprite = static_cast<int>(Sprite::SPRITE_GEAR_3);
+                      break;
+                    case 'b':
+                      // Bottom left of crate
+                      sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
+                      break;
+                    case 'y':
+                      // Bottom left of crate
+                      sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
                       break;
                     default:
                       break;
                   }
-                  if (level->tile_ids[ci] != 'n')
+                  break;
+                case '#':
+                  // Bottom right of grille
+                  sprite = static_cast<int>(Sprite::SPRITE_GRILLE_4);
+                  break;
+                case '*':
+                  // Bottom right of gear
+                  sprite = static_cast<int>(Sprite::SPRITE_GEAR_4);
+                  break;
+                case '$':
+                  // Air tank (bottom)
+                  level->hazards.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, false));
+                  break;
+                case 'b':
+                  // Bottom of crate
+                  sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
+                  break;
+                case 'i':
+                  // Stop sign pole
+                  sprite = static_cast<int>(Sprite::SPRITE_STOP_POLE);
+                  break;
+                case 'n':
+                  // Keep looking left to see what we're continuing from
+                  for (int ci = i - level->width - 1; ci >= 0; ci--)
                   {
-                    break;
+                    switch (level->tile_ids[ci])
+                    {
+                      case 'b':
+                        if (level->tile_ids[i + 1] == 'n')
+                        {
+                          // Bottom of crate
+                          sprite = static_cast<int>(Sprite::SPRITE_CRATE_D2);
+                        }
+                        else
+                        {
+                          // Bottom right of crate
+                          sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
+                        }
+                        break;
+                      case 'X':
+                        // Bottom-right of exit
+                        sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
+                        flags |= TILE_ANIMATED;
+                        sprite_count = 4;
+                        break;
+                      default:
+                        break;
+                    }
+                    if (level->tile_ids[ci] != 'n')
+                    {
+                      break;
+                    }
                   }
-                }
-                break;
-              case 'T':
-                // Column below head
-                sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
-                break;
-              case 'U':
-                // Hammer
-                sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
-                mode = TileMode::HAMMER;
-                break;
-              case 'X':
-                // Bottom-left of exit
-                // Ignore - we've already added an exit
-                break;
-              case 'y':
-                // Bottom right of crate
-                sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
-                break;
-              case -8:
-                // Glass ball thing
-                sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_3);
-                mode = TileMode::GLASS_BALL;
-                flags |= TILE_RENDER_IN_FRONT;
-                break;
-              case -91:
-                // Bottom of blue door; skip as we should have added it using the top
-                break;
-              case -92:
-                // Bottom of green door; skip as we should have added it using the top
-                break;
-              case -93:
-                // Bottom of red door; skip as we should have added it using the top
-                break;
-              default:
-                LOG_INFO("Unknown tile on level %d (%d,%d) tile_id=%d (%c)",
-                         static_cast<int>(level_id),
-                         x,
-                         y,
-                         tile_id,
-                         static_cast<char>(tile_id));
-                level->tile_unknown[i] = true;
-                break;
+                  break;
+                case 'T':
+                  // Column below head
+                  sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
+                  break;
+                case 'U':
+                  // Hammer
+                  sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
+                  mode = TileMode::HAMMER;
+                  break;
+                case 'X':
+                  // Bottom-left of exit
+                  // Ignore - we've already added an exit
+                  break;
+                case 'y':
+                  // Bottom right of crate
+                  sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
+                  break;
+                case -8:
+                  // Glass ball thing
+                  sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_3);
+                  mode = TileMode::GLASS_BALL;
+                  flags |= TILE_RENDER_IN_FRONT;
+                  break;
+                case -91:
+                  // Bottom of blue door; skip as we should have added it using the top
+                  break;
+                case -92:
+                  // Bottom of green door; skip as we should have added it using the top
+                  break;
+                case -93:
+                  // Bottom of red door; skip as we should have added it using the top
+                  break;
+                default:
+                  if (i < level->width * (level->height - 1))
+                  {
+                    // Check below for continuation tile
+                    switch (level->tile_ids[i + level->width])
+                    {
+                      case -120:
+                        // Vine
+                        sprite = static_cast<int>(Sprite::SPRITE_VINE);
+                        flags |= TILE_RENDER_IN_FRONT;
+                        break;
+                      default:
+
+                        LOG_INFO("Unknown tile on level %d (%d,%d) tile_id=%d (%c)",
+                                 static_cast<int>(level_id),
+                                 x,
+                                 y,
+                                 tile_id,
+                                 static_cast<char>(tile_id));
+                        level->tile_unknown[i] = true;
+                    }
+                  }
+                  break;
+              }
             }
             break;
           case 'N':
@@ -1180,6 +1193,20 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Pipe in hole (V)
             sprite = static_cast<int>(Sprite::SPRITE_HOLE_PIPE_V);
             break;
+          case -120:
+            if (level->tile_ids[i - level->width] == -120)
+            {
+              // Vine flower
+              sprite = static_cast<int>(Sprite::SPRITE_VINE_FLOWER);
+              flags |= TILE_RENDER_IN_FRONT;
+            }
+            else
+            {
+              // Vine
+              sprite = static_cast<int>(Sprite::SPRITE_VINE);
+              flags |= TILE_RENDER_IN_FRONT;
+            }
+            break;
           case -126:
             // Right laser
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
@@ -1206,5 +1233,4 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
 
   return level;
 }
-
 }
