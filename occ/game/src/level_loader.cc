@@ -991,6 +991,14 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             mode = TileMode::GLASS_BALL;
             flags |= TILE_RENDER_IN_FRONT;
             break;
+          case -9:
+            // Stalagmite
+            level->hazards.emplace_back(new Stalagmite(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALAGMITE_2));
+            break;
+          case -10:
+            // Stalagmite
+            level->hazards.emplace_back(new Stalagmite(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALAGMITE_1));
+            break;
           case -11:
             // Shovel
             level->actors.emplace_back(

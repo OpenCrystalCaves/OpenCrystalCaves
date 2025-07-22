@@ -470,3 +470,41 @@ class AirPipe : public Hazard
   bool is_left_;
   int frame_ = 0;
 };
+
+class Stalagmite : public Hazard
+{
+  // ➖➖➖➖➖➖➖➖➖➖➖⚫➖➖➖➖
+  // ➖➖➖➖➖➖➖➖➖➖⚫🟠⚫➖➖➖
+  // ➖➖➖➖⚫➖➖➖➖⚫🟠🟠🟠⚫➖➖
+  // ➖➖➖⚫🟨⚫➖➖➖⚫🟠🟨🟠⚫➖➖
+  // ➖➖➖⚫🟠⚫➖➖➖⚫🟨🟠🟥⚫➖➖
+  // ➖➖⚫🟠🟨🟠⚫➖➖⚫🟠🟠🟠⚫➖➖
+  // ➖➖⚫🟠🟠🟠⚫➖➖⚫🟠🟠🟥⚫➖➖
+  // ➖➖⚫🟨🟠🟥⚫➖➖⚫🟠🟨🟠🟠⚫➖
+  // ➖➖⚫🟠🟠🟠⚫➖➖⚫🟨🟠🟠🟠⚫➖
+  // ➖⚫🟠🟨🟠🟠⚫➖➖⚫🟠🟠🟠🟥⚫➖
+  // ➖⚫🟨🟠🟠🟥⚫➖➖⚫🟨🟠🟠🟠⚫➖
+  // ➖⚫🟠🟠🟠🟠⚫➖➖⚫🟠🟨🟠🟥⚫➖
+  // ➖⚫🟨🟠🟠🟥⚫➖⚫🟠🟠🟠🟠🟠🟠⚫
+  // ⚫🟠🟠🟠🟠🟠🟠⚫⚫🟨🟠🟠🟠🟠🟠⚫
+  // ⚫🟠🟨🟠🟠🟠🟥⚫⚫🟠🟨🟠🟠🟠🟥⚫
+  // ⚫🟨🟠🟠🟠🟠🟠⚫⚫🟠🟠🟠🟠🟠🟠⚫
+  // Hurts player on touch
+ public:
+  Stalagmite(geometry::Position position, const Sprite sprite) : Hazard(position), sprite_(sprite) {}
+
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  {
+    return {{position, sprite_}};
+  }
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             [[maybe_unused]] AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level) override
+  {
+    // TODO: sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
+
+ private:
+  Sprite sprite_;
+};
