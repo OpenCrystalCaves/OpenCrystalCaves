@@ -120,6 +120,31 @@ const Sprite bump_platforms[] = {
   Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
   Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
 };
+const Sprite platforms[] = {
+  // Intro 1-2
+  Sprite::SPRITE_PLATFORM_BLUE,
+  Sprite::SPRITE_PLATFORM_BLUE,
+  // Main
+  Sprite::SPRITE_PLATFORM_BLUE,
+  // 1-8
+  Sprite::SPRITE_PLATFORM_BLUE,
+  Sprite::SPRITE_PLATFORM_BLUE,
+  Sprite::SPRITE_PLATFORM_BLUE,
+  Sprite::SPRITE_PLATFORM_BLUE,
+  Sprite::SPRITE_PLATFORM_RED,
+  Sprite::SPRITE_PLATFORM_BLUE,
+  Sprite::SPRITE_PLATFORM_RED,
+  Sprite::SPRITE_PLATFORM_GREEN,
+  // 9-16
+  Sprite::SPRITE_PLATFORM_BLUE,
+  Sprite::SPRITE_PLATFORM_BLUE,
+  Sprite::SPRITE_PLATFORM_GREEN,
+  Sprite::SPRITE_PLATFORM_GREEN,
+  Sprite::SPRITE_PLATFORM_BLUE,
+  Sprite::SPRITE_PLATFORM_GREEN,
+  Sprite::SPRITE_PLATFORM_RED,
+  Sprite::SPRITE_PLATFORM_BLUE,
+};
 std::vector<Sprite> STARS{
   // The sprite with the bright star (3) seems to be less common...
   Sprite::SPRITE_STARS_1, Sprite::SPRITE_STARS_1, Sprite::SPRITE_STARS_1, Sprite::SPRITE_STARS_1, Sprite::SPRITE_STARS_2,
@@ -975,7 +1000,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}));
             break;
           case '_':
-            sprite = static_cast<int>(Sprite::SPRITE_PLATFORM_BLUE);
+            sprite = static_cast<int>(platforms[static_cast<int>(level_id)]);
             flags |= TILE_SOLID_TOP;
             break;
           case '|':
