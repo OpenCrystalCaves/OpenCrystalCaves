@@ -21,9 +21,8 @@ Current state of OCC:
 Currently the engine can:
 
 - Load sprite, item and level data.
-- Main level and entering levels.
-- Render items that, both behind and in front of the player, as well as animated items.
-- Move the player around, jumping, colliding with solid items and moving platforms.
+- Play through a few levels.
+- Some enemies, hazards and items.
 
 Features that are missing:
 

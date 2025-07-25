@@ -493,7 +493,7 @@ class Stalagmite : public Hazard
  public:
   Stalagmite(geometry::Position position, const Sprite sprite) : Hazard(position), sprite_(sprite) {}
 
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {{position, sprite_}};
   }

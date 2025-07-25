@@ -273,8 +273,15 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_WINNERS_2);
             flags |= TILE_SOLID_TOP;
             break;
-          case 'n':
-            sprite = static_cast<int>(Sprite::SPRITE_WINNERS_3);
+          case 'd':
+            // [d = danger sign
+            sprite = static_cast<int>(Sprite::SPRITE_DANGER_2);
+            flags |= TILE_SOLID_TOP;
+            mode = TileMode::NONE;
+            break;
+          case 'f':
+            // [d = falling rocks sign
+            sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_2);
             flags |= TILE_SOLID_TOP;
             mode = TileMode::NONE;
             break;
@@ -284,9 +291,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             flags |= TILE_RENDER_IN_FRONT;
             mode = TileMode::NONE;
             break;
-          case 'd':
-            // [d = danger sign
-            sprite = static_cast<int>(Sprite::SPRITE_DANGER_2);
+          case 'n':
+            sprite = static_cast<int>(Sprite::SPRITE_WINNERS_3);
             flags |= TILE_SOLID_TOP;
             mode = TileMode::NONE;
             break;
@@ -899,6 +905,13 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               case 'd':
                 // [d = danger sign
                 sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::SIGN;
+                break;
+              case 'f':
+                // [f = falling rocks sign
+                // TODO: add falling rocks to level
+                sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_1);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::SIGN;
                 break;
