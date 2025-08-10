@@ -127,8 +127,8 @@ bool Level::player_on_platform(const geometry::Position& position, const geometr
   for (const auto& platform : moving_platforms)
   {
     // Player only collides if standing exactly on top of the platform, just like with static platforms
-    if ((position.y() + size.y() - 1 == platform.position.y()) && (position.x() < platform.position.x() + SPRITE_W) &&
-        (position.x() + size.x() > platform.position.x()))
+    if (platform.is_moving && (position.y() + size.y() - 1 == platform.position.y()) &&
+        (position.x() < platform.position.x() + SPRITE_W) && (position.x() + size.x() > platform.position.x()))
     {
       return true;
     }

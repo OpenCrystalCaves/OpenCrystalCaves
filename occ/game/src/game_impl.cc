@@ -132,7 +132,7 @@ void GameImpl::update_level()
   // Add moving platforms to objects_
   for (auto& platform : level_->moving_platforms)
   {
-    objects_.emplace_back(platform.position, platform.sprite_id, platform.num_sprites, platform.is_reverse());
+    objects_.emplace_back(platform.position, platform.get_sprite(), 1, false);
   }
 
   // Add entrances

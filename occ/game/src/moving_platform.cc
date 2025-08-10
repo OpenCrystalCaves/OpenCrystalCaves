@@ -4,16 +4,22 @@
 
 MovingPlatform::MovingPlatform(geometry::Position position, const bool horizontal, const bool controlled)
   : position(position),
-    sprite_id(static_cast<int>(horizontal ? Sprite::SPRITE_PLATFORM_H_1 : Sprite::SPRITE_PLATFORM_V_1)),
-    num_sprites(4),
+    sprite_id_(static_cast<int>(horizontal ? Sprite::SPRITE_PLATFORM_H_1 : Sprite::SPRITE_PLATFORM_V_1)),
     velocity(horizontal ? Vector<int>(1, 0) * 2 : Vector<int>(0, 1) * 2),
     controlled_(controlled)
 {
 }
 
+int MovingPlatform::get_sprite() const
+{
+  const auto d = is_moving ? ticks_ % 4 : 0;
+  return (is_reverse() ? 4 - 1 - d : d) + sprite_id_;
+}
+
 void MovingPlatform::update(const Level& level)
 {
-  if (is_moving(level))
+  is_moving = !controlled_ || (level.switch_flags & SWITCH_FLAG_MOVING_PLATFORMS);
+  if (is_moving)
   {
     // Move platform
     const auto new_platform_pos = collide_position() + velocity;
@@ -25,15 +31,11 @@ void MovingPlatform::update(const Level& level)
     }
     position += velocity;
   }
+  ticks_++;
 }
 
 
 Vector<int> MovingPlatform::get_velocity(const Level& level) const
 {
-  return is_moving(level) ? velocity : Vector<int>(0, 0);
-}
-
-bool MovingPlatform::is_moving(const Level& level) const
-{
-  return !controlled_ || (level.switch_flags & SWITCH_FLAG_MOVING_PLATFORMS);
+  return is_moving ? velocity : Vector<int>(0, 0);
 }
