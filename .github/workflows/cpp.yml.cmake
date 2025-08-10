@@ -56,26 +56,15 @@ jobs:
     - name: Install dependencies (Windows)
       if: matrix.os == 'windows-latest'
       run: C:\vcpkg\vcpkg.exe install --triplet x64-windows sdl2 sdl2-mixer --recurse
-    - name: Configure CMake
-      if: matrix.os != 'windows-latest'
-      run: |
-        mkdir ${{ matrix.build_type }}
-        cmake -B ${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} occ
-    - name: Configure CMake (Windows)
-      if: matrix.os == 'windows-latest'
-      run: cmake -B ${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows occ
-    - name: Build
-      run: cmake --build ${{ matrix.build_type }} --config ${{ matrix.build_type }}
-    - name: Test
-      run: ctest -V
 
+    # Download DLLs before configure so CMake can pick it up
     - name: Download SDL2 DLLs on tags (Windows)
-      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
-      uses: carlosperate/download-file-action@v2
-      with:
-        file-url: 'https://www.libsdl.org/release/SDL2-2.26.4-win32-x64.zip'
-        file-name: 'sdl2.zip'
-        location: './${{ matrix.build_type }}/dll'
+    if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
+    uses: carlosperate/download-file-action@v2
+    with:
+      file-url: 'https://www.libsdl.org/release/SDL2-2.26.4-win32-x64.zip'
+      file-name: 'sdl2.zip'
+      location: './${{ matrix.build_type }}/dll'
 
     - name: Download SDL2_mixer DLLs on tags (Windows)
       if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
@@ -92,6 +81,19 @@ jobs:
         7z x -y sdl2.zip
         7z x -y sdl2_mixer.zip
         copy .\optional\*.dll .
+
+    - name: Configure CMake
+      if: matrix.os != 'windows-latest'
+      run: |
+        mkdir ${{ matrix.build_type }}
+        cmake -B ${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} occ
+    - name: Configure CMake (Windows)
+      if: matrix.os == 'windows-latest'
+      run: cmake -B ${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows occ
+    - name: Build
+      run: cmake --build ${{ matrix.build_type }} --config ${{ matrix.build_type }}
+    - name: Test
+      run: ctest -V
 
     - name: Make package on tags
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'

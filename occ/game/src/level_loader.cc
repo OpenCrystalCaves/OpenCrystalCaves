@@ -9,7 +9,13 @@
 #include "level.h"
 #include "logger.h"
 
-static const std::unordered_set<LevelId> completedLevels{LevelId::LEVEL_1, LevelId::LEVEL_2, LevelId::LEVEL_3, LevelId::LEVEL_4};
+static const std::unordered_set<LevelId> completedLevels{
+  LevelId::LEVEL_1,
+  LevelId::LEVEL_2,
+  LevelId::LEVEL_3,
+  LevelId::LEVEL_4,
+  LevelId::LEVEL_5,
+};
 
 namespace LevelLoader
 {
