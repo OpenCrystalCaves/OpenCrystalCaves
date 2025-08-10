@@ -439,6 +439,14 @@ void GameRenderer::render_enemies(unsigned game_tick) const
       }
     }
   }
+
+  // Falling rocks detection rect
+  if (debug_)
+  {
+    const auto r = game_->get_level().falling_rocks;
+    const geometry::Rectangle dest_rect{r.position - game_camera_.position, r.size};
+    window_.render_rectangle(dest_rect, {255, 0, 255});
+  }
 }
 
 void GameRenderer::render_complete_border() const

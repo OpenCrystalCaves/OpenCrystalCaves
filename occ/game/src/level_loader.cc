@@ -564,7 +564,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case '2':
             if (level->tile_ids[i + level->width] != '6')
             {
-              // TODO: falling rocks?
               sprite = static_cast<int>(block_sprite) + 5;  // S
             }
             else
@@ -941,7 +940,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 break;
               case 'f':
                 // [f = falling rocks sign
-                // TODO: add falling rocks to level
+                // add falling rocks to level
+                // TODO: confirm falling rocks area
+                level->falling_rocks = geometry::Rectangle{{1 * 16, 8 * 16}, {22 * 16, 15 * 16}};
                 sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_1);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::SIGN;

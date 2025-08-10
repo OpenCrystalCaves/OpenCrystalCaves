@@ -508,3 +508,43 @@ class Stalagmite : public Hazard
  private:
   Sprite sprite_;
 };
+
+class FallingRock : public Hazard
+{
+  // ➖➖➖➖➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖
+  // ➖➖➖⚫⚫🪦⚪🪦⚪🪦⚫⚫⚫➖➖➖
+  // ➖➖⚫⚪🪦⚪🪦⚪🪦🟠🪦⚫🪦⚫➖➖
+  // ➖⚫⚪🪦⚪🪦⚪🪦⚪🪦🟠🪦⚫🪦⚫➖
+  // ⚫⚪🪦🟠🪦⚪🪦🟠🪦🟠🪦🟠🪦⚫🪦⚫
+  // ⚫🪦⚪🪦⚪🪦🟠🪦🟠🪦⚫🪦⚫🪦⚫⚫
+  // ⚫⚪🪦⚪🪦🟠🪦🟠🪦🟠🪦🟠🪦⚫🪦⚫
+  // ⚫🪦⚪🪦🟠🪦🟠🪦🟠🪦⚫🪦⚫🪦⚫⚫
+  // ⚫⚪🪦⚪🪦🟠🪦🟠🪦🟠🪦⚫🪦⚫🪦⚫
+  // ⚫🪦⚪🪦⚪🪦🟠🪦🟠🪦🟠🪦⚫🪦⚫➖
+  // ➖⚫🪦⚪🪦🟠🪦🟠🪦🟠🪦⚫🪦⚫➖➖
+  // ➖➖⚫🪦⚪🪦🟠🪦🟠🪦⚫🪦⚫➖➖➖
+  // ➖➖➖⚫⚫🟠🪦🟠🪦⚫🪦⚫➖➖➖➖
+  // ➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖➖
+  // Falls from above, hurts player on touch
+ public:
+  FallingRock(geometry::Position position) : Hazard(position) {}
+
+  virtual bool is_alive() const override { return position.y() < 1000; }
+  virtual void update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                      [[maybe_unused]] const geometry::Rectangle& player_rect,
+                      [[maybe_unused]] Level& level) override
+  {
+    position += geometry::Position{0, 6};
+  }
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {{position, Sprite::SPRITE_FALLING_ROCK}};
+  }
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             [[maybe_unused]] AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level) override
+  {
+    // TODO: sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
+};
