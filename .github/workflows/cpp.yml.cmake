@@ -59,12 +59,12 @@ jobs:
 
     # Download DLLs before configure so CMake can pick it up
     - name: Download SDL2 DLLs on tags (Windows)
-    if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
-    uses: carlosperate/download-file-action@v2
-    with:
-      file-url: 'https://www.libsdl.org/release/SDL2-2.26.4-win32-x64.zip'
-      file-name: 'sdl2.zip'
-      location: './${{ matrix.build_type }}/dll'
+      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
+      uses: carlosperate/download-file-action@v2
+      with:
+        file-url: 'https://www.libsdl.org/release/SDL2-2.26.4-win32-x64.zip'
+        file-name: 'sdl2.zip'
+        location: './${{ matrix.build_type }}/dll'
 
     - name: Download SDL2_mixer DLLs on tags (Windows)
       if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
