@@ -56,6 +56,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Level complete indicator     | ![](/screenshots/complete_cc.gif?raw=true) Green overscan (invisible in dosbox)                     | ![](/screenshots/complete_occ.gif?raw=true) Flashing green screen border                                  |
 | Red mushroom                 | ![](/screenshots/tough_cc.gif?raw=true) Timer in status bar                                         | ![](/screenshots/tough_occ.gif?raw=true) Player pulses red                                                |
 | Stopped enemies              | ![](/screenshots/stop_cc.gif?raw=true) Stopped bar                                                  | ![](/screenshots/stop_occ.gif?raw=true) Stopped and blinking red                                          |
+| Falling rocks                | ![](/screenshots/rock_cc.gif?raw=true) Can spawn outside danger area bar                            | ![](/screenshots/rock_occ.png) Only spawns in danger area                                                 |
 
 ## Compiling OCC
 
