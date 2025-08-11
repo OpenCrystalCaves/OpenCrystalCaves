@@ -92,7 +92,7 @@ void LaserBeam::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   position += geometry::Position(left_ ? -4 : 4, 0);
   // TODO: reduce hitbox
   // TODO: kill outside window
-  if (level.collides_solid(position + geometry::Position(0, 1), geometry::Size(16, 16)))
+  if (level.collides_solid(position + geometry::Position(0, 1), size))
   {
     alive_ = false;
     parent_.remove_child();
