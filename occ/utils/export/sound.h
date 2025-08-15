@@ -11,7 +11,7 @@ enum class SoundType : int
   SOUND_ENEMY_HURT,  // TODO: some effect is missing, this is too short
   SOUND_CRYSTAL,
   SOUND_PICKUP_GUN,
-  SOUND_SECRET_CRYSTAL,  // TODO: use
+  SOUND_SECRET_CRYSTAL,
   SOUND_CHEST,
   SOUND_FRUIT,  // TODO: use
   SOUND_UNKNOWNC,

@@ -20,7 +20,10 @@ int Level::get_bg(const int x, const int y) const
   return bgs[(y * width) + x];
 }
 
-bool Level::collides_solid(const geometry::Position& position, const geometry::Size& size, const bool is_slime) const
+bool Level::collides_solid(const geometry::Position& position,
+                           const geometry::Size& size,
+                           const bool is_slime,
+                           Actor** collides_actor) const
 {
   // Note: this function only works with size x and y <= 16
   // With size 16x16 the object can cover at maximum 4 tiles
@@ -38,11 +41,13 @@ bool Level::collides_solid(const geometry::Position& position, const geometry::S
       return true;
     }
   }
-  // Check colliding solid actors (closed doors)
-  for (const auto& a : actors)
+  // Check colliding solid actors
+  for (auto& a : actors)
   {
     if (a->is_solid(*this) && geometry::isColliding(geometry::Rectangle(a->position, a->size), {position, size}))
     {
+      if (collides_actor)
+        *collides_actor = a.get();
       return true;
     }
   }
@@ -127,8 +132,8 @@ bool Level::player_on_platform(const geometry::Position& position, const geometr
   for (const auto& platform : moving_platforms)
   {
     // Player only collides if standing exactly on top of the platform, just like with static platforms
-    if (platform.is_moving && (position.y() + size.y() - 1 == platform.position.y()) &&
-        (position.x() < platform.position.x() + SPRITE_W) && (position.x() + size.x() > platform.position.x()))
+    if (platform.is_moving && (position.y() + size.y() - 1 == platform.position.y()) && (position.x() < platform.position.x() + SPRITE_W) &&
+        (position.x() + size.x() > platform.position.x()))
     {
       return true;
     }

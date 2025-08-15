@@ -58,7 +58,7 @@ class Actor
   {
     return TouchType::TOUCH_TYPE_NONE;
   }
-  // Returns whether the actor is hittable
+  // Returns whether the actor is hittable (missile)
   virtual bool on_hit([[maybe_unused]] AbstractSoundManager& sound_manager,
                       [[maybe_unused]] const geometry::Rectangle& player_rect,
                       const Level& level,
@@ -66,6 +66,9 @@ class Actor
   {
     return is_solid(level);
   }
+  virtual void on_collide([[maybe_unused]] const Player& player,
+                          [[maybe_unused]] AbstractSoundManager& sound_manager,
+                          [[maybe_unused]] Level& level) {};
 
   geometry::Position position;
   geometry::Size size;
@@ -237,7 +240,8 @@ class BumpPlatform : public Actor
   {
   }
 
-  virtual bool interact(AbstractSoundManager& sound_manager, Level& level) override;
+  virtual void on_collide(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
+  virtual bool is_solid([[maybe_unused]] const Level& level) const { return true; }
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
 

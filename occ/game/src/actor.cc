@@ -182,12 +182,18 @@ std::vector<std::pair<geometry::Position, Sprite>> Chest::get_sprites([[maybe_un
   return {{position, collected_ ? Sprite::SPRITE_CHEST_OPEN : Sprite::SPRITE_CHEST_CLOSED}};
 }
 
-bool BumpPlatform::interact([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+void BumpPlatform::on_collide(const Player& player, AbstractSoundManager& sound_manager, Level& level)
 {
-  // TODO: give crystal
-  has_crystal_ = false;
-  frame_ = 8;
-  return true;
+  if (player.jumping)
+  {
+    if (has_crystal_)
+    {
+      // TODO: give crystal
+      sound_manager.play_sound(SoundType::SOUND_SECRET_CRYSTAL);
+      has_crystal_ = false;
+    }
+    frame_ = 8;
+  }
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> BumpPlatform::get_sprites([[maybe_unused]] const Level& level) const

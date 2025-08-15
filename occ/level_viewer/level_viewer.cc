@@ -60,7 +60,7 @@ void draw(Window& window, Level& level, SpriteManager& sprite_manager, const int
       }
       for (const auto& platform : level.moving_platforms)
       {
-        sprite_manager.render_tile(platform.sprite_id, platform.position);
+        sprite_manager.render_tile(platform.get_sprite(), platform.position);
       }
       for (const auto& entrance : level.entrances)
       {

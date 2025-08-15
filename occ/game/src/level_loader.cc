@@ -283,13 +283,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -103:
             level->actors.emplace_back(
               new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite + 1), tile_id == -103));
-            flags |= TILE_SOLID;
             break;
           case 'n':
           case -102:
             level->actors.emplace_back(
               new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite + 2), tile_id == -102));
-            flags |= TILE_SOLID;
             mode = TileMode::NONE;
             break;
           default:
@@ -620,14 +618,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Keep adding bumpable platforms until we get an 'n'
             level->actors.emplace_back(
               new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite), tile_id == -104));
-            flags |= TILE_SOLID;
             mode = TileMode::BUMPABLE_PLATFORM;
             break;
           case 'd':
           case -103:
             level->actors.emplace_back(
               new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite + 1), tile_id == -103));
-            flags |= TILE_SOLID;
             mode = TileMode::BUMPABLE_PLATFORM;
             break;
           case 'A':

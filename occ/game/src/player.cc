@@ -9,7 +9,7 @@ constexpr geometry::Size Player::size;
 static constexpr auto jump_velocity = misc::make_array<int>(-8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 9u;
 
-void Player::update(AbstractSoundManager& sound_manager, const Level& level)
+void Player::update(AbstractSoundManager& sound_manager, Level& level)
 {
   /**
    * Updating the player is done in these steps:
@@ -133,8 +133,15 @@ void Player::update(AbstractSoundManager& sound_manager, const Level& level)
     const auto new_player_pos = position + geometry::Position(0, step_y);
 
     // If player is falling down (step_y == 1) we need to check for collision with platforms
-    if (!noclip && (level.collides_solid(new_player_pos, size) || (step_y == 1 && level.player_on_platform(new_player_pos, size))))
+    Actor* collides_actor = nullptr;
+    if (!noclip &&
+        (level.collides_solid(new_player_pos, size, false, &collides_actor) ||
+         (step_y == 1 && level.player_on_platform(new_player_pos, size))))
     {
+      if (collides_actor)
+      {
+        collides_actor->on_collide(*this, sound_manager, level);
+      }
       collide_y = true;
       break;
     }

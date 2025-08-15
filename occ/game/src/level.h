@@ -34,7 +34,10 @@ struct Level
 
   const Tile& get_tile(const int x, const int y) const;
   int get_bg(const int x, const int y) const;
-  bool collides_solid(const geometry::Position& position, const geometry::Size& size, const bool is_slime = false) const;
+  bool collides_solid(const geometry::Position& position,
+                      const geometry::Size& size,
+                      const bool is_slime = false,
+                      Actor** collides_actor = nullptr) const;
   bool collides_solid_top(const geometry::Position& position, const geometry::Size& size) const;
   Actor* collides_actor(const geometry::Position& position, const geometry::Size& size) const;
   Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size) const;
