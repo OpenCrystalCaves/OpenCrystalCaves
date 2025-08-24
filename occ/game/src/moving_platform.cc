@@ -35,7 +35,7 @@ void MovingPlatform::update(const Level& level)
 }
 
 
-Vector<int> MovingPlatform::get_velocity(const Level& level) const
+Vector<int> MovingPlatform::get_velocity([[maybe_unused]] const Level& level) const
 {
   return is_moving ? velocity : Vector<int>(0, 0);
 }

@@ -188,9 +188,9 @@ void BumpPlatform::on_collide(const Player& player, AbstractSoundManager& sound_
   {
     if (has_crystal_)
     {
-      // TODO: give crystal
       sound_manager.play_sound(SoundType::SOUND_SECRET_CRYSTAL);
       has_crystal_ = false;
+      level.actors.emplace_back(new HiddenCrystal(position));
     }
     frame_ = 8;
   }
@@ -198,7 +198,7 @@ void BumpPlatform::on_collide(const Player& player, AbstractSoundManager& sound_
 
 std::vector<std::pair<geometry::Position, Sprite>> BumpPlatform::get_sprites([[maybe_unused]] const Level& level) const
 {
-  const int dy = 2 - std::abs((frame_ / 4) - 2);
+  const int dy = frame_ > 4 ? frame_ - 9 : -frame_;
   if (has_crystal_)
   {
     return {{position, sprite_}, {position, Sprite::SPRITE_CRYSTAL_HIDDEN}};
@@ -233,4 +233,23 @@ TouchType HiddenBlock::on_touch(const Player& player, [[maybe_unused]] AbstractS
     is_hidden_ = false;
   }
   return TouchType::TOUCH_TYPE_NONE;
+}
+
+void HiddenCrystal::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                           [[maybe_unused]] const geometry::Rectangle& player_rect,
+                           Level& level)
+{
+  frame_--;
+  position += geometry::Position{0, dy_};
+  dy_++;
+  if (dy_ > 0 && level.collides_solid(position, size))
+  {
+    // Shift up so it is not intersecting
+    while (level.collides_solid(position, size))
+    {
+      position -= geometry::Position{0, 1};
+    }
+    // bounce up
+    dy_ = -dy_ + 5;
+  }
 }

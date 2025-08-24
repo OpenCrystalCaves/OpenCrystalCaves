@@ -241,7 +241,7 @@ class BumpPlatform : public Actor
   }
 
   virtual void on_collide(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
-  virtual bool is_solid([[maybe_unused]] const Level& level) const { return true; }
+  virtual bool is_solid([[maybe_unused]] const Level& level) const override { return true; }
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
 
@@ -319,4 +319,36 @@ class HiddenBlock : public Actor
 
  private:
   bool is_hidden_ = true;
+};
+
+class HiddenCrystal : public Actor
+{
+  // ➖➖➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖
+  // ➖➖⚫⚪⬜⬜⚪⬜⬜⚪⬜⬜🪦⚫➖➖
+  // ➖⚫⚪➖➖➖➖➖➖➖➖➖➖🪦⚫➖
+  // ⚫⚪➖➖➖➖➖➖➖➖➖➖➖➖🪦⚫
+  // ⬜➖⬜➖⬜➖⚪⬜⬜⬜⚪➖➖➖➖🪦
+  // ⬜➖➖➖➖➖➖➖➖➖➖➖➖➖➖🪦
+  // ⚫⚪➖➖➖➖➖➖➖➖➖➖➖➖🪦⚫
+  // ➖⚫⚪➖➖➖➖➖➖➖➖➖➖🪦⚫➖
+  // ➖➖⚫⚪➖➖➖➖➖➖➖➖🪦⚫➖➖
+  // ➖➖➖⚫⚪➖➖➖➖➖➖🪦⚫➖➖➖
+  // ➖➖➖➖⚫⚪➖➖➖➖🪦⚫➖➖➖➖
+  // ➖➖➖➖➖⚫⚪➖➖🪦⚫➖➖➖➖➖
+  // ➖➖➖➖➖➖⚫⚪🪦⚫➖➖➖➖➖➖
+  // ➖➖➖➖➖➖➖⚫⚫➖➖➖➖➖➖➖
+  // Spawned by BumpPlatform on bump, flies up, lands then dies, giving score
+ public:
+  HiddenCrystal(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
+
+  virtual bool is_alive() const override { return frame_ > 0; }
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {std::make_pair(position, Sprite::SPRITE_CRYSTAL_HIDDEN)};
+  }
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+
+ private:
+  int dy_ = -9;
+  int frame_ = 32;
 };
