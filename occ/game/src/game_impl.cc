@@ -451,6 +451,13 @@ void GameImpl::update_actors()
     // Check if actor died
     if (!a->is_alive())
     {
+      // Give score
+      if (a->get_points() > 0)
+      {
+        LOG_DEBUG("Actor death gives score: %d", a->get_points());
+        score_ += a->get_points();
+        particles_.emplace_back(new ScoreParticle(a->position, a->get_points()));
+      }
       it = level_->actors.erase(it);
     }
     else
@@ -477,10 +484,6 @@ void GameImpl::touch_actor(Actor& actor)
 
       // 99 is max ammo
       num_ammo_ = num_ammo_ > MAX_AMMO ? MAX_AMMO : num_ammo_;
-      break;
-    case TouchType::TOUCH_TYPE_SCORE:
-      LOG_DEBUG("Player took item with score: %d", actor.get_points());
-      score_ += actor.get_points();
       break;
     case TouchType::TOUCH_TYPE_POWER:
       LOG_DEBUG("Player took item of type power");

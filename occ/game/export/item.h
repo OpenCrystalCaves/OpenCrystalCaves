@@ -51,7 +51,7 @@ class Crystal : public Item
   // Gives score, need to collect all to finish level
   // TODO: collect all crystals
  public:
-  Crystal(geometry::Position position, Sprite sprite) : Item(position, sprite, SoundType::SOUND_CRYSTAL, TouchType::TOUCH_TYPE_SCORE) {}
+  Crystal(geometry::Position position, Sprite sprite) : Item(position, sprite, SoundType::SOUND_CRYSTAL, TouchType::TOUCH_TYPE_NONE) {}
 
   virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
   virtual int get_points() const override { return 50; }
@@ -96,7 +96,7 @@ class ScoreItem : public Item
   // TODO: different sounds
  public:
   ScoreItem(geometry::Position position, Sprite sprite, SoundType sound, int score)
-    : Item(position, sprite, sound, TouchType::TOUCH_TYPE_SCORE),
+    : Item(position, sprite, sound, TouchType::TOUCH_TYPE_NONE),
       score_(score)
   {
   }

@@ -199,10 +199,6 @@ void BumpPlatform::on_collide(const Player& player, AbstractSoundManager& sound_
 std::vector<std::pair<geometry::Position, Sprite>> BumpPlatform::get_sprites([[maybe_unused]] const Level& level) const
 {
   const int dy = frame_ > 4 ? frame_ - 9 : -frame_;
-  if (has_crystal_)
-  {
-    return {{position, sprite_}, {position, Sprite::SPRITE_CRYSTAL_HIDDEN}};
-  }
   return {{position + geometry::Position(0, dy), sprite_}};
 }
 

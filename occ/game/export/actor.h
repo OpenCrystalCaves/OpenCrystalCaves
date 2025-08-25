@@ -19,7 +19,6 @@ enum class TouchType
 {
   TOUCH_TYPE_NONE,
   TOUCH_TYPE_AMMO,
-  TOUCH_TYPE_SCORE,
   TOUCH_TYPE_POWER,
   TOUCH_TYPE_GRAVITY,
   TOUCH_TYPE_STOP,
@@ -272,7 +271,7 @@ class ClearBlock : public Actor
   ClearBlock(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
 
   virtual bool is_alive() const override { return is_alive_; }
-  virtual bool is_solid([[maybe_unused]] const Level& level) const { return true; }
+  virtual bool is_solid([[maybe_unused]] const Level& level) const override { return true; }
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {std::make_pair(position, Sprite::SPRITE_CLEAR_BLOCK)};
@@ -347,6 +346,7 @@ class HiddenCrystal : public Actor
     return {std::make_pair(position, Sprite::SPRITE_CRYSTAL_HIDDEN)};
   }
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual int get_points() const override { return 5000; }
 
  private:
   int dy_ = -9;
