@@ -243,6 +243,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
   int sprite_concrete = static_cast<int>(Sprite::SPRITE_CONCRETE);
   int entrance_level = static_cast<int>(LevelId::LEVEL_1);
   Caterpillar* caterpillar = nullptr;
+  bool falling_rocks = false;
   for (int i = 0; i < static_cast<int>(level->tile_ids.size()); i++)
   {
     const int x = i % level->width;
@@ -748,7 +749,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                       case 'X':
                         // Bottom-right of exit
                         sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
-                        flags |= TILE_ANIMATED;
+                        flags |= TILE_ANIMATED | TILE_SOLID;
                         sprite_count = 4;
                         break;
                       default:
@@ -936,9 +937,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 break;
               case 'f':
                 // [f = falling rocks sign
-                // add falling rocks to level
-                // TODO: confirm falling rocks area
-                level->falling_rocks = geometry::Rectangle{{1 * 16, 8 * 16}, {22 * 16, 15 * 16}};
+                falling_rocks = true;
                 sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_1);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::SIGN;
@@ -1278,6 +1277,44 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     }
     level->tiles.push_back(tile);
     level->bgs.push_back(bg);
+  }
+  if (falling_rocks)
+  {
+    // add falling rocks to level
+    // Scan level left-to-right and add rectangles
+    // Add area as long as there's a non-solid block in the column
+    geometry::Rectangle r{{0, 8 * 16}, {0, 15 * 16}};
+    for (int x = 0; x < 40; x++)
+    {
+      bool has_non_solid_block = false;
+      for (int y = 8; y < 24; y++)
+      {
+        if (!level->collides_solid({x * 16, y * 16}, {16, 16}))
+        {
+          has_non_solid_block = true;
+          break;
+        }
+      }
+      if (!has_non_solid_block)
+      {
+        // A whole column is solid; add the current rectangle if able and start a new one
+        if (r.size.x() > 0)
+        {
+          level->falling_rocks_areas.push_back(r);
+        }
+        r.position = {(x + 1) * 16, r.position.y()};
+        r.size = {0, r.size.y()};
+      }
+      else
+      {
+        // Column has non-solid blocks, extend the current rectangle
+        r.size += {16, 0};
+      }
+    }
+    if (r.size.x() > 0)
+    {
+      level->falling_rocks_areas.push_back(r);
+    }
   }
 
   return level;

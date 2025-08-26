@@ -178,12 +178,17 @@ void GameImpl::update_level()
   }
 
   // Falling rocks
-  if (level_->falling_rock_ticks == 0 && geometry::isColliding(level_->falling_rocks, player_.rect()))
+  if (level_->falling_rock_ticks == 0)
   {
-    level_->falling_rock_ticks = 40;
-    // Spawn inside detection area
-    level_->hazards.emplace_back(
-      new FallingRock({level_->falling_rocks.position.x() + static_cast<int>(rand() % level_->falling_rocks.size.x()), 0}));
+    for (const auto& area : level_->falling_rocks_areas)
+    {
+      if (geometry::isColliding(area, player_.rect()))
+      {
+        level_->falling_rock_ticks = 40;
+        // Spawn inside detection area
+        level_->hazards.emplace_back(new FallingRock({area.position.x() + static_cast<int>(rand() % area.size.x()), 0}));
+      }
+    }
   }
   if (level_->falling_rock_ticks > 0)
   {

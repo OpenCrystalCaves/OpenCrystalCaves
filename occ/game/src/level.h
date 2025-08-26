@@ -64,6 +64,6 @@ struct Level
   bool has_crystals = false;
   std::bitset<3> lever_on = {0};
   geometry::Position dv;
-  geometry::Rectangle falling_rocks = {{0, 0}, {0, 0}};
+  std::vector<geometry::Rectangle> falling_rocks_areas = {};
   int falling_rock_ticks = 0;
 };
