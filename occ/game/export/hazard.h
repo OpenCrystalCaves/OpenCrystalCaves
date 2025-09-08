@@ -471,7 +471,7 @@ class AirPipe : public Hazard
   int frame_ = 0;
 };
 
-class Stalagmite : public Hazard
+class Speleothem : public Hazard
 {
   // ➖➖➖➖➖➖➖➖➖➖➖⚫➖➖➖➖
   // ➖➖➖➖➖➖➖➖➖➖⚫🟠⚫➖➖➖
@@ -491,7 +491,7 @@ class Stalagmite : public Hazard
   // ⚫🟨🟠🟠🟠🟠🟠⚫⚫🟠🟠🟠🟠🟠🟠⚫
   // Hurts player on touch
  public:
-  Stalagmite(geometry::Position position, const Sprite sprite) : Hazard(position), sprite_(sprite) {}
+  Speleothem(geometry::Position position, const Sprite sprite) : Hazard(position), sprite_(sprite) {}
 
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {

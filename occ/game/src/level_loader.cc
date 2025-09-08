@@ -520,6 +520,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Spider
             level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}));
             break;
+          case ')':
+            // Stalactite
+            level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALACTITE_2));
+            break;
           case '*':
             // Rockman
             level->enemies.emplace_back(new Rockman(geometry::Position{x * 16, y * 16}));
@@ -1046,11 +1050,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -9:
             // Stalagmite
-            level->hazards.emplace_back(new Stalagmite(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALAGMITE_2));
+            level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALAGMITE_2));
             break;
           case -10:
             // Stalagmite
-            level->hazards.emplace_back(new Stalagmite(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALAGMITE_1));
+            level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALAGMITE_1));
             break;
           case -11:
             // Shovel
