@@ -66,4 +66,5 @@ struct Level
   geometry::Position dv;
   std::vector<geometry::Rectangle> falling_rocks_areas = {};
   int falling_rock_ticks = 0;
+  bool reverse_gravity = false;
 };

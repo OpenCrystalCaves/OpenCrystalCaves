@@ -298,6 +298,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
       case TileMode::SIGN:
         switch (tile_id)
         {
+          case '1':
+            // [1 = reverse gravity sign
+            sprite = static_cast<int>(Sprite::SPRITE_REVERSE_GRAVITY_2);
+            flags |= TILE_SOLID_TOP;
+            mode = TileMode::NONE;
+            break;
           case '4':
             // [4n = winners drugs sign
             sprite = static_cast<int>(Sprite::SPRITE_WINNERS_2);
@@ -912,6 +918,13 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case '[':
             switch (level->tile_ids[i + 1])
             {
+              case '1':
+                // [1 = reverse gravity sign
+                level->reverse_gravity = true;
+                sprite = static_cast<int>(Sprite::SPRITE_REVERSE_GRAVITY_1);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::SIGN;
+                break;
               case '4':
                 // [4n = winners drugs sign
                 sprite = static_cast<int>(Sprite::SPRITE_WINNERS_1);

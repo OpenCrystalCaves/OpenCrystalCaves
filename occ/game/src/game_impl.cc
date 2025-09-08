@@ -231,17 +231,12 @@ void GameImpl::update_player(const PlayerInput& player_input)
     player_.godmode = !player_.godmode;
     sound_manager_->play_sound(SoundType::SOUND_POWER_FIRE);
     LOG_DEBUG("God mode %s", player_.godmode ? "ON" : "OFF");
-    if (!player_.godmode && player_.reverse_gravity)
-    {
-      player_.reverse_gravity = false;
-      LOG_DEBUG("Reverse gravity OFF");
-    }
   }
   if (player_input.reverse_gravity_pressed && player_.godmode)
   {
-    player_.reverse_gravity = !player_.reverse_gravity;
+    level_->reverse_gravity = !level_->reverse_gravity;
     sound_manager_->play_sound(SoundType::SOUND_SWITCH);
-    LOG_DEBUG("Reverse gravity %s", player_.reverse_gravity ? "ON" : "OFF");
+    LOG_DEBUG("Reverse gravity %s", level_->reverse_gravity ? "ON" : "OFF");
   }
 
   // Check left / right

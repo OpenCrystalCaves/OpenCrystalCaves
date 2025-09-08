@@ -49,12 +49,11 @@ struct Player
 
   bool noclip = false;
   bool godmode = false;
-  bool reverse_gravity = false;
 
   void update(AbstractSoundManager& sound_manager, Level& level);
   void hurt(const TouchType& touch_type);
   bool is_flashing() const;
   geometry::Rectangle rect() const { return {position, size}; }
-  // Get the effective reverse gravity w.r.t. powerups and cheat mode
-  bool is_reverse_gravity() const { return (gravity_tick > 0) ^ reverse_gravity; }
+  // Get the effective reverse gravity w.r.t. powerups
+  bool is_reverse_gravity() const { return gravity_tick > 0; }
 };

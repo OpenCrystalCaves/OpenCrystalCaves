@@ -72,7 +72,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     {
       velocity = Vector<int>(velocity.x(), GRAVITY);
     }
-    if (is_reverse_gravity())
+    if (is_reverse_gravity() ^ level.reverse_gravity)
     {
       velocity = Vector<int>(velocity.x(), -velocity.y());
     }
@@ -165,7 +165,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     // Check if player hit something while jumping
     if (collide_y)
     {
-      if (is_reverse_gravity() ? velocity.y() > 0 : velocity.y() < 0)
+      if ((is_reverse_gravity() ^ level.reverse_gravity) ? velocity.y() > 0 : velocity.y() < 0)
       {
         // Player hit something while jumping up
         const auto position_below = position - geometry::Position(0, step_y);
@@ -191,7 +191,8 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
       // Player jump ended
       jumping = false;
     }
-    else if (jump_tick != 0 && level.collides_solid(position + geometry::Position(0, is_reverse_gravity() ? -1 : 1), size))
+    else if (jump_tick != 0 &&
+             level.collides_solid(position + geometry::Position(0, (is_reverse_gravity() ^ level.reverse_gravity) ? -1 : 1), size))
     {
       // Player did not actually collide with the ground, but standing directly above it
       // and this isn't the first tick in the jump, so we can consider the jump to have
