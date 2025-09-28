@@ -530,7 +530,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case '$':
             // Air tank (top)
-            level->hazards.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, true));
+            level->actors.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, true));
             break;
             // Crystals
           case '+':
@@ -728,7 +728,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                   break;
                 case '$':
                   // Air tank (bottom)
-                  level->hazards.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, false));
+                  level->actors.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, false));
                   break;
                 case 'b':
                   // Bottom of crate

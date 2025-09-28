@@ -249,3 +249,34 @@ void HiddenCrystal::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     dy_ = -dy_ + 5;
   }
 }
+
+void AirTank::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                     [[maybe_unused]] const geometry::Rectangle& player_rect,
+                     Level& level)
+{
+  if (!is_alive_)
+  {
+    level.no_air = true;
+    return;
+  }
+  frame_++;
+  if (frame_ == 4)
+  {
+    frame_ = 0;
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites([[maybe_unused]] const Level& level) const
+{
+  return {std::make_pair(
+    position, top_ ? static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_TANK_TOP_1) + frame_ / 2) : Sprite::SPRITE_AIR_TANK_BOTTOM)};
+}
+
+bool AirTank::on_hit(AbstractSoundManager& sound_manager,
+                     [[maybe_unused]] const geometry::Rectangle& player_rect,
+                     [[maybe_unused]] const Level& level,
+                     [[maybe_unused]] const bool power)
+{
+  is_alive_ = false;
+  return true;
+}

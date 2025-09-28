@@ -3,24 +3,6 @@
 #include "level.h"
 #include "player.h"
 
-void AirTank::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                     [[maybe_unused]] const geometry::Rectangle& player_rect,
-                     [[maybe_unused]] Level& level)
-{
-  // TODO: check if shot
-  frame_++;
-  if (frame_ == 2)
-  {
-    frame_ = 0;
-  }
-}
-
-std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites([[maybe_unused]] const Level& level) const
-{
-  return {std::make_pair(
-    position, top_ ? static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_TANK_TOP_1) + frame_) : Sprite::SPRITE_AIR_TANK_BOTTOM)};
-}
-
 void Laser::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   if ((level.switch_flags & SWITCH_FLAG_LASERS) && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))

@@ -206,6 +206,12 @@ void GameImpl::update_player(const PlayerInput& player_input)
   {
     return;
   }
+  if (level_->no_air)
+  {
+    // TODO: message
+    // TODO: death type
+    player_.health_ = 0;
+  }
 
   /**
    * 1. Update player information based on input
