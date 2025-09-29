@@ -197,6 +197,13 @@ void GameRenderer::render_background() const
 void GameRenderer::render_player() const
 {
   // Player sprite ids
+  static constexpr std::array<Sprite, 7> sprite_explode = {Sprite::SPRITE_PLAYER_EXPLODE_1,
+                                                           Sprite::SPRITE_PLAYER_EXPLODE_1,
+                                                           Sprite::SPRITE_PLAYER_EXPLODE_1,
+                                                           Sprite::SPRITE_PLAYER_EXPLODE_2,
+                                                           Sprite::SPRITE_PLAYER_EXPLODE_3,
+                                                           Sprite::SPRITE_PLAYER_EXPLODE_3,
+                                                           Sprite::SPRITE_PLAYER_EXPLODE_3};
   static constexpr std::array<int, 12> sprite_walking_right = {260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271};
   static constexpr int sprite_jumping_right = 284;
   static constexpr int sprite_shooting_right = 286;
@@ -212,6 +219,17 @@ void GameRenderer::render_player() const
   {
     const auto& player = game_->get_player();
     int sprite = 0;
+
+    if (player.dying_tick > 0)
+    {
+      const int ds = 12 - player.dying_tick / 4;
+      if (ds > 6)
+      {
+        // TODO: spawn particle and flying hat
+        return 0;
+      }
+      return static_cast<int>(sprite_explode[ds]);
+    }
 
     // Sprite selection priority: (currently 'shooting' means pressing shoot button without ammo)
     // If walking:
@@ -291,37 +309,41 @@ void GameRenderer::render_player() const
   const auto player_render_pos = game_->get_player().position - geometry::Position{2, 0};
 
   const geometry::Rectangle dest_rect{player_render_pos - game_camera_.position, 16, 16};
-  if (game_->get_player().crushed)
+
+  if (sprite > 0)
   {
-    // only render the hat and the feet
-    constexpr int feet_h = 2;
-    constexpr int hat_h = 3;
-    const auto src_rect = sprite_manager_->get_rect_for_tile(sprite);
-    const geometry::Rectangle feet_src_rect{src_rect.position.x(), src_rect.position.y() + 16 - feet_h, src_rect.size.x(), feet_h};
-    const geometry::Rectangle feet_dest_rect{dest_rect.position.x(), dest_rect.position.y() + 16 - feet_h, dest_rect.size.x(), feet_h};
-    sprite_manager_->get_surface()->blit_surface(feet_src_rect, feet_dest_rect);
-    const int hat_dy = sprite_walking_dy[game_->get_player().walk_tick % sprite_walking_dy.size()];
-    const geometry::Rectangle hat_src_rect{src_rect.position, src_rect.size.x(), hat_h};
-    const geometry::Rectangle hat_dest_rect{
-      dest_rect.position.x(), dest_rect.position.y() + 16 - hat_h - feet_h, dest_rect.size.x(), hat_h + hat_dy};
-    sprite_manager_->get_surface()->blit_surface(hat_src_rect, hat_dest_rect);
-  }
-  else if (game_->get_player().is_flashing())
-  {
-    // TODO: draw white sprite
-    window_.fill_rect(dest_rect, {255u, 255u, 255u});
-  }
-  else
-  {
-    // Render tough player as red tinted
-    const int period = FPS / 8;
-    float d = sprite_manager_->remaster ? (float)(game_->get_player().tough_tick % period) / period : 0;
-    if (d > 0.5f)
+    if (game_->get_player().crushed)
     {
-      d = 1 - d;
+      // only render the hat and the feet
+      constexpr int feet_h = 2;
+      constexpr int hat_h = 3;
+      const auto src_rect = sprite_manager_->get_rect_for_tile(sprite);
+      const geometry::Rectangle feet_src_rect{src_rect.position.x(), src_rect.position.y() + 16 - feet_h, src_rect.size.x(), feet_h};
+      const geometry::Rectangle feet_dest_rect{dest_rect.position.x(), dest_rect.position.y() + 16 - feet_h, dest_rect.size.x(), feet_h};
+      sprite_manager_->get_surface()->blit_surface(feet_src_rect, feet_dest_rect);
+      const int hat_dy = sprite_walking_dy[game_->get_player().walk_tick % sprite_walking_dy.size()];
+      const geometry::Rectangle hat_src_rect{src_rect.position, src_rect.size.x(), hat_h};
+      const geometry::Rectangle hat_dest_rect{
+        dest_rect.position.x(), dest_rect.position.y() + 16 - hat_h - feet_h, dest_rect.size.x(), hat_h + hat_dy};
+      sprite_manager_->get_surface()->blit_surface(hat_src_rect, hat_dest_rect);
     }
-    const std::uint8_t gb = 0xff - static_cast<std::uint8_t>(d * 2 * 0xff);
-    render_tile(sprite, player_render_pos, {0xff, gb, gb});
+    else if (game_->get_player().is_flashing())
+    {
+      // TODO: draw white sprite
+      window_.fill_rect(dest_rect, {255u, 255u, 255u});
+    }
+    else
+    {
+      // Render tough player as red tinted
+      const int period = FPS / 8;
+      float d = sprite_manager_->remaster ? (float)(game_->get_player().tough_tick % period) / period : 0;
+      if (d > 0.5f)
+      {
+        d = 1 - d;
+      }
+      const std::uint8_t gb = 0xff - static_cast<std::uint8_t>(d * 2 * 0xff);
+      render_tile(sprite, player_render_pos, {0xff, gb, gb});
+    }
   }
 
   if (debug_)

@@ -206,10 +206,11 @@ void GameImpl::update_player(const PlayerInput& player_input)
   {
     return;
   }
-  if (level_->no_air)
+  if (level_->no_air && player_.dying_tick == 0 && player_.health_ > 0)
   {
     // TODO: message
     // TODO: death type
+    player_.dying_tick = 48;
     player_.health_ = 0;
   }
 

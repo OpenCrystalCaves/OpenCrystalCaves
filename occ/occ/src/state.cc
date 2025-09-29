@@ -542,8 +542,7 @@ void GameState::update(const Input& input)
       game_.update(game_tick_, input_to_player_input(input));
       game_tick_ += 1;
 
-      // TODO: death effects
-      if (game_.get_player().health_ == 0)
+      if (game_.get_player().health_ == 0 && game_.get_player().dying_tick == 0)
       {
         finish();
         reset();

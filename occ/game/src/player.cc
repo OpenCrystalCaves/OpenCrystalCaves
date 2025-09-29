@@ -17,6 +17,11 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
    * 3. Update player position based on player velocity
    * 4. Update player information based on collision
    */
+  if (dying_tick > 0)
+  {
+    dying_tick--;
+    return;
+  }
 
   // Warp player back to last known good position if they are currently colliding
   // This is to allow them to jump into hidden blocks that solidify
@@ -225,13 +230,17 @@ void Player::hurt(const TouchType& touch_type)
     return;
   }
 
+  if (dying_tick > 0)
+  {
+    return;
+  }
+
   hurt_tick = 24;
 
   if (health_ > 0 && !godmode)
   {
     health_--;
   }
-  // TODO: die on 0 health
   if (touch_type == TouchType::TOUCH_TYPE_CRUSHING && !falling)
   {
     crushed = true;
