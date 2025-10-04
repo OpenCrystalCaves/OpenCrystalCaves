@@ -11,6 +11,7 @@
 #include "item.h"
 #include "level_id.h"
 #include "moving_platform.h"
+#include "particle.h"
 #include "sprite.h"
 #include "tile.h"
 
@@ -53,6 +54,7 @@ struct Level
   std::vector<std::unique_ptr<Enemy>> enemies;
   std::vector<std::unique_ptr<Hazard>> hazards;
   std::vector<std::unique_ptr<Actor>> actors;
+  std::vector<std::unique_ptr<Particle>> particles;
   std::vector<MovingPlatform> moving_platforms;
   std::vector<Entrance> entrances;
   std::unique_ptr<Exit> exit;

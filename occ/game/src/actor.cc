@@ -272,7 +272,7 @@ std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites([[maybe_
     position, top_ ? static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_TANK_TOP_1) + frame_ / 2) : Sprite::SPRITE_AIR_TANK_BOTTOM)};
 }
 
-bool AirTank::on_hit(AbstractSoundManager& sound_manager,
+bool AirTank::on_hit([[maybe_unused]] AbstractSoundManager& sound_manager,
                      [[maybe_unused]] const geometry::Rectangle& player_rect,
                      [[maybe_unused]] const Level& level,
                      [[maybe_unused]] const bool power)

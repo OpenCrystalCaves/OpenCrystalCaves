@@ -326,14 +326,14 @@ void GameImpl::update_player(const PlayerInput& player_input)
 void GameImpl::update_missile()
 {
   // Update particles (explosions etc.)
-  for (auto it = particles_.begin(); it != particles_.end();)
+  for (auto it = level_->particles.begin(); it != level_->particles.end();)
   {
     auto p = it->get();
     p->update();
 
     if (!p->is_alive())
     {
-      it = particles_.erase(it);
+      it = level_->particles.erase(it);
     }
     else
     {
@@ -344,7 +344,7 @@ void GameImpl::update_missile()
 
   if (missile_.update(*sound_manager_, player_.rect(), *level_))
   {
-    particles_.emplace_back(new Explosion(missile_.position));
+    level_->particles.emplace_back(new Explosion(missile_.position, Explosion::sprites_explosion));
   }
 
   // Player wants to shoot new missile
@@ -405,7 +405,7 @@ void GameImpl::update_enemies()
       // Don't even bother showing score particle unless it is high enough (>= 1000?)
       if (e->get_points() >= 1000)
       {
-        particles_.emplace_back(new ScoreParticle(e->position, e->get_points()));
+        level_->particles.emplace_back(new ScoreParticle(e->position, e->get_points()));
       }
 
       // Remove enemy
@@ -463,7 +463,7 @@ void GameImpl::update_actors()
       {
         LOG_DEBUG("Actor death gives score: %d", a->get_points());
         score_ += a->get_points();
-        particles_.emplace_back(new ScoreParticle(a->position, a->get_points()));
+        level_->particles.emplace_back(new ScoreParticle(a->position, a->get_points()));
       }
       it = level_->actors.erase(it);
     }

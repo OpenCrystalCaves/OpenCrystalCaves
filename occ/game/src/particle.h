@@ -19,16 +19,35 @@ class Particle
 
 class Explosion : public Particle
 {
+  // ➖➖➖➖⚫⚫➖➖➖➖⚫⚫⚫➖➖➖
+  // ➖➖➖⚫🟥🟥⚫➖➖⚫🟥🟥🟥⚫➖➖
+  // ➖➖➖⚫🟥🟨🟥⚫⚫🟥🟨🟥⚫➖➖➖
+  // ➖➖➖⚫🟥🟨🟨🟥⚫🟥🟨🟥⚫➖➖➖
+  // ➖➖➖➖⚫🟥🟨🟨🟥🟨🟨🟥⚫➖➖➖
+  // ➖➖➖⚫🟥🟨🟨🟨🟨🟨🟨🟥⚫⚫➖➖
+  // ➖➖➖⚫🟥🟨🟨🟥🟥🟨🟨🟨🟥🟥⚫➖
+  // ➖⚫⚫🟥🟨🟨🟥🟨🟨🟨🟨🟨🟨🟨🟥⚫
+  // ⚫🟥🟥🟨🟨🟨🟥🟨🟨🟨🟥🟨🟨🟥🟥⚫
+  // ⚫🟥🟥🟥🟨🟨🟨🟨🟨🟥🟨🟨🟥⚫⚫➖
+  // ➖⚫⚫⚫🟥🟨🟨🟨🟨🟨🟥🟨🟥⚫➖➖
+  // ➖➖➖⚫🟥🟥🟥🟥🟨🟥⚫🟥🟨🟥⚫➖
+  // ➖➖⚫🟥🟥⚫⚫⚫🟥🟥⚫⚫🟥🟥⚫➖
+  // ➖➖⚫🟥⚫➖➖➖⚫🟥⚫➖⚫⚫➖➖
+  // ➖➖➖⚫➖➖➖➖➖⚫➖➖➖➖➖➖
+  // Short-lived animated sprite
  public:
-  Explosion(geometry::Position position) : Particle(position) {}
+  Explosion(geometry::Position position, const std::vector<Sprite>& sprites) : Particle(position), sprites_(sprites) {}
 
   virtual void update() override;
   virtual int get_sprite() const override;
   virtual bool is_alive() const override;
 
+  static const std::vector<Sprite> sprites_explosion;
+  static const std::vector<Sprite> sprites_implosion;
+
  private:
   unsigned frame_ = 0;
-  static constexpr auto sprites_ = misc::make_array(28, 29, 30, 31, 30, 29, 28);
+  const std::vector<Sprite>& sprites_;
 };
 
 class ScoreParticle : public Particle

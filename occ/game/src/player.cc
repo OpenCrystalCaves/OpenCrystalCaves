@@ -3,6 +3,7 @@
 #include "constants.h"
 #include "level.h"
 #include "misc.h"
+#include "particle.h"
 
 static constexpr auto GRAVITY = 8u;
 constexpr geometry::Size Player::size;
@@ -20,6 +21,10 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   if (dying_tick > 0)
   {
     dying_tick--;
+    if (dying_tick == 23)  // 12 - dying_tick / 4 > 6
+    {
+      level.particles.emplace_back(new Explosion(position - geometry::Position{2, 0}, Explosion::sprites_implosion));
+    }
     return;
   }
 

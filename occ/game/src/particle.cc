@@ -51,7 +51,22 @@ bool ScoreParticle::is_alive() const
   return frame_ < 16;
 }
 
-constexpr decltype(Explosion::sprites_) Explosion::sprites_;
+const decltype(Explosion::sprites_explosion) Explosion::sprites_explosion = {Sprite::SPRITE_EXPLOSION_1,
+                                                                             Sprite::SPRITE_EXPLOSION_2,
+                                                                             Sprite::SPRITE_EXPLOSION_3,
+                                                                             Sprite::SPRITE_EXPLOSION_4,
+                                                                             Sprite::SPRITE_EXPLOSION_3,
+                                                                             Sprite::SPRITE_EXPLOSION_2,
+                                                                             Sprite::SPRITE_EXPLOSION_1};
+const decltype(Explosion::sprites_implosion) Explosion::sprites_implosion = {Sprite::SPRITE_IMPLOSION_1,
+                                                                             Sprite::SPRITE_IMPLOSION_2,
+                                                                             Sprite::SPRITE_IMPLOSION_3,
+                                                                             Sprite::SPRITE_IMPLOSION_4,
+                                                                             Sprite::SPRITE_IMPLOSION_5,
+                                                                             Sprite::SPRITE_IMPLOSION_6,
+                                                                             Sprite::SPRITE_IMPLOSION_7,
+                                                                             Sprite::SPRITE_IMPLOSION_8,
+                                                                             Sprite::SPRITE_IMPLOSION_9};
 
 void Explosion::update()
 {
@@ -62,7 +77,7 @@ void Explosion::update()
 }
 int Explosion::get_sprite() const
 {
-  return sprites_[frame_];
+  return static_cast<int>(sprites_[frame_]);
 }
 bool Explosion::is_alive() const
 {
