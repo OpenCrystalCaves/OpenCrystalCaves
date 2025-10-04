@@ -225,7 +225,6 @@ void GameRenderer::render_player() const
       const int ds = 12 - player.dying_tick / 4;
       if (ds > 6)
       {
-        // TODO: spawn flying hat
         return 0;
       }
       return static_cast<int>(sprite_explode[ds]);

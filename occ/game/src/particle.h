@@ -63,3 +63,22 @@ class ScoreParticle : public Particle
   unsigned frame_ = 0;
   Sprite sprite_;
 };
+
+class HatParticle : public Particle
+{
+  // ➖➖➖➖➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖
+  // ➖➖➖➖⚫🚨🟥🟨🟨🟥🟥⚫➖➖➖➖
+  // ➖➖➖⚫🚨🟥🟨🟨🟨🟨🟥🟥⚫➖➖➖
+  // ➖➖⚫🚨🟥🟥🟥🟨🟨🟥🟥🟥🟥⚫➖➖
+  // ➖➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖
+  // Flies off when the player implodes
+ public:
+  HatParticle(geometry::Position position) : Particle(position) {}
+
+  virtual void update() override;
+  virtual int get_sprite() const override { return static_cast<int>(Sprite::SPRITE_PLAYER_HAT); }
+  virtual bool is_alive() const override;
+
+ private:
+  unsigned frame_ = 0;
+};

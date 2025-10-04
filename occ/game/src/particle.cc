@@ -83,3 +83,15 @@ bool Explosion::is_alive() const
 {
   return frame_ < sprites_.size();
 }
+
+
+void HatParticle::update()
+{
+  frame_++;
+  position += geometry::Position(0, -4);
+}
+
+bool HatParticle::is_alive() const
+{
+  return frame_ < 32;
+}
