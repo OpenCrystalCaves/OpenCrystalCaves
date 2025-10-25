@@ -824,12 +824,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                     switch (level->tile_ids[i + level->width])
                     {
                       case -120:
+                        // Hanging leaves
+                        sprite = static_cast<int>(Sprite::SPRITE_HANGING_LEAVES);
+                        flags |= TILE_RENDER_IN_FRONT;
+                        break;
+                      case -121:
                         // Vine
                         sprite = static_cast<int>(Sprite::SPRITE_VINE);
                         flags |= TILE_RENDER_IN_FRONT;
                         break;
                       default:
-
                         LOG_INFO("Unknown tile on level %d (%d,%d) tile_id=%d (%c)",
                                  static_cast<int>(level_id),
                                  x,
@@ -1285,16 +1289,29 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case -120:
             if (level->tile_ids[i - level->width] == -120)
             {
-              // Vine flower
-              sprite = static_cast<int>(Sprite::SPRITE_VINE_FLOWER);
-              flags |= TILE_RENDER_IN_FRONT;
+              // Hanging flower
+              sprite = static_cast<int>(Sprite::SPRITE_HANGING_FLOWER);
             }
             else
             {
-              // Vine
-              sprite = static_cast<int>(Sprite::SPRITE_VINE);
-              flags |= TILE_RENDER_IN_FRONT;
+              // Hanging leaves
+              sprite = static_cast<int>(Sprite::SPRITE_HANGING_LEAVES);
             }
+            flags |= TILE_RENDER_IN_FRONT;
+            break;
+          case -121:
+            // Vine
+            if (i < level->width * (level->height - 1) && level->tile_ids[i + level->width] == -121)
+            {
+              // Continuing vine
+              sprite = static_cast<int>(Sprite::SPRITE_VINE);
+            }
+            else
+            {
+              // Vine loop
+              sprite = static_cast<int>(Sprite::SPRITE_VINE_LOOP);
+            }
+            flags |= TILE_RENDER_IN_FRONT;
             break;
           case -126:
             // Right laser
