@@ -516,12 +516,21 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Faucet
             level->hazards.emplace_back(new Faucet(geometry::Position{x * 16, y * 16}));
             break;
+          case '"':
+            // Ceiling moss 2
+            sprite = static_cast<int>(Sprite::SPRITE_CEILING_MOSS_2);
+            flags |= TILE_RENDER_IN_FRONT;
+            break;
           case '#':
             // Spider
             level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}));
             break;
+          case '(':
+            // Stalactite 1
+            level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALACTITE_1));
+            break;
           case ')':
-            // Stalactite
+            // Stalactite 2
             level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALACTITE_2));
             break;
           case '*':
@@ -531,6 +540,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case '$':
             // Air tank (top)
             level->actors.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, true));
+            break;
+          case ':':
+            // Ceiling moss 1
+            sprite = static_cast<int>(Sprite::SPRITE_CEILING_MOSS_1);
+            flags |= TILE_RENDER_IN_FRONT;
             break;
             // Crystals
           case '+':
@@ -832,6 +846,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'N':
             level->has_moon = true;
             break;
+          case 'o':
+            // Inactive rockman
+            sprite = static_cast<int>(Sprite::SPRITE_ROCKMAN_R_1);
+            flags |= TILE_RENDER_IN_FRONT;
+            break;
           case 'q':
             // Left laser
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
@@ -1112,6 +1131,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
             sprite_count = 4;
             flags |= TILE_ANIMATED;
+            break;
+          case -50:
+            // Grass
+            sprite = static_cast<int>(Sprite::SPRITE_GRASS);
+            flags |= TILE_RENDER_IN_FRONT;
             break;
           case -53:
             sprite = static_cast<int>(Sprite::SPRITE_PILLAR_1);
