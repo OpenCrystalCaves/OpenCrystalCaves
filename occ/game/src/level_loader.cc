@@ -704,9 +704,13 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->has_earth = true;
             break;
           case 'n':
+          {
+            bool handled = false;
+
             // Check tile above for continuation tile
             if (i >= level->width)
             {
+              handled = true;
               switch (level->tile_ids[i - level->width])
               {
                 case '[':
@@ -818,35 +822,40 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                   // Bottom of red door; skip as we should have added it using the top
                   break;
                 default:
-                  if (i < level->width * (level->height - 1))
-                  {
-                    // Check below for continuation tile
-                    switch (level->tile_ids[i + level->width])
-                    {
-                      case -120:
-                        // Hanging leaves
-                        sprite = static_cast<int>(Sprite::SPRITE_HANGING_LEAVES);
-                        flags |= TILE_RENDER_IN_FRONT;
-                        break;
-                      case -121:
-                        // Vine
-                        sprite = static_cast<int>(Sprite::SPRITE_VINE);
-                        flags |= TILE_RENDER_IN_FRONT;
-                        break;
-                      default:
-                        LOG_INFO("Unknown tile on level %d (%d,%d) tile_id=%d (%c)",
-                                 static_cast<int>(level_id),
-                                 x,
-                                 y,
-                                 tile_id,
-                                 static_cast<char>(tile_id));
-                        level->tile_unknown[i] = true;
-                    }
-                  }
+                  handled = false;
                   break;
               }
             }
-            break;
+
+            if (!handled && i < level->width * (level->height - 1))
+            {
+              handled = true;
+              // Check below for continuation tile
+              switch (level->tile_ids[i + level->width])
+              {
+                case -120:
+                  // Hanging leaves
+                  sprite = static_cast<int>(Sprite::SPRITE_HANGING_LEAVES);
+                  flags |= TILE_RENDER_IN_FRONT;
+                  break;
+                case -121:
+                  // Vine
+                  sprite = static_cast<int>(Sprite::SPRITE_VINE);
+                  flags |= TILE_RENDER_IN_FRONT;
+                  break;
+                default:
+                  handled = false;
+                  break;
+              }
+            }
+            if (!handled)
+            {
+              LOG_INFO(
+                "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
+              level->tile_unknown[i] = true;
+            }
+          }
+          break;
           case 'N':
             level->has_moon = true;
             break;
