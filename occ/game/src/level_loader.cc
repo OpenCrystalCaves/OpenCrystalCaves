@@ -15,6 +15,8 @@ static const std::unordered_set<LevelId> completedLevels{
   LevelId::LEVEL_3,
   LevelId::LEVEL_4,
   LevelId::LEVEL_5,
+  LevelId::LEVEL_6,
+  LevelId::LEVEL_7,
 };
 
 namespace LevelLoader
@@ -545,6 +547,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Ceiling moss 1
             sprite = static_cast<int>(Sprite::SPRITE_CEILING_MOSS_1);
             flags |= TILE_RENDER_IN_FRONT;
+            break;
+          case '=':
+            // Wall monster (left)
+            level->enemies.emplace_back(new WallMonster(geometry::Position{x * 16, y * 16}, true));
             break;
             // Crystals
           case '+':

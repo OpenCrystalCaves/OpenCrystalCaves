@@ -388,3 +388,40 @@ class Bat : public Enemy
   int frame_ = 0;
   int next_reverse_ = 0;
 };
+
+class WallMonster : public Enemy
+{
+  // ⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖➖➖➖➖➖
+  // 🟩🦚🦚🟩🦚🦚🟩🦚⚫⚫⚫⚫➖➖➖➖
+  // 🦚🟩🦚🦚🟩🦚🦚🟩🦚🟪🟪🟪⚫➖➖➖
+  // 🟪🟪🟪🟪🟪🟪🟪🟪🟪🟣🟣🟨🟪⚫➖➖
+  // 🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟨⚫🟪⚫➖
+  // 🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣🟪⚫
+  // 🦚🟩🦚🟩🦚🟩🟣🟣🟣🟣🟣🟣🟣🟣🟣🟪
+  // 🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣⚫⬜🟣🟣🟣🟪
+  // 🟣🟣🟣🟣🟣🟣🟣🟣🟣🟣⬜⚫⬜🟣🟣⚫
+  // 🦚🟩🦚🦚🟩🦚🦚⚫🟣🟣🟣⬜⚫⚫⚫➖
+  // 🟩🦚🦚🟩🦚🦚⚫➖⚫🟣🟣🟣🟣⚫➖➖
+  // ⚫⚫⚫⚫⚫⚫➖➖➖⚫🟣🟣🟣⚫➖➖
+  // ➖➖➖➖➖➖➖➖➖➖⚫⚫⚫➖➖➖
+  // Pops out of the wall when close, tough
+ public:
+  WallMonster(geometry::Position position, bool left) : Enemy(position, geometry::Size(16, 16), 1), left_(left) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual int get_points() const override { return 100; }
+  virtual bool is_tough() const override { return true; }
+  virtual std::vector<geometry::Rectangle> get_detection_rects([[maybe_unused]] const Level& level) const override
+  {
+    std::vector<geometry::Rectangle> rects;
+    rects.push_back(left_ ? geometry::Rectangle{position.x() - 16, position.y(), 16 * 2, size.y()}
+                          : geometry::Rectangle{position.x(), position.y(), 16 * 2, size.y()});
+    return rects;
+  }
+
+ private:
+  int frame_ = 0;
+  bool awake_ = false;
+  bool left_;
+};

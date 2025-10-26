@@ -516,3 +516,30 @@ std::vector<std::pair<geometry::Position, Sprite>> Bat::get_sprites([[maybe_unus
 {
   return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_BAT_1) + frame_))};
 }
+
+void WallMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
+{
+  const auto detection_rects = get_detection_rects(level);
+  if (geometry::isColliding(detection_rects[0], player_rect))
+  {
+    awake_ = true;
+  }
+  if (awake_ && frame_ == 16)
+  {
+    awake_ = false;
+  }
+  if (awake_ && frame_ < 16)
+  {
+    frame_++;
+  }
+  if (!awake_ && frame_ > 0)
+  {
+    frame_--;
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> WallMonster::get_sprites([[maybe_unused]] const Level& level) const
+{
+  return {std::make_pair(position,
+                         static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_WALL_MONSTER_R_1) + (left_ ? 9 : 0) + std::min(frame_, 8)))};
+}
