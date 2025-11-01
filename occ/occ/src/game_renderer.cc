@@ -503,7 +503,7 @@ void GameRenderer::render_statusbar() const
     sprite_manager_->render_icon(Icon::ICON_HEART, statusbar_rect.position + geometry::Position((i + 19) * CHAR_W, dy));
   }
   // Key
-  if (game_->has_key())
+  if (game_->get_level().has_key)
   {
     sprite_manager_->render_icon(Icon::ICON_KEY, statusbar_rect.position + geometry::Position(23 * CHAR_W, dy));
   }

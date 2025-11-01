@@ -32,7 +32,6 @@ bool GameImpl::init(AbstractSoundManager& sound_manager, const ExeData& exe_data
 
   score_ = 0u;
   num_ammo_ = 5u;
-  has_key_ = false;
 
   missile_.alive = false;
 
@@ -509,7 +508,7 @@ void GameImpl::touch_actor(Actor& actor)
       break;
     case TouchType::TOUCH_TYPE_KEY:
       LOG_DEBUG("Player took key");
-      has_key_ = true;
+      level_->has_key = true;
       break;
     case TouchType::TOUCH_TYPE_HURT:
       LOG_DEBUG("Player got hurt");

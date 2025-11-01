@@ -16,7 +16,7 @@
 class GameImpl : public Game
 {
  public:
-  GameImpl() : player_(), level_(), objects_(), score_(0u), num_ammo_(0u), has_key_(false), missile_() {}
+  GameImpl() : player_(), level_(), objects_(), score_(0u), num_ammo_(0u), missile_() {}
 
   virtual bool init(AbstractSoundManager& sound_manager, const ExeData& exe_data, const LevelId level) override;
   void update(unsigned game_tick, const PlayerInput& player_input) override;
@@ -34,7 +34,6 @@ class GameImpl : public Game
 
   unsigned get_score() const override { return score_; }
   unsigned get_num_ammo() const override { return num_ammo_; }
-  bool has_key() const override { return has_key_; }
 
   std::wstring get_debug_info() const override;
 
@@ -54,7 +53,6 @@ class GameImpl : public Game
 
   unsigned score_;
   unsigned num_ammo_;
-  bool has_key_;
 
   Missile missile_;
 };
