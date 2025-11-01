@@ -331,7 +331,7 @@ class Snoozer : public Enemy
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 5000; }
-  virtual bool is_tough() const override { return pause_frame_ > 0; }
+  virtual bool is_tough() const override { return pause_frame_ == 0; }
 
  private:
   bool left_ = false;
