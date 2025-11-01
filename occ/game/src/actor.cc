@@ -166,15 +166,16 @@ std::vector<std::pair<geometry::Position, Sprite>> Switch::get_sprites(const Lev
   return {{position, static_cast<Sprite>(static_cast<int>(sprite_) + static_cast<int>(!!(level.switch_flags & switch_flag_)))}};
 }
 
-bool Chest::interact(AbstractSoundManager& sound_manager, Level& level)
+TouchType Chest::on_touch([[maybe_unused]] const Player& player, AbstractSoundManager& sound_manager, Level& level)
 {
-  // TODO: auto interact
-  if (!level.has_key)
+  if (!level.has_key || collected_)
   {
-    return false;
+    return TouchType::TOUCH_TYPE_NONE;
   }
+  collected_ = true;
   sound_manager.play_sound(SoundType::SOUND_CHEST);
-  return true;
+  level.actors.emplace_back(new OpenChest(position));
+  return TouchType::TOUCH_TYPE_NONE;
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Chest::get_sprites([[maybe_unused]] const Level& level) const

@@ -206,11 +206,46 @@ class Chest : public Actor
  public:
   Chest(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
 
-  virtual bool interact(AbstractSoundManager& sound_manager, Level& level) override;
+  virtual TouchType on_touch([[maybe_unused]] const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual bool is_alive() const override { return !collected_; }
+  virtual int get_points() const override
+  {
+    // Randomly give 1000, 2000 or 5000 points
+    return std::array{1000, 2000, 5000}[rand() % 3];
+  }
 
  private:
   bool collected_ = false;
+};
+
+
+class OpenChest : public Actor
+{
+  // ➖➖➖➖⚫⚫⚫🟨⚫⚫⚫⚫➖➖➖➖
+  // ➖⚫➖⚫🟠🟠🟠🟨🟠🟠🟠🟠⚫➖⚫➖
+  // ⚫🟨⚫🟠🟠🟠🟠🟨🟠🪦🟠🪦🟠⚫🟨⚫
+  // ➖⚫🟨🟠🪦🟠🟠🟨🟠🟠🟠🟠🪦🟨⚫➖
+  // ➖⚫🟠🟨🟠🪦🟠🪦🟠⚫🟠🪦🟨🪦⚫➖
+  // ➖⚫🪦🟠🪦⚫🟠🟠⚫🟨⚫⚫🪦🟠⚫➖
+  // ➖⚫⚫🟠⚫🟨⚫⚫🟨🟨🟨🟨⚫⚫⚫➖
+  // ➖⚫🟨⚫🟨🟨⚫🟨🟨🟨🟨🟨⚫🟨⚫➖
+  // ⚫🪦🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠🪦🟠⚫
+  // ⚫🟠🪦🟠🪦🟠🪦⚫⚫🟠🪦🟠🟠🟠🟠⚫
+  // ⚫🪦🟠🪦🟠🟠⚫⚫⚫⚫🟠🪦🟠🪦🟠⚫
+  // ⚫🟠🪦🟠🪦🟠⚫⚫⚫⚫🪦🟠🪦🟠🟠⚫
+  // ⚫🟠🟠🪦🟠🟠🟠⚫⚫🪦🟠🟠🟠🪦🟠⚫
+  // ⚫🟠🪦🟠🪦🟠🪦⚫⚫🟠🪦🟠🪦🟠🟠⚫
+  // ⚫🟠🟠🟠🟠🟠🟠⚫⚫⚫🟠🪦🟠🟠🟠⚫
+  // ⚫🟠🪦🟠🪦🟠🟠🟠🟠🟠🟠🟠🟠🟠🟠⚫
+  // Open chest sprite after collecting
+ public:
+  OpenChest(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
+
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  {
+    return {{position, Sprite::SPRITE_CHEST_OPEN}};
+  }
 };
 
 
