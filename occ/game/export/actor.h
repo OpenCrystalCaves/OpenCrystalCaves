@@ -206,7 +206,7 @@ class Chest : public Actor
  public:
   Chest(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
 
-  virtual TouchType on_touch([[maybe_unused]] const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
+  virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual bool is_alive() const override { return !collected_; }
   virtual int get_points() const override
@@ -242,7 +242,7 @@ class OpenChest : public Actor
  public:
   OpenChest(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
 
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {{position, Sprite::SPRITE_CHEST_OPEN}};
   }
