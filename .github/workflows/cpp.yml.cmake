@@ -138,5 +138,4 @@ jobs:
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
       run: |
-        cd ${{ matrix.build_type }}
-        .\build\windows\butler.bat
+        butler push ${{ matrix.build_type }}/OpenCrystalCaves-*.zip  congusbongus/opencrystalcaves:win --userversion $VERSION
