@@ -24,7 +24,9 @@ void MovingPlatform::update(const Level& level)
     // Move platform
     const auto new_platform_pos = collide_position() + velocity;
 
-    if (level.collides_solid(new_platform_pos, collide_size))
+    if (level.collides_solid(new_platform_pos, collide_size) ||
+        // Don't leave the top of level
+        new_platform_pos.y() < 0)
     {
       // Change direction
       velocity = -velocity;

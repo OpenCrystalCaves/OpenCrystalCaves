@@ -143,10 +143,12 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   {
     const auto new_player_pos = position + geometry::Position(0, step_y);
 
-    // If player is falling down (step_y == 1) we need to check for collision with platforms
     Actor* collides_actor = nullptr;
     if (!noclip &&
         (level.collides_solid(new_player_pos, size, false, &collides_actor) ||
+         // Don't let the player leave the top of the level
+         new_player_pos.y() < 0 ||
+         // If player is falling down (step_y == 1) we need to check for collision with platforms
          (step_y == 1 && level.player_on_platform(new_player_pos, size))))
     {
       if (collides_actor)
