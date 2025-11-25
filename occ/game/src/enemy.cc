@@ -543,3 +543,28 @@ std::vector<std::pair<geometry::Position, Sprite>> WallMonster::get_sprites([[ma
   return {std::make_pair(position,
                          static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_WALL_MONSTER_R_1) + (left_ ? 9 : 0) + std::min(frame_, 8)))};
 }
+
+void Bird::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                  [[maybe_unused]] const geometry::Rectangle& player_rect,
+                  Level& level)
+{
+  frame_++;
+  if (frame_ == 10)
+  {
+    frame_ = 0;
+  }
+  const auto d = geometry::Position(left_ ? -2 : 2, 0);
+  position += d;
+  if (should_reverse(level))
+  {
+    left_ = !left_;
+    position -= d;
+  }
+
+  // TODO: lay eggs
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Bird::get_sprites([[maybe_unused]] const Level& level) const
+{
+  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_BIRD_1) + frame_))};
+}

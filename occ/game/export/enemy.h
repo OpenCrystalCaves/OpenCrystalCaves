@@ -425,3 +425,27 @@ class WallMonster : public Enemy
   bool awake_ = false;
   bool left_;
 };
+
+class Bird : public Enemy
+{
+  // ➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖
+  // ➖➖⚫⚫⚫⚫📘📘📘📘⚫⚫⚫⚫➖➖
+  // ➖⚫🟦🟦🟦📘🟨📘📘🟨📘🟦🟦🟦⚫➖
+  // ⚫🟦🟦⚫⚫⚫📘📘📘📘⚫⚫⚫🟦🟦⚫
+  // ⚫🟦🟦⚫➖➖🚨➖➖🚨➖➖⚫🟦🟦⚫
+  // 🟦⚫⚫➖⚫🚨⚫➖➖➖🚨⚫➖➖⚫🟦
+  // ⚫➖➖⚫🚨➖🚨⚫➖🚨➖🚨⚫➖➖⚫
+  // ➖➖➖➖⚫➖⚫➖➖⚫➖⚫➖➖➖➖
+  // Moves left and right, lays eggs
+ public:
+  Bird(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual int get_points() const override { return 100; }
+  virtual bool flying() const { return true; }
+
+ private:
+  bool left_ = false;
+  int frame_ = 0;
+};

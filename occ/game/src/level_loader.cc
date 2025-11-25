@@ -1053,6 +1053,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Power
             level->actors.emplace_back(new Power(geometry::Position{x * 16, y * 16}));
             break;
+          case '^':
+            // Bird
+            level->enemies.emplace_back(new Bird(geometry::Position{x * 16, y * 16}));
+            break;
           case '/':
             level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}));
             break;
