@@ -7,6 +7,7 @@
 #include "sprite.h"
 
 struct Level;
+class BirdEgg;
 class SpiderWeb;
 
 class Enemy : public Actor
@@ -442,10 +443,16 @@ class Bird : public Enemy
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(0, 1, level);
+  }
+  void remove_child() { child_ = nullptr; }
   virtual int get_points() const override { return 100; }
   virtual bool flying() const { return true; }
 
  private:
   bool left_ = false;
   int frame_ = 0;
+  BirdEgg* child_ = nullptr;
 };

@@ -561,7 +561,12 @@ void Bird::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     position -= d;
   }
 
-  // TODO: lay eggs
+  // Lay eggs
+  if (child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+  {
+    child_ = new BirdEgg(position, *this);
+    level.hazards.emplace_back(child_);
+  }
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Bird::get_sprites([[maybe_unused]] const Level& level) const

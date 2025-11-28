@@ -305,3 +305,16 @@ TouchType AirPipe::on_touch(const Player& player, AbstractSoundManager& sound_ma
   }
   return TouchType::TOUCH_TYPE_NONE;
 }
+
+void BirdEgg::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                     [[maybe_unused]] const geometry::Rectangle& player_rect,
+                     Level& level)
+{
+  position += geometry::Position(0, 4);
+  if (level.collides_solid(position + geometry::Position(0, -6), geometry::Size(16, 16)))
+  {
+    alive_ = false;
+    parent_.remove_child();
+    // TODO: open egg
+  }
+}

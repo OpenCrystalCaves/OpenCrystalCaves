@@ -7,6 +7,7 @@
 #include "sprite.h"
 
 struct Level;
+class Bird;
 class Spider;
 
 class Hazard : public Actor
@@ -517,4 +518,43 @@ class FallingRock : public Hazard
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
   }
+};
+
+class BirdEgg : public Hazard
+{
+  // ➖➖➖➖➖➖➖⚫⚫⚫➖➖➖➖➖➖
+  // ➖➖➖➖➖➖⚫⬜⬜⬜⚫➖➖➖➖➖
+  // ➖➖➖➖➖⚫⬜⬜⚪⚪⬜⚫➖➖➖➖
+  // ➖➖➖➖⚫⬜⬜⬜⬜⬜⚪⬜⚫➖➖➖
+  // ➖➖➖➖⚫⬜⬜⬜⬜⬜⬜⬜⚫➖➖➖
+  // ➖➖➖➖➖⚫⬜⬜⬜⬜⬜⚫➖➖➖➖
+  // ➖➖➖➖➖➖⚫⬜⬜⬜⚫➖➖➖➖➖
+  // ➖➖➖➖➖➖➖⚫⚫⚫➖➖➖➖➖➖
+  // ➖➖➖➖➖➖➖⚫⚫⚫➖➖➖➖➖➖
+  // ➖➖⚫⚫⚫⚫⚫🟨🟨🟨⚫⚫⚫⚫⚫➖
+  // ➖⚫⬜⬜⬜⬜🟨🟨🟨🟨🟨⬜⬜⬜⬜⚫
+  // ➖➖⚫⬜⬜⬜⬜🟨🟨🟨⬜⬜⬜⬜⚫➖
+  // Moves down
+  // TODO: breaks on ground
+  // TODO: sometimes hatches into a small bird
+ public:
+  BirdEgg(geometry::Position position, Bird& parent) : Hazard(position), parent_(parent) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {std::make_pair(position, Sprite::SPRITE_BIRD_EGG)};
+  }
+  virtual bool is_alive() const override { return alive_; }
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             [[maybe_unused]] AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level) override
+  {
+    // TODO: sound
+    return TouchType::TOUCH_TYPE_HURT;
+  }
+
+ private:
+  Bird& parent_;
+  bool alive_ = true;
 };
