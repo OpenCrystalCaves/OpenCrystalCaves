@@ -491,30 +491,36 @@ std::vector<std::pair<geometry::Position, Sprite>> Triceratops::get_sprites([[ma
           std::make_pair(position + geometry::Position{32, 0}, static_cast<Sprite>(frame + df * 2))};
 }
 
-void Bat::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                 [[maybe_unused]] const geometry::Rectangle& player_rect,
-                 Level& level)
+void Flier::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                   [[maybe_unused]] const geometry::Rectangle& player_rect,
+                   Level& level)
 {
   frame_++;
-  if (frame_ == 10)
+  if (frame_ == num_frames())
   {
     frame_ = 0;
   }
   const auto d = geometry::Position(left_ ? -2 : 2, 0);
   position += d;
-  if (next_reverse_ == 0 || should_reverse(level))
+  if (should_reverse(level))
   {
     left_ = !left_;
     position -= d;
+  }
+}
+
+void Bat::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                 [[maybe_unused]] const geometry::Rectangle& player_rect,
+                 Level& level)
+{
+  const bool old_left = left_;
+  Flier::update(sound_manager, player_rect, level);
+  if (left_ != old_left)
+  {
     // Change directions every 1-10 seconds
     next_reverse_ = 17 * (1 + static_cast<int>(rand() % 10));
   }
   next_reverse_--;
-}
-
-std::vector<std::pair<geometry::Position, Sprite>> Bat::get_sprites([[maybe_unused]] const Level& level) const
-{
-  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_BAT_1) + frame_))};
 }
 
 void WallMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
@@ -546,18 +552,7 @@ std::vector<std::pair<geometry::Position, Sprite>> WallMonster::get_sprites([[ma
 
 void Bird::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
-  frame_++;
-  if (frame_ == 10)
-  {
-    frame_ = 0;
-  }
-  const auto d = geometry::Position(left_ ? -2 : 2, 0);
-  position += d;
-  if (should_reverse(level))
-  {
-    left_ = !left_;
-    position -= d;
-  }
+  Flier::update(sound_manager, player_rect, level);
 
   // Lay eggs
   if (child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
@@ -566,9 +561,4 @@ void Bird::update(AbstractSoundManager& sound_manager, const geometry::Rectangle
     child_ = new BirdEgg(position, *this);
     level.hazards.emplace_back(child_);
   }
-}
-
-std::vector<std::pair<geometry::Position, Sprite>> Bird::get_sprites([[maybe_unused]] const Level& level) const
-{
-  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_BIRD_1) + frame_))};
 }

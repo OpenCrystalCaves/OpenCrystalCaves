@@ -36,7 +36,7 @@ class Enemy : public Actor
   int health;
 
  protected:
-  bool should_reverse(const Level& level) const;
+  virtual bool should_reverse(const Level& level) const;
 };
 
 class Bigfoot : public Enemy
@@ -369,7 +369,31 @@ class Triceratops : public Enemy
   int frame_ = 0;
 };
 
-class Bat : public Enemy
+class Flier : public Enemy
+{
+  // ABC for enemy that flies left and right
+ public:
+  Flier(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  {
+    return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(get_sprite()) + frame_))};
+  }
+  virtual int get_points() const override { return 100; }
+  virtual bool flying() const { return true; }
+
+ protected:
+  virtual Sprite get_sprite() const = 0;
+  virtual int num_frames() const = 0;
+  bool left_ = false;
+
+ private:
+  int frame_ = 0;
+  int next_reverse_ = 0;
+};
+
+class Bat : public Flier
 {
   // ➖⚫⚫⚫⚫➖🟨⚫⚫🟨➖⚫⚫⚫⚫➖
   // ⚫⚫⚫➖⚫⚫⚫⚫⚫⚫⚫⚫➖⚫⚫⚫
@@ -377,16 +401,15 @@ class Bat : public Enemy
   // ⚫➖➖➖➖➖➖⚫⚫➖➖➖➖➖➖⚫
   // Moves left and right erratically, flies
  public:
-  Bat(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
-
+  using Flier::Flier;
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
-  virtual int get_points() const override { return 100; }
-  virtual bool flying() const { return true; }
+
+ protected:
+  virtual Sprite get_sprite() const override { return Sprite::SPRITE_BAT_1; }
+  virtual int num_frames() const override { return 10; }
+  virtual bool should_reverse(const Level& level) const override { return next_reverse_ == 0 || Enemy::should_reverse(level); }
 
  private:
-  bool left_ = false;
-  int frame_ = 0;
   int next_reverse_ = 0;
 };
 
@@ -427,7 +450,7 @@ class WallMonster : public Enemy
   bool left_;
 };
 
-class Bird : public Enemy
+class Bird : public Flier
 {
   // ➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖
   // ➖➖⚫⚫⚫⚫📘📘📘📘⚫⚫⚫⚫➖➖
@@ -439,21 +462,19 @@ class Bird : public Enemy
   // ➖➖➖➖⚫➖⚫➖➖⚫➖⚫➖➖➖➖
   // Moves left and right, lays eggs
  public:
-  Bird(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
-
+  using Flier::Flier;
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
     return create_detection_rects(0, 1, level);
   }
   void remove_child() { child_ = nullptr; }
   void set_child(Hazard* child) { child_ = child; }
-  virtual int get_points() const override { return 100; }
-  virtual bool flying() const { return true; }
+
+ protected:
+  virtual Sprite get_sprite() const override { return Sprite::SPRITE_BIRD_1; }
+  virtual int num_frames() const override { return 10; }
 
  private:
-  bool left_ = false;
-  int frame_ = 0;
   Hazard* child_ = nullptr;
 };
