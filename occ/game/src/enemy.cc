@@ -544,9 +544,7 @@ std::vector<std::pair<geometry::Position, Sprite>> WallMonster::get_sprites([[ma
                          static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_WALL_MONSTER_R_1) + (left_ ? 9 : 0) + std::min(frame_, 8)))};
 }
 
-void Bird::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                  [[maybe_unused]] const geometry::Rectangle& player_rect,
-                  Level& level)
+void Bird::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ == 10)
@@ -564,6 +562,7 @@ void Bird::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   // Lay eggs
   if (child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
+    sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
     child_ = new BirdEgg(position, *this);
     level.hazards.emplace_back(child_);
   }

@@ -306,11 +306,9 @@ TouchType AirPipe::on_touch(const Player& player, AbstractSoundManager& sound_ma
   return TouchType::TOUCH_TYPE_NONE;
 }
 
-void BirdEgg::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                     [[maybe_unused]] const geometry::Rectangle& player_rect,
-                     Level& level)
+void BirdEgg::update(AbstractSoundManager& sound_manager, [[maybe_unused]] const geometry::Rectangle& player_rect, Level& level)
 {
-  position += geometry::Position(0, 4);
+  position += geometry::Position(0, 6);
   if (level.collides_solid(position, geometry::Size(16, 16)))
   {
     alive_ = false;
@@ -322,6 +320,7 @@ void BirdEgg::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     else
     {
       // Spawn open egg
+      sound_manager.play_sound(SoundType::SOUND_HAMMER);
       auto open_egg = new BirdEggOpen(geometry::Position(position.x(), (position.y() / 16) * 16), parent_);
       parent_.set_child(open_egg);
       level.hazards.emplace_back(open_egg);
@@ -336,6 +335,7 @@ void BirdEggOpen::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   frame_++;
   if (!is_alive())
   {
+    sound_manager.play_sound(SoundType::SOUND_HAMMER);
     parent_.remove_child();
   }
 }

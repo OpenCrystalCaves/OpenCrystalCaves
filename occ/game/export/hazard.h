@@ -565,7 +565,7 @@ class BirdEggOpen : public CorpseSlime
  public:
   BirdEggOpen(geometry::Position position, Bird& parent) : CorpseSlime(position, Sprite::SPRITE_BIRD_EGG_OPEN), parent_(parent) {}
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual bool is_alive() const override { return frame_ < 16; }
+  virtual bool is_alive() const override { return frame_ < 24; }
 
  private:
   Bird& parent_;
