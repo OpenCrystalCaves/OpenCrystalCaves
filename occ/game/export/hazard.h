@@ -530,13 +530,9 @@ class BirdEgg : public Hazard
   // ➖➖➖➖➖⚫⬜⬜⬜⬜⬜⚫➖➖➖➖
   // ➖➖➖➖➖➖⚫⬜⬜⬜⚫➖➖➖➖➖
   // ➖➖➖➖➖➖➖⚫⚫⚫➖➖➖➖➖➖
-  // ➖➖➖➖➖➖➖⚫⚫⚫➖➖➖➖➖➖
-  // ➖➖⚫⚫⚫⚫⚫🟨🟨🟨⚫⚫⚫⚫⚫➖
-  // ➖⚫⬜⬜⬜⬜🟨🟨🟨🟨🟨⬜⬜⬜⬜⚫
-  // ➖➖⚫⬜⬜⬜⬜🟨🟨🟨⬜⬜⬜⬜⚫➖
   // Moves down
   // TODO: breaks on ground
-  // TODO: sometimes hatches into a small bird
+  // TODO: sometimes hatches into a small bird, 10% chance
  public:
   BirdEgg(geometry::Position position, Bird& parent) : Hazard(position), parent_(parent) {}
 
@@ -557,4 +553,21 @@ class BirdEgg : public Hazard
  private:
   Bird& parent_;
   bool alive_ = true;
+};
+
+class BirdEggOpen : public CorpseSlime
+{
+  // ➖➖➖➖➖➖➖⚫⚫⚫➖➖➖➖➖➖
+  // ➖➖⚫⚫⚫⚫⚫🟨🟨🟨⚫⚫⚫⚫⚫➖
+  // ➖⚫⬜⬜⬜⬜🟨🟨🟨🟨🟨⬜⬜⬜⬜⚫
+  // ➖➖⚫⬜⬜⬜⬜🟨🟨🟨⬜⬜⬜⬜⚫➖
+  // Disappears shortly
+ public:
+  BirdEggOpen(geometry::Position position, Bird& parent) : CorpseSlime(position, Sprite::SPRITE_BIRD_EGG_OPEN), parent_(parent) {}
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual bool is_alive() const override { return frame_ < 16; }
+
+ private:
+  Bird& parent_;
+  int frame_ = 0;
 };

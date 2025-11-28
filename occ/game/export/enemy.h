@@ -7,7 +7,7 @@
 #include "sprite.h"
 
 struct Level;
-class BirdEgg;
+class Hazard;
 class SpiderWeb;
 
 class Enemy : public Actor
@@ -448,11 +448,12 @@ class Bird : public Enemy
     return create_detection_rects(0, 1, level);
   }
   void remove_child() { child_ = nullptr; }
+  void set_child(Hazard* child) { child_ = child; }
   virtual int get_points() const override { return 100; }
   virtual bool flying() const { return true; }
 
  private:
   bool left_ = false;
   int frame_ = 0;
-  BirdEgg* child_ = nullptr;
+  Hazard* child_ = nullptr;
 };
