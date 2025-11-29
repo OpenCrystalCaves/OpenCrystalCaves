@@ -376,7 +376,7 @@ class Flier : public Enemy
   Flier(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(get_sprite()) + frame_))};
   }

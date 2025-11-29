@@ -58,6 +58,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Stopped enemies              | ![](/screenshots/stop_cc.gif?raw=true) Stopped bar                                                  | ![](/screenshots/stop_occ.gif?raw=true) Stopped and blinking red                                          |
 | Falling rocks                | ![](/screenshots/rock_cc.gif?raw=true) Can spawn outside danger area                                | ![](/screenshots/rock_occ.png) Only spawns in danger area                                                 |
 | Stopped platforms            | ![](/screenshots/stopped_platform_cc.gif?raw=true) Animated                                         | ![](/screenshots/stopped_platform_occ.gif?raw=true) Not animated                                          |
+| Slime and egg positions      | ![](/screenshots/egg_cc.gif?raw=true) Strictly aligned with tile grid                               | ![](/screenshots/egg_occ.gif?raw=true) Dynamic position based on parent                                   |
 
 ## Compiling OCC
 
