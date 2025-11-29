@@ -313,18 +313,18 @@ void BirdEgg::update(AbstractSoundManager& sound_manager, [[maybe_unused]] const
   {
     alive_ = false;
     sound_manager.play_sound(SoundType::SOUND_HAMMER);
-    const auto position = geometry::Position(this->position.x(), (this->position.y() / 16) * 16);
+    const auto child_pos = geometry::Position(position.x(), (position.y() / 16) * 16);
     if (misc::random<int>(0, 10) == 0)
     {
       // Spawn birdlet
-      auto birdlet = new Birdlet(position, parent_);
+      auto birdlet = new Birdlet(child_pos, parent_);
       parent_.set_child(birdlet);
       level.enemies.emplace_back(birdlet);
     }
     else
     {
       // Spawn open egg
-      auto open_egg = new BirdEggOpen(position, parent_);
+      auto open_egg = new BirdEggOpen(child_pos, parent_);
       parent_.set_child(open_egg);
       level.hazards.emplace_back(open_egg);
     }
