@@ -567,3 +567,45 @@ void Birdlet::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[m
 {
   parent_.remove_child();
 }
+
+void Robot::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                   [[maybe_unused]] const geometry::Rectangle& player_rect,
+                   Level& level)
+{
+  frame_++;
+  if (frame_ == 4)
+  {
+    frame_ = 0;
+  }
+  const auto d = geometry::Position(left_ ? -4 : 4, 0);
+  position += d;
+  if (next_reverse_ == 0 || should_reverse(level))
+  {
+    left_ = !left_;
+    position -= d;
+    // Change directions every 1-20 seconds
+    // TODO: confirm
+    next_reverse_ = 17 * (1 + static_cast<int>(rand() % 19));
+  }
+  next_reverse_--;
+  // TODO: zapping
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Robot::get_sprites([[maybe_unused]] const Level& level) const
+{
+  const auto sprite = zapping_
+    ? (left_ ? Sprite::SPRITE_ROBOT_ZAP_L : Sprite::SPRITE_ROBOT_ZAP_R)
+    : (static_cast<Sprite>(static_cast<int>(left_ ? Sprite::SPRITE_ROBOT_L_1 : Sprite::SPRITE_ROBOT_R_1) + frame_));
+  return {std::make_pair(position, sprite)};
+}
+
+bool Robot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, const Level& level, const bool power)
+{
+  // Turn to face player
+  if (left_ ^ (player_rect.position.x() < position.x()))
+  {
+    left_ = !left_;
+    next_reverse_ = 17 * (1 + static_cast<int>(rand() % 19));
+  }
+  return Enemy::on_hit(sound_manager, player_rect, level, power);
+}

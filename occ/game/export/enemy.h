@@ -500,3 +500,39 @@ class Birdlet : public Flier
  private:
   Bird& parent_;
 };
+
+class Robot : public Enemy
+{
+  // ➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖
+  // ⚫⬜⬜⬜⬜🩵🩵🩵🩵🩵🩵🩵🩵⚫➖➖
+  // ⚫⬜⬜🩵🩵🩵🩵🩵🩵🟥🟥🟥🟥⚫➖➖
+  // ⚫⬜⬜⬜⬜🩵🩵🩵🩵🟥🟥🟥🟥⚫➖➖
+  // ⚫⬜⬜🩵🩵🩵🩵🩵🩵📘📘📘📘⚫➖➖
+  // ➖➖➖➖⚫⬜🩵📘⚫➖➖➖➖➖➖➖
+  // ⚫⬜⬜⬜🩵🩵🩵🩵📘📘📘📘📘⚫⚫⚫
+  // ⚫⬜⬜⬜⬜🩵🩵🩵🩵📘📘📘📘⚫🇪🇺🇪🇺
+  // ⚫⬜⬜⬜🩵🩵🩵🩵📘📘📘🇪🇺🇪🇺🇪🇺⚫⚫
+  // ⚫⬜⬜⬜⬜🩵🩵🩵🩵📘📘📘📘⚫🇪🇺🇪🇺
+  // ⚫⬜⬜⬜🩵🩵🩵🩵📘📘📘📘📘⚫⚫⚫
+  // ⚫⬜⬜⬜⬜🩵🩵🩵🩵📘📘📘📘⚫➖➖
+  // ➖⚫⚫🪦⚪⚪⚪⚪⚪⚪🪦⚫⚫➖➖➖
+  // ➖⚫⬜⬜⬜🩵🩵🩵📘📘🟦🟦⚫➖➖➖
+  // ➖➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖➖
+  // Moves left and right erratically, zaps player when they are close
+ public:
+  Robot(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 3) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual bool on_hit(AbstractSoundManager& sound_manager,
+                      const geometry::Rectangle& player_rect,
+                      const Level& level,
+                      const bool power) override;
+  virtual int get_points() const override { return 100; }
+
+ private:
+  bool left_ = false;
+  int frame_ = 0;
+  int next_reverse_ = 0;
+  bool zapping_ = false;
+};

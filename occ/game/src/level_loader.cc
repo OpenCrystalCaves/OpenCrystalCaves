@@ -527,6 +527,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Spider
             level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}));
             break;
+          case '&':
+            // Robot
+            level->enemies.emplace_back(new Robot(geometry::Position{x * 16, y * 16}));
+            break;
           case '(':
             // Stalactite 1
             level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALACTITE_1));
