@@ -559,6 +559,11 @@ void Bird::update(AbstractSoundManager& sound_manager, const geometry::Rectangle
   {
     sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
     child_ = new BirdEgg(position, *this);
-    level.hazards.emplace_back(child_);
+    level.hazards.emplace_back(reinterpret_cast<Hazard*>(child_));
   }
+}
+
+void Birdlet::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+{
+  parent_.remove_child();
 }

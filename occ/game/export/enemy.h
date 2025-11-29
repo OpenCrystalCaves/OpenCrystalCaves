@@ -469,12 +469,34 @@ class Bird : public Flier
     return create_detection_rects(0, 1, level);
   }
   void remove_child() { child_ = nullptr; }
-  void set_child(Hazard* child) { child_ = child; }
+  void set_child(Actor* child) { child_ = child; }
 
  protected:
   virtual Sprite get_sprite() const override { return Sprite::SPRITE_BIRD_1; }
   virtual int num_frames() const override { return 10; }
 
  private:
-  Hazard* child_ = nullptr;
+  Actor* child_ = nullptr;
+};
+
+class Birdlet : public Flier
+{
+  // ➖➖➖➖➖➖➖⚫⚫➖➖➖➖➖➖➖
+  // ➖➖⚫⚫⚫⚫⚫📘📘⚫⚫⚫⚫⚫➖➖
+  // ➖⚫🟦🟦🟦📘🟨📘📘🟨📘🟦🟦🟦⚫➖
+  // ⚫🟦⚫⚫⚫⚫⚫📘📘⚫⚫⚫⚫⚫🟦⚫
+  // ➖⚫➖➖➖⚫🚨⚫⚫🚨⚫➖➖➖⚫➖
+  // ➖➖➖➖⚫🚨➖🚨🚨➖🚨⚫➖➖➖➖
+  // ➖➖➖➖➖⚫➖⚫⚫➖⚫➖➖➖➖➖
+  // Simple flier spawned by egg
+ public:
+  Birdlet(geometry::Position position, Bird& parent) : Flier(position), parent_(parent) {}
+  virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
+
+ protected:
+  virtual Sprite get_sprite() const override { return Sprite::SPRITE_BIRDLET_1; }
+  virtual int num_frames() const override { return 5; }
+
+ private:
+  Bird& parent_;
 };

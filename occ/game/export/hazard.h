@@ -530,9 +530,7 @@ class BirdEgg : public Hazard
   // ➖➖➖➖➖⚫⬜⬜⬜⬜⬜⚫➖➖➖➖
   // ➖➖➖➖➖➖⚫⬜⬜⬜⚫➖➖➖➖➖
   // ➖➖➖➖➖➖➖⚫⚫⚫➖➖➖➖➖➖
-  // Moves down
-  // TODO: breaks on ground
-  // TODO: sometimes hatches into a small bird, 10% chance
+  // Moves down, breaks on ground, sometimes hatches into a small bird, 10% chance
  public:
   BirdEgg(geometry::Position position, Bird& parent) : Hazard(position), parent_(parent) {}
 
