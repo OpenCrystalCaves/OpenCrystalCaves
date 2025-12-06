@@ -583,9 +583,8 @@ void Robot::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   {
     left_ = !left_;
     position -= d;
-    // Change directions every 1-20 seconds
-    // TODO: confirm
-    next_reverse_ = 17 * (1 + static_cast<int>(rand() % 19));
+    // Change directions every 1-8 seconds, but at least 1 second
+    next_reverse_ = 17 * std::max(static_cast<int>(rand() % 9), 1);
   }
   next_reverse_--;
   // TODO: zapping
