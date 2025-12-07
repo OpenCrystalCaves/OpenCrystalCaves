@@ -6,11 +6,13 @@
 std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
                                                                const int dy,
                                                                const Level& level,
-                                                               const bool include_self) const
+                                                               const bool include_self,
+                                                               const int max_len) const
 {
   // Create rectangles originating from this actor extending toward a cardinal direction,
   // until there is a solid collision.
   std::vector<geometry::Rectangle> rects;
+  int count = 0;
   if (dx == 1)
   {
     // right
@@ -24,9 +26,11 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
       {
         auto r_new = r;
         r_new.size += geometry::Size{16, 0};
+        count++;
         // TODO: check camera for inside
         if (level.collides_solid(r_new.position, r_new.size) ||
-            !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)))
+            !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)) ||
+            (max_len > 0 && count >= max_len))
         {
           rects.push_back(r);
           break;
@@ -49,8 +53,10 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
         auto r_new = r;
         r_new.position -= geometry::Position{16, 0};
         r_new.size += geometry::Size{16, 0};
+        count++;
         if (level.collides_solid(r_new.position, r_new.size) ||
-            !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)))
+            !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)) ||
+            (max_len > 0 && count >= max_len))
         {
           rects.push_back(r);
           break;
@@ -72,8 +78,10 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
       {
         auto r_new = r;
         r_new.size += geometry::Size{0, 16};
+        count++;
         if (level.collides_solid(r_new.position, r_new.size) ||
-            !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)))
+            !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)) ||
+            (max_len > 0 && count >= max_len))
         {
           rects.push_back(r);
           break;
@@ -96,8 +104,10 @@ std::vector<geometry::Rectangle> Actor::create_detection_rects(const int dx,
         auto r_new = r;
         r_new.position -= geometry::Position{0, 16};
         r_new.size += geometry::Size{0, 16};
+        count++;
         if (level.collides_solid(r_new.position, r_new.size) ||
-            !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)))
+            !geometry::is_inside(r_new, geometry::Rectangle(0, 0, level.width * 16, level.height * 16)) ||
+            (max_len > 0 && count >= max_len))
         {
           rects.push_back(r);
           break;

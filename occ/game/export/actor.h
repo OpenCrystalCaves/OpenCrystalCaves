@@ -77,7 +77,8 @@ class Actor
   std::vector<geometry::Rectangle> create_detection_rects(const int dx,
                                                           const int dy,
                                                           const Level& level,
-                                                          const bool include_self = false) const;
+                                                          const bool include_self = false,
+                                                          const int max_len = 0) const;
 };
 
 class Lever : public Actor

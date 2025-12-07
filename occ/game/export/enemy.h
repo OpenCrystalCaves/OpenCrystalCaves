@@ -529,6 +529,10 @@ class Robot : public Enemy
                       const Level& level,
                       const bool power) override;
   virtual int get_points() const override { return 100; }
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(left_ ? -1 : 1, 0, level, false, 2);
+  }
 
  private:
   bool left_ = false;

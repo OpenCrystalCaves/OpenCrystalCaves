@@ -568,26 +568,32 @@ void Birdlet::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[m
   parent_.remove_child();
 }
 
-void Robot::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                   [[maybe_unused]] const geometry::Rectangle& player_rect,
-                   Level& level)
+void Robot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ == 4)
   {
     frame_ = 0;
   }
-  const auto d = geometry::Position(left_ ? -4 : 4, 0);
-  position += d;
-  if (next_reverse_ == 0 || should_reverse(level))
+  // Zapping; don't move if zapping
+  zapping_ = geometry::is_any_colliding(get_detection_rects(level), player_rect);
+  if (zapping_)
   {
-    left_ = !left_;
-    position -= d;
-    // Change directions every 1-8 seconds, but at least 1 second
-    next_reverse_ = 17 * std::max(static_cast<int>(rand() % 9), 1);
+    // TODO: spawn laser
   }
-  next_reverse_--;
-  // TODO: zapping
+  else
+  {
+    const auto d = geometry::Position(left_ ? -4 : 4, 0);
+    position += d;
+    if (next_reverse_ == 0 || should_reverse(level))
+    {
+      left_ = !left_;
+      position -= d;
+      // Change directions every 1-8 seconds, but at least 1 second
+      next_reverse_ = 17 * std::max(static_cast<int>(rand() % 9), 1);
+    }
+    next_reverse_--;
+  }
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Robot::get_sprites([[maybe_unused]] const Level& level) const
