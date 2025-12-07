@@ -32,6 +32,7 @@ enum class TouchType
 
 struct Level;
 struct Player;
+class LaserBeam;
 
 class Actor
 {
@@ -79,6 +80,17 @@ class Actor
                                                           const Level& level,
                                                           const bool include_self = false,
                                                           const int max_len = 0) const;
+};
+
+class LaserBeam;
+
+class LaserBeamParent
+{
+ public:
+  virtual void remove_child([[maybe_unused]] Level& level) { child_ = nullptr; }
+
+ protected:
+  LaserBeam* child_ = nullptr;
 };
 
 class Lever : public Actor

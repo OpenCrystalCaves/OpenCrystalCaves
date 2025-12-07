@@ -70,14 +70,26 @@ void LaserBeam::update([[maybe_unused]] AbstractSoundManager& sound_manager,
                        [[maybe_unused]] const geometry::Rectangle& player_rect,
                        Level& level)
 {
-  frame_ = 1 - frame_;
-  position += geometry::Position(left_ ? -4 : 4, 0);
+  frame_++;
   // TODO: reduce hitbox
-  // TODO: kill outside window
-  if (level.collides_solid(position + geometry::Position(0, 1), size))
+  if (moving_)
   {
-    alive_ = false;
-    parent_.remove_child();
+    position += geometry::Position(left_ ? -4 : 4, 0);
+    // TODO: kill outside window
+    if (level.collides_solid(position + geometry::Position(0, 1), size))
+    {
+      alive_ = false;
+      parent_.remove_child(level);
+    }
+  }
+  else
+  {
+    // Kill after 2 frames
+    if (frame_ == 3)
+    {
+      alive_ = false;
+      parent_.remove_child(level);
+    }
   }
 }
 

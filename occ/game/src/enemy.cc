@@ -579,7 +579,13 @@ void Robot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const g
   zapping_ = geometry::is_any_colliding(get_detection_rects(level), player_rect);
   if (zapping_)
   {
-    // TODO: spawn laser
+    // Spawn laser
+    if (!child_)
+    {
+      geometry::Position child_pos = position + geometry::Position((left_ ? -16 : 16) + 4, 4);
+      child_ = new LaserBeam(child_pos, left_, *this, false);
+      level.hazards.emplace_back(child_);
+    }
   }
   else
   {
@@ -613,4 +619,19 @@ bool Robot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangl
     next_reverse_ = 17 * (1 + static_cast<int>(rand() % 19));
   }
   return Enemy::on_hit(sound_manager, player_rect, level, power);
+}
+
+void Robot::remove_child(Level& level)
+{
+  // Respawn laser immediately if zapping
+  if (zapping_)
+  {
+    geometry::Position child_pos = position + geometry::Position((left_ ? -16 : 16) + 4, 4);
+    child_ = new LaserBeam(child_pos, left_, *this, false);
+    level.hazards.emplace_back(child_);
+  }
+  else
+  {
+    child_ = nullptr;
+  }
 }

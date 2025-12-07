@@ -18,9 +18,9 @@ class Hazard : public Actor
   virtual ~Hazard() = default;
 };
 
-class LaserBeam;
-
-class Laser : public Hazard
+class Laser
+  : public Hazard
+  , public LaserBeamParent
 {
   // ⚫🩵🩵⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫
   // ⚫🔴🟥🩵🩵⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫
@@ -45,13 +45,11 @@ class Laser : public Hazard
     return {std::make_pair(position, left_ ? Sprite::SPRITE_LASER_L : Sprite::SPRITE_LASER_R)};
   }
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override;
-  void remove_child() { child_ = nullptr; }
 
  private:
   bool left_;
   bool moving_;
   bool down_ = false;
-  LaserBeam* child_ = nullptr;
 };
 
 class LaserBeam : public Hazard
@@ -63,12 +61,18 @@ class LaserBeam : public Hazard
   // ⬛⬛⬛⬛⬛🚨⬛⬛⬛⬛⬛⬛🚨🚨⬛⬛
   // Moves left/right, disappear on collide or out of frame
  public:
-  LaserBeam(geometry::Position position, bool left, Laser& parent) : Hazard(position, {8, 8}), left_(left), parent_(parent) {}
+  LaserBeam(geometry::Position position, bool left, LaserBeamParent& parent, bool moving = true)
+    : Hazard(position, {8, 8}),
+      left_(left),
+      parent_(parent),
+      moving_(moving)
+  {
+  }
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position - geometry::Size(4, 4), frame_ == 0 ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
+    return {std::make_pair(position - geometry::Size(4, 4), (frame_ & 1) ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
   }
   virtual bool is_alive() const override { return alive_; }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
@@ -82,8 +86,9 @@ class LaserBeam : public Hazard
  private:
   bool left_;
   int frame_ = 0;
-  Laser& parent_;
+  LaserBeamParent& parent_;
   bool alive_ = true;
+  bool moving_;
 };
 
 class Thorn : public Hazard

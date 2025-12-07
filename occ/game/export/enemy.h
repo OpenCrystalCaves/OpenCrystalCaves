@@ -501,7 +501,9 @@ class Birdlet : public Flier
   Bird& parent_;
 };
 
-class Robot : public Enemy
+class Robot
+  : public Enemy
+  , public LaserBeamParent
 {
   // ➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖
   // ⚫⬜⬜⬜⬜🩵🩵🩵🩵🩵🩵🩵🩵⚫➖➖
@@ -533,6 +535,7 @@ class Robot : public Enemy
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level, false, 2);
   }
+  virtual void remove_child(Level& level) override;
 
  private:
   bool left_ = false;
