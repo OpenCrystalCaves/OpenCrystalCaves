@@ -115,7 +115,7 @@ Enemy* Level::collides_enemy(const geometry::Position& position, const geometry:
 bool Level::player_on_platform(const geometry::Position& position, const geometry::Size& size) const
 {
   // Need to check both static platforms (e.g. foreground items with SOLID_TOP)
-  // and moving platforms
+  // and moving platforms and hazards that are solid on top.
 
   // Standing on a static platform requires the player to stand on the edge of a tile
   if ((position.y() + size.y() - 1) % SPRITE_H == 0)
@@ -134,6 +134,16 @@ bool Level::player_on_platform(const geometry::Position& position, const geometr
     // Player only collides if standing exactly on top of the platform, just like with static platforms
     if (platform.is_moving && (position.y() + size.y() - 1 == platform.position.y()) && (position.x() < platform.position.x() + SPRITE_W) &&
         (position.x() + size.x() > platform.position.x()))
+    {
+      return true;
+    }
+  }
+
+  // Check hazards that are solid on top
+  for (const auto& hazard : hazards)
+  {
+    if (hazard->is_solid_top(*this) && (position.y() + size.y() - 1 == hazard->position.y()) &&
+        (position.x() < hazard->position.x() + hazard->size.x()) && (position.x() + size.x() > hazard->position.x()))
     {
       return true;
     }

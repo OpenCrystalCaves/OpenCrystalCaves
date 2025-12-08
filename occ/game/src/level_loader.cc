@@ -336,6 +336,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             flags |= TILE_SOLID_TOP;
             mode = TileMode::NONE;
             break;
+          case 'D':
+            // [D = danger sign (falls)
+            mode = TileMode::NONE;
+            break;
           case 'f':
             // [d = falling rocks sign
             sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_2);
@@ -1046,6 +1050,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 // [d = danger sign
                 sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
                 flags |= TILE_SOLID_TOP;
+                mode = TileMode::SIGN;
+                break;
+              case 'D':
+                // [D = danger sign (falls)
+                level->hazards.emplace_back(
+                  new FallingSign(geometry::Position{x * 16, y * 16}, {Sprite::SPRITE_DANGER_1, Sprite::SPRITE_DANGER_2}));
                 mode = TileMode::SIGN;
                 break;
               case 'f':

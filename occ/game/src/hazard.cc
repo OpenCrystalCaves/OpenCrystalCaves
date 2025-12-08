@@ -354,3 +354,38 @@ void BirdEggOpen::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     parent_.remove_child();
   }
 }
+
+void FallingSign::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                         [[maybe_unused]] const geometry::Rectangle& player_rect,
+                         Level& level)
+{
+  if (landed_)
+    return;
+  if (!falling_)
+  {
+    if (geometry::is_any_colliding(get_detection_rects(level), player_rect))
+    {
+      falling_ = true;
+    }
+  }
+  if (falling_)
+  {
+    position += geometry::Position{0, 4};
+    if (level.collides_solid_top(position + geometry::Position{0, 4}, size))
+    {
+      sound_manager.play_sound(SoundType::SOUND_HAMMER);
+      landed_ = true;
+      falling_ = false;
+    }
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> FallingSign::get_sprites(const Level& level) const
+{
+  std::vector<std::pair<geometry::Position, Sprite>> result;
+  for (size_t i = 0; i < sprites_.size(); i++)
+  {
+    result.emplace_back(position + geometry::Position(static_cast<int>(i) * 16, 0), sprites_[i]);
+  }
+  return result;
+}

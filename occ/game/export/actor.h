@@ -43,6 +43,7 @@ class Actor
   virtual bool is_alive() const { return true; }
   virtual int get_points() const { return 0; }
   virtual bool is_solid([[maybe_unused]] const Level& level) const { return false; }
+  virtual bool is_solid_top([[maybe_unused]] const Level& level) const { return false; }
 
   virtual void update([[maybe_unused]] AbstractSoundManager& sound_manager,
                       [[maybe_unused]] const geometry::Rectangle& player_rect,
