@@ -191,6 +191,7 @@ enum class TileMode
   TRICERATOPS,
   AIR_PIPE,
   METAL_CRATE,
+  HAZARD_CRATE
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -535,6 +536,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_UR);
         mode = TileMode::NONE;
         break;
+      case TileMode::HAZARD_CRATE:
+        flags |= TILE_SOLID_TOP;
+        sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_UR);
+        mode = TileMode::NONE;
+        break;
       default:
         switch (tile_id)
         {
@@ -766,6 +772,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                       // Bottom left of crate
                       sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
                       break;
+                    case 'c':
+                      // Bottom left of hazard crate
+                      sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_DL);
+                      break;
                     case 'x':
                       // Bottom left of metal crate
                       sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_DL);
@@ -790,6 +800,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 case 'g':  // Fallthrough
                   // Bottom of crate
                   sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
+                  break;
+                case 'c':
+                  // Bottom right of hazard crate
+                  sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_DR);
                   break;
                 case 'x':
                   // Bottom right of metal crate
@@ -1021,6 +1035,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 sprite = static_cast<int>(Sprite::SPRITE_CRATE_UL);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::CRATE;
+                break;
+              case 'c':
+                // [c = hazard crate, 2x2
+                sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_UL);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::HAZARD_CRATE;
                 break;
               case 'd':
                 // [d = danger sign
