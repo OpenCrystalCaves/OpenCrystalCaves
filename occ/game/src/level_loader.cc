@@ -190,6 +190,7 @@ enum class TileMode
   CATERPILLAR,
   TRICERATOPS,
   AIR_PIPE,
+  METAL_CRATE,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
@@ -529,6 +530,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         // Skip this tile
         mode = TileMode::NONE;
         break;
+      case TileMode::METAL_CRATE:
+        flags |= TILE_SOLID_TOP;
+        sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_UR);
+        mode = TileMode::NONE;
+        break;
       default:
         switch (tile_id)
         {
@@ -760,6 +766,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                       // Bottom left of crate
                       sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
                       break;
+                    case 'x':
+                      // Bottom left of metal crate
+                      sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_DL);
+                      break;
                     default:
                       break;
                   }
@@ -780,6 +790,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 case 'g':  // Fallthrough
                   // Bottom of crate
                   sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
+                  break;
+                case 'x':
+                  // Bottom right of metal crate
+                  sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_DR);
                   break;
                 case 'i':
                   // Stop sign pole
@@ -1057,6 +1071,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD_L);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::COLUMN;
+                break;
+              case 'x':
+                // [x = Metal crate 2x2
+                sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_UL);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::METAL_CRATE;
                 break;
               case 'y':
                 // [y = Yellow/green crate, 2x2
