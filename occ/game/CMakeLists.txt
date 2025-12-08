@@ -11,6 +11,7 @@ add_library(game
   "export/item.h"
   "export/level_id.h"
   "export/object.h"
+  "export/particle.h"
   "export/player_input.h"
   "export/player.h"
   "export/tile.h"
@@ -31,7 +32,6 @@ add_library(game
   "src/moving_platform.h"
   "src/moving_platform.cc"
   "src/particle.cc"
-  "src/particle.h"
   "src/player.cc"
   "src/tile.cc"
 )

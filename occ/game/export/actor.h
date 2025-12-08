@@ -70,6 +70,7 @@ class Actor
   virtual void on_collide([[maybe_unused]] const Player& player,
                           [[maybe_unused]] AbstractSoundManager& sound_manager,
                           [[maybe_unused]] Level& level) {};
+  virtual const std::vector<Sprite>* get_explosion_sprites() const { return nullptr; }
 
   geometry::Position position;
   geometry::Size size;

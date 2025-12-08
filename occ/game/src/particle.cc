@@ -67,9 +67,23 @@ const decltype(Explosion::sprites_implosion) Explosion::sprites_implosion = {Spr
                                                                              Sprite::SPRITE_IMPLOSION_7,
                                                                              Sprite::SPRITE_IMPLOSION_8,
                                                                              Sprite::SPRITE_IMPLOSION_9};
+const decltype(Explosion::sprites_bones) Explosion::sprites_bones = {Sprite::SPRITE_BONES_PARTICLE_1,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_2,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_3,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_4,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_5,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_6,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_7,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_8,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_9,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_10,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_11,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_12,
+                                                                     Sprite::SPRITE_BONES_PARTICLE_13};
 
 void Explosion::update()
 {
+  position += geometry::Position(dx_, 0);
   if (is_alive())
   {
     frame_++;

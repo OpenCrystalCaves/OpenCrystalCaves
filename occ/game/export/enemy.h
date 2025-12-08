@@ -4,6 +4,7 @@
 #include "actor.h"
 #include "geometry.h"
 #include "misc.h"
+#include "particle.h"
 #include "sprite.h"
 
 struct Level;
@@ -86,6 +87,7 @@ class Bigfoot : public Enemy
                       const Level& level,
                       const bool power) override;
   virtual int get_points() const override { return 5000; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
  private:
   bool left_ = false;
@@ -111,6 +113,7 @@ class Hopper : public Enemy
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 100; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
  private:
   bool left_ = false;
@@ -136,6 +139,7 @@ class Slime : public Enemy
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 100; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
  private:
   int dx_ = 1;
@@ -166,6 +170,7 @@ class Snake : public Enemy
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
   virtual int get_points() const override { return 100; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
  private:
   bool left_ = false;
@@ -201,6 +206,7 @@ class Spider : public Enemy
   }
   void remove_child() { child_ = nullptr; }
   virtual int get_points() const override { return 100; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
  private:
   bool up_ = false;
@@ -233,6 +239,7 @@ class Rockman : public Enemy
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override;
   virtual int get_points() const override { return 100; }
   virtual bool is_tough() const override { return true; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
  private:
   bool left_ = false;
@@ -263,6 +270,7 @@ class MineCart : public Enemy
   // TODO: confirm points
   virtual int get_points() const override { return 100; }
   virtual bool is_tough() const override { return true; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
  private:
   bool left_ = false;
@@ -300,6 +308,7 @@ class Caterpillar : public Enemy
   }
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
   void set_child(Caterpillar& child);
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
  private:
   // Rank 0 = head
@@ -333,6 +342,7 @@ class Snoozer : public Enemy
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 5000; }
   virtual bool is_tough() const override { return pause_frame_ == 0; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
  private:
   bool left_ = false;
@@ -363,6 +373,7 @@ class Triceratops : public Enemy
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 5000; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
  private:
   bool left_ = false;
@@ -408,6 +419,7 @@ class Bat : public Flier
   virtual Sprite get_sprite() const override { return Sprite::SPRITE_BAT_1; }
   virtual int num_frames() const override { return 10; }
   virtual bool should_reverse(const Level& level) const override { return next_reverse_ == 0 || Enemy::should_reverse(level); }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
  private:
   int next_reverse_ = 0;
@@ -443,6 +455,7 @@ class WallMonster : public Enemy
                           : geometry::Rectangle{position.x(), position.y(), 16 * 2, size.y()});
     return rects;
   }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
  private:
   int frame_ = 0;
@@ -470,6 +483,7 @@ class Bird : public Flier
   }
   void remove_child() { child_ = nullptr; }
   void set_child(Actor* child) { child_ = child; }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
  protected:
   virtual Sprite get_sprite() const override { return Sprite::SPRITE_BIRD_1; }
@@ -492,6 +506,7 @@ class Birdlet : public Flier
  public:
   Birdlet(geometry::Position position, Bird& parent) : Flier(position), parent_(parent) {}
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
  protected:
   virtual Sprite get_sprite() const override { return Sprite::SPRITE_BIRDLET_1; }
@@ -536,6 +551,7 @@ class Robot
     return create_detection_rects(left_ ? -1 : 1, 0, level, false, 2);
   }
   virtual void remove_child(Level& level) override;
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
  private:
   bool left_ = false;

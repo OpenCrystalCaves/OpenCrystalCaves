@@ -390,14 +390,13 @@ void GameImpl::update_enemies()
     if (!e->is_alive())
     {
       e->on_death(*sound_manager_, *level_);
-
-      // TODO: When an enemy dies there should be another type of explosion
-      //       or bones spawning. The explosion/bones should move during animation
-      //       in the same direction as the missile coming from
-      // Create explosion where enemy is
-      // explosion_.alive = true;
-      // explosion_.frame = 0;
-      // explosion_.position = e->position;
+      // Death explosion
+      auto explosion_sprites = e->get_explosion_sprites();
+      if (explosion_sprites)
+      {
+        // TODO: if enemy not killed by missile, explosion position should be that of the enemy and not moving
+        level_->particles.emplace_back(new Explosion(missile_.position, *explosion_sprites, missile_.right ? 2 : -2));
+      }
 
       // Give score
       score_ += e->get_points();

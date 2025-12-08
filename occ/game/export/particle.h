@@ -36,7 +36,7 @@ class Explosion : public Particle
   // ➖➖➖⚫➖➖➖➖➖⚫➖➖➖➖➖➖
   // Short-lived animated sprite
  public:
-  Explosion(geometry::Position position, const std::vector<Sprite>& sprites) : Particle(position), sprites_(sprites) {}
+  Explosion(geometry::Position position, const std::vector<Sprite>& sprites, int dx = 0) : Particle(position), dx_(dx), sprites_(sprites) {}
 
   virtual void update() override;
   virtual int get_sprite() const override;
@@ -44,8 +44,10 @@ class Explosion : public Particle
 
   static const std::vector<Sprite> sprites_explosion;
   static const std::vector<Sprite> sprites_implosion;
+  static const std::vector<Sprite> sprites_bones;
 
  private:
+  int dx_;
   unsigned frame_ = 0;
   const std::vector<Sprite>& sprites_;
 };
