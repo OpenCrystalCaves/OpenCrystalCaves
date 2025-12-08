@@ -120,7 +120,7 @@ const Sprite bump_platforms[] = {
   Sprite::SPRITE_BUMP_PLATFORM_RED_L,
   Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
   Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+  Sprite::SPRITE_BUMP_PLATFORM_GREEN_L,
   // 9-16
   Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
   Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
@@ -428,6 +428,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
         switch (tile_id)
         {
           case 'b':
+            sprite = static_cast<int>(Sprite::SPRITE_CRATE_U1);
+            break;
+          case 'g':
             sprite = static_cast<int>(Sprite::SPRITE_CRATE_U1);
             break;
           case 'n':
@@ -751,10 +754,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                       // Bottom left of gear
                       sprite = static_cast<int>(Sprite::SPRITE_GEAR_3);
                       break;
-                    case 'b':
-                      // Bottom left of crate
-                      sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
-                      break;
+                    case 'b':  // Fallthrough
+                    case 'g':  // Fallthrough
                     case 'y':
                       // Bottom left of crate
                       sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
@@ -776,6 +777,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                   level->actors.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, false));
                   break;
                 case 'b':
+                case 'g':  // Fallthrough
                   // Bottom of crate
                   sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
                   break;
@@ -790,6 +792,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                     switch (level->tile_ids[ci])
                     {
                       case 'b':
+                      case 'g':  // Fallthrough
                         if (level->tile_ids[i + 1] == 'n')
                         {
                           // Bottom of crate
@@ -1017,6 +1020,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_1);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::SIGN;
+                break;
+              case 'g':
+                // [gn = Yellow/green crate, 3x2
+                sprite = static_cast<int>(Sprite::SPRITE_CRATE_UL);
+                flags |= TILE_SOLID_TOP;
+                mode = TileMode::CRATE;
                 break;
               case 'm':
                 // [m = mine sign
