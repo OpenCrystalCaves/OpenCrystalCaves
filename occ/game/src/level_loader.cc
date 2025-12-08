@@ -51,6 +51,9 @@ constexpr int levelRows[] = {
   24,
   24,
 };
+// Some levels have a missing first row (those with levelRows 23)
+// Fill in the first row with block tiles
+const std::string extraRow = "5gggggggggggggggggggggggggggggggggggggg5";
 const std::pair<Sprite, geometry::Size> levelBGs[] = {
   // intro
   {Sprite::SPRITE_STARS_1, {6, 1}},
@@ -214,6 +217,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
 
   // Read the tile ids of the level
   level->width = 0;
+  if (levelRows[l] == 23)
+  {
+    // Some levels have a missing first row
+    LOG_DEBUG("%s", extraRow.c_str());
+    for (char c : extraRow)
+    {
+      level->tile_ids.push_back(static_cast<int>(c));
+      level->tile_unknown.push_back(false);
+    }
+  }
   for (int row = 0; row < levelRows[l]; row++)
   {
     const int len = *ptr;
@@ -231,7 +244,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     }
   }
   level->level_id = level_id;
-  level->height = levelRows[static_cast<int>(level_id)];
+  level->height = levelRows[l];
+  if (levelRows[l] == 23)
+  {
+    level->height++;
+  }
   const auto background = levelBGs[static_cast<int>(level_id)];
   const auto block_sprite = blockColors[static_cast<int>(level_id)];
   const int bump_sprite = static_cast<int>(bump_platforms[static_cast<int>(level_id)]);
