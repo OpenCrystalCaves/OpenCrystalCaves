@@ -18,10 +18,7 @@ class Enemy : public Actor
   virtual ~Enemy() = default;
 
   virtual bool is_alive() const override { return health > 0; }
-  virtual bool on_hit(AbstractSoundManager& sound_manager,
-                      const geometry::Rectangle& player_rect,
-                      const Level& level,
-                      const bool power) override;
+  virtual bool on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level, const bool power) override;
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level);
   // Whether this enemy requires the power powerup to hit/kill
   virtual bool is_tough() const { return false; }
@@ -82,10 +79,7 @@ class Bigfoot : public Enemy
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
   }
-  virtual bool on_hit(AbstractSoundManager& sound_manager,
-                      const geometry::Rectangle& player_rect,
-                      const Level& level,
-                      const bool power) override;
+  virtual bool on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level, const bool power) override;
   virtual int get_points() const override { return 5000; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
@@ -541,10 +535,7 @@ class Robot
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
-  virtual bool on_hit(AbstractSoundManager& sound_manager,
-                      const geometry::Rectangle& player_rect,
-                      const Level& level,
-                      const bool power) override;
+  virtual bool on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level, const bool power) override;
   virtual int get_points() const override { return 100; }
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
@@ -584,8 +575,7 @@ class EyeMonster : public Enemy
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 5000; }
-  // TODO: dynamic toughness based on what part was hit or open
-  virtual bool is_tough() const override { return true; }
+  virtual bool on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level, const bool power) override;
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
  private:

@@ -6,7 +6,7 @@
 
 bool Enemy::on_hit(AbstractSoundManager& sound_manager,
                    [[maybe_unused]] const geometry::Rectangle& player_rect,
-                   [[maybe_unused]] const Level& level,
+                   [[maybe_unused]] Level& level,
                    const bool power)
 {
   if (is_tough() && !power)
@@ -68,7 +68,7 @@ void Bigfoot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const
   }
 }
 
-bool Bigfoot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, const Level& level, const bool power)
+bool Bigfoot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level, const bool power)
 {
   running_ = true;
   // Turn to face player
@@ -610,7 +610,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Robot::get_sprites([[maybe_un
   return {std::make_pair(position, sprite)};
 }
 
-bool Robot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, const Level& level, const bool power)
+bool Robot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level, const bool power)
 {
   // Turn to face player
   if (left_ ^ (player_rect.position.x() < position.x()))
@@ -636,7 +636,9 @@ void Robot::remove_child(Level& level)
   }
 }
 
-void EyeMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
+void EyeMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                        [[maybe_unused]] const geometry::Rectangle& player_rect,
+                        Level& level)
 {
   frame_++;
   if (frame_ == 8)
@@ -650,23 +652,91 @@ void EyeMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager, co
     left_ = !left_;
     position -= d;
   }
+  // TODO: shoot eyeballs
 }
 
-Sprite get_eye_sprite(const bool closed, const Sprite closed_sprite, const Sprite open_sprite, const int frame)
+bool on_hit_eye(int& health,
+                const bool closed,
+                AbstractSoundManager& sound_manager,
+                Level& level,
+                const bool power,
+                const geometry::Position position)
 {
-  // TODO: eye stub sprites when eye is destroyed
+  if (health > 0 && !closed)
+  {
+    health = power ? 0 : health - 1;
+    if (health > 0)
+    {
+      sound_manager.play_sound(SoundType::SOUND_ENEMY_HURT);
+    }
+    else
+    {
+      level.particles.emplace_back(new Explosion(position, Explosion::sprites_implosion));
+    }
+    return true;
+  }
+  return false;
+}
+
+bool EyeMonster::on_hit(AbstractSoundManager& sound_manager,
+                        [[maybe_unused]] const geometry::Rectangle& player_rect,
+                        Level& level,
+                        const bool power)
+{
+  // Check which body part was hit, starting with the eyes
+  if (on_hit_eye(left_health_, left_closed_, sound_manager, level, power, position))
+  {
+    return true;
+  }
+  if (on_hit_eye(right_health_, right_closed_, sound_manager, level, power, position))
+  {
+    return true;
+  }
+  if (left_health_ == 0 && right_health_ == 0)
+  {
+    health--;
+    // TODO: if hurt, enter flashing state
+    if (is_alive())
+    {
+      sound_manager.play_sound(SoundType::SOUND_ENEMY_HURT);
+    }
+  }
+  return true;
+}
+
+Sprite get_eye_sprite(const int health,
+                      const bool closed,
+                      const Sprite closed_sprite,
+                      const Sprite open_sprite,
+                      const Sprite stub_sprite,
+                      const int frame)
+{
   // TODO: opening/closing animation
+  if (health == 0)
+  {
+    return stub_sprite;
+  }
   return closed ? closed_sprite : static_cast<Sprite>(static_cast<int>(open_sprite) + frame / 2);
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[maybe_unused]] const Level& level) const
 {
   return {
-    std::make_pair(
-      position, get_eye_sprite(left_closed_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_L_1, Sprite::SPRITE_EYE_MONSTER_EYE_OPEN_L_1, frame_)),
-    std::make_pair(position + geometry::Position(16, 0), static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_EYE_MONSTER_BODY_1) + frame_ / 2)),
-    std::make_pair(
-      position + geometry::Position(32, 0),
-      get_eye_sprite(right_closed_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_R_1, Sprite::SPRITE_EYE_MONSTER_EYE_OPEN_R_1, frame_)),
+    std::make_pair(position,
+                   get_eye_sprite(left_health_,
+                                  left_closed_,
+                                  Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_L_1,
+                                  Sprite::SPRITE_EYE_MONSTER_EYE_OPEN_L_1,
+                                  Sprite::SPRITE_EYE_MONSTER_EYE_STUB_L_1,
+                                  frame_)),
+    std::make_pair(position + geometry::Position(16, 0),
+                   static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_EYE_MONSTER_BODY_1) + frame_ / 2)),
+    std::make_pair(position + geometry::Position(32, 0),
+                   get_eye_sprite(right_health_,
+                                  right_closed_,
+                                  Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_R_1,
+                                  Sprite::SPRITE_EYE_MONSTER_EYE_OPEN_R_1,
+                                  Sprite::SPRITE_EYE_MONSTER_EYE_STUB_R_1,
+                                  frame_)),
   };
 }

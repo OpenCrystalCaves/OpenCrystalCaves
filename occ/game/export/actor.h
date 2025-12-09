@@ -62,7 +62,7 @@ class Actor
   // Returns whether the actor is hittable (missile)
   virtual bool on_hit([[maybe_unused]] AbstractSoundManager& sound_manager,
                       [[maybe_unused]] const geometry::Rectangle& player_rect,
-                      const Level& level,
+                      Level& level,
                       [[maybe_unused]] const bool power)
   {
     return is_solid(level);
@@ -328,7 +328,7 @@ class ClearBlock : public Actor
   }
   virtual bool on_hit(AbstractSoundManager& sound_manager,
                       const geometry::Rectangle& player_rect,
-                      const Level& level,
+                      Level& level,
                       const bool power) override;
 
  private:
@@ -443,7 +443,7 @@ class AirTank : public Actor
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual bool on_hit(AbstractSoundManager& sound_manager,
                       const geometry::Rectangle& player_rect,
-                      const Level& level,
+                      Level& level,
                       const bool power) override;
 
  private:
