@@ -392,10 +392,9 @@ void GameImpl::update_enemies()
       e->on_death(*sound_manager_, *level_);
       // Death explosion
       auto explosion_sprites = e->get_explosion_sprites();
-      if (explosion_sprites)
+      if (explosion_sprites && !missile_.killed_enemy)
       {
-        // TODO: if enemy not killed by missile, explosion position should be that of the enemy and not moving
-        level_->particles.emplace_back(new Explosion(missile_.position, *explosion_sprites, missile_.right ? 2 : -2));
+        level_->particles.emplace_back(new Explosion(e->position, *explosion_sprites));
       }
 
       // Give score

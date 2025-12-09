@@ -9,6 +9,7 @@ constexpr decltype(Missile::speed) Missile::speed;
 void Missile::init(AbstractSoundManager& sound_manager, const Player& player)
 {
   alive = true;
+  killed_enemy = false;
   frame = 0;
   is_power = player.power_tick > 0;
   if (player.direction == Player::Direction::right)
@@ -34,7 +35,7 @@ void Missile::set_cooldown()
   cooldown = 7;
 }
 
-bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, const Level& level)
+bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   bool explode = false;
   if (alive)
@@ -62,6 +63,13 @@ bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectan
       if (enemy && enemy->on_hit(sound_manager, player_rect, level, is_power))
       {
         alive = false;
+        // If enemy killed, spawn explosion
+        auto explosion_sprites = enemy->get_explosion_sprites();
+        if (explosion_sprites && !enemy->is_alive())
+        {
+          level.particles.emplace_back(new Explosion(position, *explosion_sprites, right ? 2 : -2));
+          killed_enemy = true;
+        }
         break;
       }
 

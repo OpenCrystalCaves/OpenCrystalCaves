@@ -595,7 +595,7 @@ class FallingSign : public Hazard
   // Falls when player is underneath
  public:
   FallingSign(geometry::Position position, const std::vector<Sprite>& sprites)
-    : Hazard(position, geometry::Size(16 * sprites.size(), 16)),
+    : Hazard(position, geometry::Size(16 * static_cast<int>(sprites.size()), 16)),
       sprites_(sprites)
   {
   }

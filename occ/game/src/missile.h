@@ -12,6 +12,7 @@ struct Missile
   Missile() : position() {}
 
   bool alive = false;
+  bool killed_enemy = false;
   unsigned frame = 0;
   bool is_power = false;
   geometry::Position position;
@@ -22,7 +23,7 @@ struct Missile
   bool is_in_cooldown() const;
   void set_cooldown();
   // Returns whether it exploded
-  bool update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, const Level& level);
+  bool update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level);
   int get_sprite() const;
   int get_num_sprites() const;
 
