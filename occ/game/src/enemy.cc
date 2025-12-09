@@ -684,12 +684,23 @@ bool EyeMonster::on_hit(AbstractSoundManager& sound_manager,
                         const bool power)
 {
   // Check which body part was hit, starting with the eyes
-  if (on_hit_eye(left_health_, left_closed_, sound_manager, level, power, position))
+  if (left_health_ > 0 && on_hit_eye(left_health_, left_closed_, sound_manager, level, power, position))
   {
+    if (left_health_ == 0)
+    {
+      // Adjust size and position
+      position += geometry::Position(16, 0);
+      size -= geometry::Size(16, 0);
+    }
     return true;
   }
-  if (on_hit_eye(right_health_, right_closed_, sound_manager, level, power, position))
+  if (right_health_ > 0 && on_hit_eye(right_health_, right_closed_, sound_manager, level, power, position))
   {
+    if (right_health_ == 0)
+    {
+      // Adjust size
+      size -= geometry::Size(16, 0);
+    }
     return true;
   }
   if (left_health_ == 0 && right_health_ == 0)
@@ -721,17 +732,23 @@ Sprite get_eye_sprite(const int health,
 
 std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[maybe_unused]] const Level& level) const
 {
+  // Adjust draw position if left eye is gone
+  auto draw_position = position;
+  if (left_health_ == 0)
+  {
+    draw_position -= geometry::Position(16, 0);
+  }
   return {
-    std::make_pair(position,
+    std::make_pair(draw_position,
                    get_eye_sprite(left_health_,
                                   left_closed_,
                                   Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_L_1,
                                   Sprite::SPRITE_EYE_MONSTER_EYE_OPEN_L_1,
                                   Sprite::SPRITE_EYE_MONSTER_EYE_STUB_L_1,
                                   frame_)),
-    std::make_pair(position + geometry::Position(16, 0),
+    std::make_pair(draw_position + geometry::Position(16, 0),
                    static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_EYE_MONSTER_BODY_1) + frame_ / 2)),
-    std::make_pair(position + geometry::Position(32, 0),
+    std::make_pair(draw_position + geometry::Position(32, 0),
                    get_eye_sprite(right_health_,
                                   right_closed_,
                                   Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_R_1,
