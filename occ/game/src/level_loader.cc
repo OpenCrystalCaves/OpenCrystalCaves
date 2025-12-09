@@ -321,6 +321,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
       case TileMode::SIGN:
         switch (tile_id)
         {
+          case '-':
+            // [- = hanging platform
+            sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_2);
+            flags |= TILE_SOLID;
+            mode = TileMode::NONE;
+            break;
           case '1':
             // [1 = reverse gravity sign
             sprite = static_cast<int>(Sprite::SPRITE_REVERSE_GRAVITY_2);
@@ -371,6 +377,15 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case '*':  // [* = 2x2 gear
             sprite = static_cast<int>(Sprite::SPRITE_GEAR_2);
+            mode = TileMode::NONE;
+            break;
+          case '^':  // [^ = hanging platform hoist
+            sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_HOIST_2);
+            mode = TileMode::NONE;
+            break;
+          case '|':
+            // [| = Hanging platform cable
+            sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_CABLE_2);
             mode = TileMode::NONE;
             break;
           default:
@@ -1018,6 +1033,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case '[':
             switch (level->tile_ids[i + 1])
             {
+              case '-':
+                // [- = hanging platform
+                sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_1);
+                flags |= TILE_SOLID;
+                mode = TileMode::SIGN;
+                break;
               case '1':
                 // [1 = reverse gravity sign
                 level->reverse_gravity = true;
@@ -1124,6 +1145,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               case '*':
                 // [* = 2x2 gear
                 sprite = static_cast<int>(Sprite::SPRITE_GEAR_1);
+                mode = TileMode::SIGN;
+                break;
+              case '^':
+                // [^ = Hanging platform hoist
+                sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_HOIST_1);
+                mode = TileMode::SIGN;
+                break;
+              case '|':
+                // [| = Hanging platform cable
+                sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_CABLE_1);
                 mode = TileMode::SIGN;
                 break;
               default:
