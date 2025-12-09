@@ -635,3 +635,38 @@ void Robot::remove_child(Level& level)
     child_ = nullptr;
   }
 }
+
+void EyeMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
+{
+  frame_++;
+  if (frame_ == 8)
+  {
+    frame_ = 0;
+  }
+  const auto d = geometry::Position(left_ ? -2 : 2, 0);
+  position += d;
+  if (should_reverse(level))
+  {
+    left_ = !left_;
+    position -= d;
+  }
+}
+
+Sprite get_eye_sprite(const bool closed, const Sprite closed_sprite, const Sprite open_sprite, const int frame)
+{
+  // TODO: eye stub sprites when eye is destroyed
+  // TODO: opening/closing animation
+  return closed ? closed_sprite : static_cast<Sprite>(static_cast<int>(open_sprite) + frame / 2);
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[maybe_unused]] const Level& level) const
+{
+  return {
+    std::make_pair(
+      position, get_eye_sprite(left_closed_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_L_1, Sprite::SPRITE_EYE_MONSTER_EYE_OPEN_L_1, frame_)),
+    std::make_pair(position + geometry::Position(16, 0), static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_EYE_MONSTER_BODY_1) + frame_ / 2)),
+    std::make_pair(
+      position + geometry::Position(32, 0),
+      get_eye_sprite(right_closed_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_R_1, Sprite::SPRITE_EYE_MONSTER_EYE_OPEN_R_1, frame_)),
+  };
+}

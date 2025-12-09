@@ -189,7 +189,7 @@ enum class TileMode
   HAMMER,
   GLASS_BALL,
   CATERPILLAR,
-  TRICERATOPS,
+  TRI_ENEMY,
   AIR_PIPE,
   METAL_CRATE,
   HAZARD_CRATE
@@ -542,7 +542,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
         }
         break;
-      case TileMode::TRICERATOPS:
+      case TileMode::TRI_ENEMY:
         if (level->tile_ids[i + 1] != 'n')
         {
           mode = TileMode::NONE;
@@ -1055,7 +1055,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               case '=':
                 // [=n - triceratops
                 level->enemies.emplace_back(new Triceratops(geometry::Position{x * 16, y * 16}));
-                mode = TileMode::TRICERATOPS;
+                mode = TileMode::TRI_ENEMY;
                 break;
               case 'b':
                 // [bnn = Yellow/green crate, 4x2
@@ -1080,6 +1080,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 level->hazards.emplace_back(
                   new FallingSign(geometry::Position{x * 16, y * 16}, {Sprite::SPRITE_DANGER_1, Sprite::SPRITE_DANGER_2}));
                 mode = TileMode::SIGN;
+                break;
+              case 'E':
+                // [En = eye monster
+                level->enemies.emplace_back(new EyeMonster(geometry::Position{x * 16, y * 16}));
+                mode = TileMode::TRI_ENEMY;
                 break;
               case 'f':
                 // [f = falling rocks sign
