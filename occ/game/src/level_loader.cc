@@ -55,31 +55,31 @@ constexpr int levelRows[] = {
 // Some levels have a missing first row (those with levelRows 23)
 // Fill in the first row with block tiles
 const std::string extraRow = "5gggggggggggggggggggggggggggggggggggggg5";
-const std::pair<Sprite, geometry::Size> levelBGs[] = {
+const std::tuple<Sprite, geometry::Size, int> levelBGs[] = {
   // intro
-  {Sprite::SPRITE_STARS_1, {6, 1}},
+  {Sprite::SPRITE_STARS_1, {6, 1}, 0},
   // finale
-  {Sprite::SPRITE_STARS_1, {6, 1}},
+  {Sprite::SPRITE_STARS_1, {6, 1}, 0},
   // main
-  {Sprite::SPRITE_ROCKS_1, {2, 2}},
+  {Sprite::SPRITE_ROCKS_1, {2, 2}, 0},
   // 1-8
-  {Sprite::SPRITE_HEX_ROCKS_1, {4, 2}},
-  {Sprite::SPRITE_VERTICAL_WALL_1, {2, 2}},
-  {Sprite::SPRITE_COBBLE_1, {2, 2}},
-  {Sprite::SPRITE_RED_PANEL_1, {2, 2}},
-  {Sprite::SPRITE_PEBBLE_WALL_1, {2, 2}},
-  {Sprite::SPRITE_DARK_STONE_1, {3, 2}},
-  {Sprite::SPRITE_DIAMOND_WALL_1, {2, 2}},
-  {Sprite::SPRITE_COLUMN_AND_KNOB_1, {2, 2}},
+  {Sprite::SPRITE_HEX_ROCKS_1, {4, 2}, 1},
+  {Sprite::SPRITE_VERTICAL_WALL_1, {2, 2}, 0},
+  {Sprite::SPRITE_COBBLE_1, {2, 2}, 0},
+  {Sprite::SPRITE_RED_PANEL_1, {2, 2}, 0},
+  {Sprite::SPRITE_PEBBLE_WALL_1, {2, 2}, 0},
+  {Sprite::SPRITE_DARK_STONE_1, {3, 2}, 1},
+  {Sprite::SPRITE_DIAMOND_WALL_1, {2, 2}, 0},
+  {Sprite::SPRITE_COLUMN_AND_KNOB_1, {2, 2}, 0},
   // 9-16
-  {Sprite::SPRITE_GREEN_SCAFFOLD_1, {3, 2}},
-  {Sprite::SPRITE_WOOD_WALL_1, {4, 2}},
-  {Sprite::SPRITE_GREY_STONE_1, {2, 2}},
-  {Sprite::SPRITE_RED_RECT_1, {4, 2}},
-  {Sprite::SPRITE_BRICK_1, {2, 2}},
-  {Sprite::SPRITE_RED_SCAFFOLD_1, {4, 2}},
-  {Sprite::SPRITE_METAL_BARS_1, {2, 2}},
-  {Sprite::SPRITE_BLUE_DIAMOND_1, {2, 2}},
+  {Sprite::SPRITE_GREEN_SCAFFOLD_1, {3, 2}, 1},
+  {Sprite::SPRITE_WOOD_WALL_1, {4, 2}, 1},
+  {Sprite::SPRITE_GREY_STONE_1, {2, 2}, 0},
+  {Sprite::SPRITE_RED_RECT_1, {4, 2}, 1},
+  {Sprite::SPRITE_BRICK_1, {2, 2}, 0},
+  {Sprite::SPRITE_RED_SCAFFOLD_1, {4, 2}, 1},
+  {Sprite::SPRITE_METAL_BARS_1, {2, 2}, 0},
+  {Sprite::SPRITE_BLUE_DIAMOND_1, {2, 2}, 0},
 };
 // Different levels use different block colours
 const Sprite blockColors[] = {
@@ -279,7 +279,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     const int y = i / level->width;
     const auto tile_id = level->tile_ids[i];
     Tile tile;
-    int bg = static_cast<int>(background.first);
+    int bg = static_cast<int>(std::get<0>(background));
     if (is_stars_row)
     {
       bg = static_cast<int>(STARS[rand() % STARS.size()]);
@@ -288,10 +288,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
     {
       bg = static_cast<int>(HORIZON[rand() % HORIZON.size()]);
     }
-    else if (background.first != Sprite::SPRITE_NONE)
+    else
     {
       // Normal background
-      bg = static_cast<int>(background.first) + (((y + 1) % background.second.y()) * 4) + (x % background.second.x());
+      const auto bgsize = std::get<1>(background);
+      bg = bg + (((y + 1) % bgsize.y()) * 4) + ((x - std::get<2>(background)) % bgsize.x());
     }
     // Decode tile ids from exe data
     int sprite = -1;

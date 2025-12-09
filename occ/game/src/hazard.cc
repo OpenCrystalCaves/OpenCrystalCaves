@@ -380,7 +380,7 @@ void FallingSign::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> FallingSign::get_sprites(const Level& level) const
+std::vector<std::pair<geometry::Position, Sprite>> FallingSign::get_sprites([[maybe_unused]] const Level& level) const
 {
   std::vector<std::pair<geometry::Position, Sprite>> result;
   for (size_t i = 0; i < sprites_.size(); i++)
