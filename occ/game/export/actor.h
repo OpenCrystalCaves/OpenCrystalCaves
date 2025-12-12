@@ -60,7 +60,8 @@ class Actor
     return TouchType::TOUCH_TYPE_NONE;
   }
   // Returns whether the actor is hittable (missile)
-  virtual bool on_hit([[maybe_unused]] AbstractSoundManager& sound_manager,
+  virtual bool on_hit([[maybe_unused]] const geometry::Rectangle& rect,
+                      [[maybe_unused]] AbstractSoundManager& sound_manager,
                       [[maybe_unused]] const geometry::Rectangle& player_rect,
                       Level& level,
                       [[maybe_unused]] const bool power)
@@ -326,7 +327,8 @@ class ClearBlock : public Actor
   {
     return {std::make_pair(position, Sprite::SPRITE_CLEAR_BLOCK)};
   }
-  virtual bool on_hit(AbstractSoundManager& sound_manager,
+  virtual bool on_hit(const geometry::Rectangle& rect,
+                      AbstractSoundManager& sound_manager,
                       const geometry::Rectangle& player_rect,
                       Level& level,
                       const bool power) override;
@@ -441,7 +443,8 @@ class AirTank : public Actor
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
-  virtual bool on_hit(AbstractSoundManager& sound_manager,
+  virtual bool on_hit(const geometry::Rectangle& rect,
+                      AbstractSoundManager& sound_manager,
                       const geometry::Rectangle& player_rect,
                       Level& level,
                       const bool power) override;

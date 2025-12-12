@@ -4,7 +4,8 @@
 #include "level.h"
 
 
-bool Enemy::on_hit(AbstractSoundManager& sound_manager,
+bool Enemy::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
+                   AbstractSoundManager& sound_manager,
                    [[maybe_unused]] const geometry::Rectangle& player_rect,
                    [[maybe_unused]] Level& level,
                    const bool power)
@@ -68,7 +69,11 @@ void Bigfoot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const
   }
 }
 
-bool Bigfoot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level, const bool power)
+bool Bigfoot::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
+                     AbstractSoundManager& sound_manager,
+                     const geometry::Rectangle& player_rect,
+                     Level& level,
+                     const bool power)
 {
   running_ = true;
   // Turn to face player
@@ -76,7 +81,7 @@ bool Bigfoot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectan
   {
     left_ = !left_;
   }
-  return Enemy::on_hit(sound_manager, player_rect, level, power);
+  return Enemy::on_hit(rect, sound_manager, player_rect, level, power);
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites([[maybe_unused]] const Level& level) const
@@ -610,7 +615,11 @@ std::vector<std::pair<geometry::Position, Sprite>> Robot::get_sprites([[maybe_un
   return {std::make_pair(position, sprite)};
 }
 
-bool Robot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level, const bool power)
+bool Robot::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
+                   AbstractSoundManager& sound_manager,
+                   const geometry::Rectangle& player_rect,
+                   Level& level,
+                   const bool power)
 {
   // Turn to face player
   if (left_ ^ (player_rect.position.x() < position.x()))
@@ -618,7 +627,7 @@ bool Robot::on_hit(AbstractSoundManager& sound_manager, const geometry::Rectangl
     left_ = !left_;
     next_reverse_ = 17 * (1 + static_cast<int>(rand() % 19));
   }
-  return Enemy::on_hit(sound_manager, player_rect, level, power);
+  return Enemy::on_hit(rect, sound_manager, player_rect, level, power);
 }
 
 void Robot::remove_child(Level& level)
@@ -655,14 +664,15 @@ void EyeMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   // TODO: shoot eyeballs
 }
 
-bool on_hit_eye(int& health,
+bool on_hit_eye(const geometry::Rectangle& rect,
+                const geometry::Rectangle& erect,
+                int& health,
                 const bool closed,
                 AbstractSoundManager& sound_manager,
                 Level& level,
-                const bool power,
-                const geometry::Position position)
+                const bool power)
 {
-  if (health > 0 && !closed)
+  if (health > 0 && !closed && geometry::isColliding(rect, erect))
   {
     health = power ? 0 : health - 1;
     if (health > 0)
@@ -671,20 +681,21 @@ bool on_hit_eye(int& health,
     }
     else
     {
-      level.particles.emplace_back(new Explosion(position, Explosion::sprites_implosion));
+      level.particles.emplace_back(new Explosion(erect.position, Explosion::sprites_implosion));
     }
     return true;
   }
   return false;
 }
 
-bool EyeMonster::on_hit(AbstractSoundManager& sound_manager,
+bool EyeMonster::on_hit(const geometry::Rectangle& rect,
+                        AbstractSoundManager& sound_manager,
                         [[maybe_unused]] const geometry::Rectangle& player_rect,
                         Level& level,
                         const bool power)
 {
   // Check which body part was hit, starting with the eyes
-  if (left_health_ > 0 && on_hit_eye(left_health_, left_closed_, sound_manager, level, power, position))
+  if (left_health_ > 0 && on_hit_eye(rect, {position, geometry::Size{16, 16}}, left_health_, left_closed_, sound_manager, level, power))
   {
     if (left_health_ == 0)
     {
@@ -694,7 +705,8 @@ bool EyeMonster::on_hit(AbstractSoundManager& sound_manager,
     }
     return true;
   }
-  if (right_health_ > 0 && on_hit_eye(right_health_, right_closed_, sound_manager, level, power, position))
+  const auto rrect = geometry::Rectangle{position + geometry::Position{left_health_ == 0 ? 16 : 32, 0}, geometry::Size{16, 16}};
+  if (right_health_ > 0 && on_hit_eye(rect, rrect, right_health_, right_closed_, sound_manager, level, power))
   {
     if (right_health_ == 0)
     {
@@ -703,7 +715,7 @@ bool EyeMonster::on_hit(AbstractSoundManager& sound_manager,
     }
     return true;
   }
-  if (left_health_ == 0 && right_health_ == 0)
+  if (left_health_ == 0 && right_health_ == 0 && geometry::isColliding(rect, geometry::Rectangle{position, size}))
   {
     health--;
     // TODO: if hurt, enter flashing state

@@ -44,13 +44,14 @@ bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectan
     const int dx = right ? 1 : -1;
     // Adjust position due to collision size being smaller than sprite size
     const auto collision_position = position + geometry::Position(0, 3);
+    const auto crect = geometry::Rectangle{collision_position, size};
     for (int i = 0; i < s; i++)
     {
       position += geometry::Position(dx, 0);
 
       // Check colliding solid actors (closed doors)
       auto actor = level.collides_actor(collision_position, size);
-      if (actor && actor->on_hit(sound_manager, player_rect, level, is_power))
+      if (actor && actor->on_hit(crect, sound_manager, player_rect, level, is_power))
       {
         alive = false;
         set_cooldown();
@@ -60,7 +61,7 @@ bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectan
       }
 
       auto enemy = level.collides_enemy(collision_position, size);
-      if (enemy && enemy->on_hit(sound_manager, player_rect, level, is_power))
+      if (enemy && enemy->on_hit(crect, sound_manager, player_rect, level, is_power))
       {
         alive = false;
         // If enemy killed, spawn explosion
