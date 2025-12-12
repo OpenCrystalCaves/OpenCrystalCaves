@@ -770,8 +770,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           {
             bool handled = false;
 
-            // Check tile above for continuation tile
-            if (i >= level->width)
+            // Check tile above for continuation tile, unless it's the first row
+            if (i - level->width >= level->width)
             {
               handled = true;
               switch (level->tile_ids[i - level->width])
