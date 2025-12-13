@@ -645,6 +645,14 @@ void Robot::remove_child(Level& level)
   }
 }
 
+void Robot::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+{
+  if (child_)
+  {
+    child_->kill();
+  }
+}
+
 void EyeMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager,
                         [[maybe_unused]] const geometry::Rectangle& player_rect,
                         Level& level)

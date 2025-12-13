@@ -555,6 +555,7 @@ class Robot
   }
   virtual void remove_child(Level& level) override;
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
+  virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
 
  private:
   bool left_ = false;

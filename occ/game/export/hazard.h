@@ -75,6 +75,7 @@ class LaserBeam : public Hazard
     return {std::make_pair(position - geometry::Size(4, 4), (frame_ & 1) ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
   }
   virtual bool is_alive() const override { return alive_; }
+  void kill() { alive_ = false; }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,
                              [[maybe_unused]] Level& level) override
