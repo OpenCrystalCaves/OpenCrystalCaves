@@ -662,6 +662,55 @@ void EyeMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   {
     frame_ = 0;
   }
+  if (left_closed_)
+  {
+    if (left_frame_ > 0)
+    {
+      left_frame_--;
+    }
+  }
+  else
+  {
+    if (left_frame_ < 8)
+    {
+      left_frame_++;
+    }
+  }
+  if (right_closed_)
+  {
+    if (right_frame_ > 0)
+    {
+      right_frame_--;
+    }
+  }
+  else
+  {
+    if (right_frame_ < 8)
+    {
+      right_frame_++;
+    }
+  }
+  // Open/close eyes
+  left_close_counter_--;
+  if (left_close_counter_ <= 0)
+  {
+    if (left_close_counter_ == 0)
+    {
+      left_closed_ = !left_closed_;
+    }
+    // Randomly open/close every 0-10 seconds, biased towards sooner
+    left_close_counter_ = 17 * std::abs(misc::random<int>(-5, 5) + misc::random<int>(-5, 5)) + 1;
+  }
+  right_close_counter_--;
+  if (right_close_counter_ <= 0)
+  {
+    if (right_close_counter_ == 0)
+    {
+      right_closed_ = !right_closed_;
+    }
+    // Randomly open/close every 0-10 seconds, biased towards sooner
+    right_close_counter_ = 17 * std::abs(misc::random<int>(-5, 5) + misc::random<int>(-5, 5)) + 1;
+  }
   const auto d = geometry::Position(left_ ? -2 : 2, 0);
   position += d;
   if (should_reverse(level))
@@ -740,19 +789,18 @@ bool EyeMonster::on_hit(const geometry::Rectangle& rect,
   return true;
 }
 
-Sprite get_eye_sprite(const int health,
-                      const bool closed,
-                      const Sprite closed_sprite,
-                      const Sprite open_sprite,
-                      const Sprite stub_sprite,
-                      const int frame)
+Sprite get_eye_sprite(const int health, const Sprite closed_sprite, const Sprite stub_sprite, const int eye_frame, const int frame)
 {
-  // TODO: opening/closing animation
   if (health == 0)
   {
     return stub_sprite;
   }
-  return closed ? closed_sprite : static_cast<Sprite>(static_cast<int>(open_sprite) + frame / 2);
+  if (eye_frame == 8)
+  {
+    // Eye fully open
+    return static_cast<Sprite>(static_cast<int>(closed_sprite) + 4 + frame / 2);
+  }
+  return static_cast<Sprite>(static_cast<int>(closed_sprite) + eye_frame / 2);
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[maybe_unused]] const Level& level) const
@@ -764,21 +812,15 @@ std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[may
     draw_position -= geometry::Position(16, 0);
   }
   return {
-    std::make_pair(draw_position,
-                   get_eye_sprite(left_health_,
-                                  left_closed_,
-                                  Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_L_1,
-                                  Sprite::SPRITE_EYE_MONSTER_EYE_OPEN_L_1,
-                                  Sprite::SPRITE_EYE_MONSTER_EYE_STUB_L_1,
-                                  frame_)),
+    std::make_pair(
+      draw_position,
+      get_eye_sprite(
+        left_health_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_L_1, Sprite::SPRITE_EYE_MONSTER_EYE_STUB_L_1, left_frame_, frame_)),
     std::make_pair(draw_position + geometry::Position(16, 0),
                    static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_EYE_MONSTER_BODY_1) + frame_ / 2)),
-    std::make_pair(draw_position + geometry::Position(32, 0),
-                   get_eye_sprite(right_health_,
-                                  right_closed_,
-                                  Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_R_1,
-                                  Sprite::SPRITE_EYE_MONSTER_EYE_OPEN_R_1,
-                                  Sprite::SPRITE_EYE_MONSTER_EYE_STUB_R_1,
-                                  frame_)),
+    std::make_pair(
+      draw_position + geometry::Position(32, 0),
+      get_eye_sprite(
+        right_health_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_R_1, Sprite::SPRITE_EYE_MONSTER_EYE_STUB_R_1, right_frame_, frame_)),
   };
 }

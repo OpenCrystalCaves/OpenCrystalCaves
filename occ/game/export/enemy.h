@@ -602,4 +602,8 @@ class EyeMonster : public Enemy
   bool right_closed_ = false;
   int left_health_ = 2;
   int right_health_ = 2;
+  int left_close_counter_ = 0;
+  int right_close_counter_ = 0;
+  int left_frame_ = 0;
+  int right_frame_ = 0;
 };
