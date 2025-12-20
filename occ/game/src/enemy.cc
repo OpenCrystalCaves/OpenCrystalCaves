@@ -698,10 +698,15 @@ bool on_hit_eye(const geometry::Rectangle& rect,
 
 bool EyeMonster::on_hit(const geometry::Rectangle& rect,
                         AbstractSoundManager& sound_manager,
-                        [[maybe_unused]] const geometry::Rectangle& player_rect,
+                        const geometry::Rectangle& player_rect,
                         Level& level,
                         const bool power)
 {
+  // Turn to face player
+  if (left_ ^ (player_rect.position.x() < position.x()))
+  {
+    left_ = !left_;
+  }
   // Check which body part was hit, starting with the eyes
   if (left_health_ > 0 && on_hit_eye(rect, {position, geometry::Size{16, 16}}, left_health_, left_closed_, sound_manager, level, power))
   {
