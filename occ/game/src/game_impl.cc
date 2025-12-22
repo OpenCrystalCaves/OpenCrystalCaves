@@ -373,9 +373,10 @@ void GameImpl::update_missile()
 
 void GameImpl::update_enemies()
 {
-  for (auto it = level_->enemies.begin(); it != level_->enemies.end();)
+  // Iterate by index as we may add/remove enemies while updating
+  for (int i = 0; i < level_->enemies.size(); i++)
   {
-    auto e = it->get();
+    auto e = level_->enemies[i].get();
     if (player_.stop_tick == 0)
     {
       // TODO: When enemy getting hit and not dying the enemy sprite should turn white for
@@ -406,11 +407,8 @@ void GameImpl::update_enemies()
       }
 
       // Remove enemy
-      it = level_->enemies.erase(it);
-    }
-    else
-    {
-      it++;
+      level_->enemies.erase(level_->enemies.begin() + i);
+      i--;
     }
   }
 }

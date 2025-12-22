@@ -107,9 +107,13 @@ bool SoundManager::load_sounds(const int episode)
     LOG_DEBUG("Reading sound file at %s", path.c_str());
     std::ifstream input{path, std::ios::binary};
     Sound sound;
+    int j = 0;
     while (input.read(reinterpret_cast<char*>(&sound), sizeof sound))
     {
+      LOG_DEBUG("Read sound %d with priority %d, vibrate %d", j, sound.priority, sound.vibrate);
+      LOG_DEBUG("unknown0 %x unknown1 %x unknown2 %x", sound.unknown0, sound.unknown1, sound.unknown2);
       sounds.push_back(sound);
+      j++;
     }
   }
   LOG_DEBUG("Read %d sounds", static_cast<int>(sounds.size()));

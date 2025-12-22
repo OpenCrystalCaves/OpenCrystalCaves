@@ -653,9 +653,28 @@ void Robot::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[may
   }
 }
 
-void EyeMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+void Projectile::update([[maybe_unused]] AbstractSoundManager& sound_manager,
                         [[maybe_unused]] const geometry::Rectangle& player_rect,
                         Level& level)
+{
+  frame_++;
+  if (frame_ == num_sprites())
+  {
+    frame_ = 0;
+  }
+  position += geometry::Position(left_ ? -get_speed() : get_speed(), 0);
+  if (level.collides_solid(position, size))
+  {
+    health = 0;
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Projectile::get_sprites([[maybe_unused]] const Level& level) const
+{
+  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(get_sprite()) + frame_))};
+}
+
+void EyeMonster::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ == 8)
@@ -718,7 +737,19 @@ void EyeMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     left_ = !left_;
     position -= d;
   }
-  // TODO: shoot eyeballs
+  // Shoot eyeballs
+  if (next_shoot_ > 0)
+  {
+    next_shoot_--;
+  }
+  if (next_shoot_ == 0 && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+  {
+    sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
+    level.enemies.emplace_back(new Eyeball(position, left_));
+    // Shoot infrequently (every 5-15 seconds)
+    // TODO: find out what the logic is; it seems very inconsistent and not based on eyes opening
+    next_shoot_ = 17 * misc::random<int>(5, 15);
+  }
 }
 
 bool on_hit_eye(const geometry::Rectangle& rect,
@@ -784,6 +815,10 @@ bool EyeMonster::on_hit(const geometry::Rectangle& rect,
     if (is_alive())
     {
       sound_manager.play_sound(SoundType::SOUND_ENEMY_HURT);
+    }
+    else
+    {
+      sound_manager.play_sound(SoundType::SOUND_ENEMY_DIE);
     }
   }
   return true;

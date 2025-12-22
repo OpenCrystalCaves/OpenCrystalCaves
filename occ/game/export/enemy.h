@@ -564,6 +564,51 @@ class Robot
   bool zapping_ = false;
 };
 
+class Projectile : public Enemy
+{
+  // ABC, Fired by enemy, moves in a straight line, hurts player on touch, can be destroyed
+ public:
+  Projectile(geometry::Position position, const bool left) : Enemy(position, geometry::Size(16, 16), 1), left_(left) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             [[maybe_unused]] AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level) override
+  {
+    return TouchType::TOUCH_TYPE_HURT;
+  }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
+
+ protected:
+  virtual int get_speed() const = 0;
+  virtual Sprite get_sprite() const = 0;
+  virtual int num_sprites() const = 0;
+  bool left_;
+
+ private:
+  int frame_ = 0;
+};
+
+class Eyeball : public Projectile
+{
+  // ➖➖➖➖⚫⚫⚫⚫➖➖➖⚫⚫⚫➖➖
+  // ➖➖➖⚫⬜⬜🦚🦚⚫⚫⚫🦚🦚🦚⚫➖
+  // ➖➖⚫🟦🟦📘⬜🦚🦚🦚🦚⚫⚫⚫➖➖
+  // ➖⚫🟦⚫⚫🟦📘⬜🦚🦚⚫⚫⚫⚫➖➖
+  // ➖⚫🟦⚫⚫🟦📘⬜🦚🦚🦚🦚🦚🦚⚫➖
+  // ➖➖⚫🟦🟦📘⬜🦚🦚⚫⚫⚫⚫⚫➖➖
+  // ➖➖➖⚫⬜⬜🦚🦚⚫➖➖➖➖➖➖➖
+  // ➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖➖➖
+ public:
+  using Projectile::Projectile;
+
+ protected:
+  virtual int get_speed() const override { return 4; }
+  virtual Sprite get_sprite() const override { return left_ ? Sprite::SPRITE_EYEBALL_L_1 : Sprite::SPRITE_EYEBALL_R_1; }
+  virtual int num_sprites() const override { return 4; }
+};
+
 class EyeMonster : public Enemy
 {
   // ➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖➖➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖➖➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖
@@ -594,6 +639,10 @@ class EyeMonster : public Enemy
                       Level& level,
                       const bool power) override;
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(left_ ? -1 : 1, 0, level);
+  }
 
  private:
   bool left_ = false;
@@ -606,4 +655,5 @@ class EyeMonster : public Enemy
   int right_close_counter_ = 0;
   int left_frame_ = 0;
   int right_frame_ = 0;
+  int next_shoot_ = 0;
 };
