@@ -4,6 +4,7 @@
 #include "actor.h"
 #include "geometry.h"
 #include "misc.h"
+#include "particle.h"
 #include "sprite.h"
 
 struct Level;
@@ -20,7 +21,7 @@ class Hazard : public Actor
 
 class Laser
   : public Hazard
-  , public LaserBeamParent
+  , public ProjectileParent
 {
   // ⚫🩵🩵⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫
   // ⚫🔴🟥🩵🩵⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫
@@ -52,7 +53,77 @@ class Laser
   bool down_ = false;
 };
 
-class LaserBeam : public Hazard
+class Projectile : public Hazard
+{
+  // ABC, Fired by enemy, moves in a straight line, hurts player on touch, has parent (only one per parent)
+ public:
+  Projectile(geometry::Position position, const bool left, ProjectileParent& parent)
+    : Hazard(position + geometry::Position(4, 4), geometry::Size(8, 8)),
+      left_(left),
+      parent_(parent)
+  {
+  }
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             [[maybe_unused]] AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level) override
+  {
+    return TouchType::TOUCH_TYPE_HURT;
+  }
+  virtual bool is_alive() const override { return alive_; }
+  void kill() { alive_ = false; }
+
+ protected:
+  virtual int get_speed() const = 0;
+  virtual Sprite get_sprite() const = 0;
+  virtual int num_sprites() const = 0;
+  bool left_;
+  bool alive_ = true;
+  ProjectileParent& parent_;
+  int frame_ = 0;
+};
+
+class HittableProjectile : public Projectile
+{
+  // ABC for projectile that can be destroyed by player
+ public:
+  using Projectile::Projectile;
+
+  virtual bool on_hit([[maybe_unused]] const geometry::Rectangle& rect,
+                      AbstractSoundManager& sound_manager,
+                      [[maybe_unused]] const geometry::Rectangle& player_rect,
+                      [[maybe_unused]] Level& level,
+                      [[maybe_unused]] const bool power) override
+  {
+    alive_ = false;
+    sound_manager.play_sound(SoundType::SOUND_ENEMY_DIE);
+    return true;
+  }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
+};
+
+class Eyeball : public HittableProjectile
+{
+  // ➖➖➖➖⚫⚫⚫⚫➖➖➖⚫⚫⚫➖➖
+  // ➖➖➖⚫⬜⬜🦚🦚⚫⚫⚫🦚🦚🦚⚫➖
+  // ➖➖⚫🟦🟦📘⬜🦚🦚🦚🦚⚫⚫⚫➖➖
+  // ➖⚫🟦⚫⚫🟦📘⬜🦚🦚⚫⚫⚫⚫➖➖
+  // ➖⚫🟦⚫⚫🟦📘⬜🦚🦚🦚🦚🦚🦚⚫➖
+  // ➖➖⚫🟦🟦📘⬜🦚🦚⚫⚫⚫⚫⚫➖➖
+  // ➖➖➖⚫⬜⬜🦚🦚⚫➖➖➖➖➖➖➖
+  // ➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖➖➖
+ public:
+  using HittableProjectile::HittableProjectile;
+
+ protected:
+  virtual int get_speed() const override { return 4; }
+  virtual Sprite get_sprite() const override { return left_ ? Sprite::SPRITE_EYEBALL_L_1 : Sprite::SPRITE_EYEBALL_R_1; }
+  virtual int num_sprites() const override { return 4; }
+};
+
+class LaserBeam : public Projectile
 {
   // 🟥⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🟥
   // ⬛🟥🚨🚨⬛⬛🟥⬛🚨⬛🟥🟥🟥⬛🟥⬛
@@ -61,35 +132,22 @@ class LaserBeam : public Hazard
   // ⬛⬛⬛⬛⬛🚨⬛⬛⬛⬛⬛⬛🚨🚨⬛⬛
   // Moves left/right, disappear on collide or out of frame
  public:
-  LaserBeam(geometry::Position position, bool left, LaserBeamParent& parent, bool moving = true)
-    : Hazard(position, {8, 8}),
-      left_(left),
-      parent_(parent),
+  LaserBeam(geometry::Position position, bool left, ProjectileParent& parent, bool moving = true)
+    : Projectile(position, left, parent),
       moving_(moving)
   {
   }
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
-  {
-    return {std::make_pair(position - geometry::Size(4, 4), (frame_ & 1) ? Sprite::SPRITE_LASER_BEAM_1 : Sprite::SPRITE_LASER_BEAM_2)};
-  }
-  virtual bool is_alive() const override { return alive_; }
-  void kill() { alive_ = false; }
-  virtual TouchType on_touch([[maybe_unused]] const Player& player,
-                             [[maybe_unused]] AbstractSoundManager& sound_manager,
-                             [[maybe_unused]] Level& level) override
-  {
-    // TODO: sound
-    return TouchType::TOUCH_TYPE_HURT;
-  }
+
+ protected:
+  virtual int get_speed() const override { return moving_ ? 4 : 0; }
+  virtual Sprite get_sprite() const override { return Sprite::SPRITE_LASER_BEAM_1; }
+  virtual int num_sprites() const override { return 2; }
 
  private:
-  bool left_;
-  int frame_ = 0;
-  LaserBeamParent& parent_;
-  bool alive_ = true;
   bool moving_;
+  int kill_frame_ = 0;
 };
 
 class Thorn : public Hazard

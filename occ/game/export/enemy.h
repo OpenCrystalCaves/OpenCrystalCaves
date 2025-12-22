@@ -520,7 +520,7 @@ class Birdlet : public Flier
 
 class Robot
   : public Enemy
-  , public LaserBeamParent
+  , public ProjectileParent
 {
   // ➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖
   // ⚫⬜⬜⬜⬜🩵🩵🩵🩵🩵🩵🩵🩵⚫➖➖
@@ -564,52 +564,9 @@ class Robot
   bool zapping_ = false;
 };
 
-class Projectile : public Enemy
-{
-  // ABC, Fired by enemy, moves in a straight line, hurts player on touch, can be destroyed
- public:
-  Projectile(geometry::Position position, const bool left) : Enemy(position, geometry::Size(16, 16), 1), left_(left) {}
-
-  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
-  virtual TouchType on_touch([[maybe_unused]] const Player& player,
-                             [[maybe_unused]] AbstractSoundManager& sound_manager,
-                             [[maybe_unused]] Level& level) override
-  {
-    return TouchType::TOUCH_TYPE_HURT;
-  }
-  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
-
- protected:
-  virtual int get_speed() const = 0;
-  virtual Sprite get_sprite() const = 0;
-  virtual int num_sprites() const = 0;
-  bool left_;
-
- private:
-  int frame_ = 0;
-};
-
-class Eyeball : public Projectile
-{
-  // ➖➖➖➖⚫⚫⚫⚫➖➖➖⚫⚫⚫➖➖
-  // ➖➖➖⚫⬜⬜🦚🦚⚫⚫⚫🦚🦚🦚⚫➖
-  // ➖➖⚫🟦🟦📘⬜🦚🦚🦚🦚⚫⚫⚫➖➖
-  // ➖⚫🟦⚫⚫🟦📘⬜🦚🦚⚫⚫⚫⚫➖➖
-  // ➖⚫🟦⚫⚫🟦📘⬜🦚🦚🦚🦚🦚🦚⚫➖
-  // ➖➖⚫🟦🟦📘⬜🦚🦚⚫⚫⚫⚫⚫➖➖
-  // ➖➖➖⚫⬜⬜🦚🦚⚫➖➖➖➖➖➖➖
-  // ➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖➖➖
- public:
-  using Projectile::Projectile;
-
- protected:
-  virtual int get_speed() const override { return 4; }
-  virtual Sprite get_sprite() const override { return left_ ? Sprite::SPRITE_EYEBALL_L_1 : Sprite::SPRITE_EYEBALL_R_1; }
-  virtual int num_sprites() const override { return 4; }
-};
-
-class EyeMonster : public Enemy
+class EyeMonster
+  : public Enemy
+  , public ProjectileParent
 {
   // ➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖➖➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖➖➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖
   // ➖➖➖⚫⚫🟩🦚🦚🦚⚫⚫➖➖➖➖➖➖➖➖➖⚫⚫🟩🦚🦚🦚⚫⚫➖➖➖➖➖➖➖➖➖⚫⚫🟩🦚🦚🦚⚫⚫➖➖➖
@@ -643,6 +600,7 @@ class EyeMonster : public Enemy
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
   }
+  virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
 
  private:
   bool left_ = false;

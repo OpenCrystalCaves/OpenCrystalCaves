@@ -94,6 +94,19 @@ Actor* Level::collides_actor(const geometry::Position& position, const geometry:
   return nullptr;
 }
 
+Hazard* Level::collides_hazard(const geometry::Position& position, const geometry::Size& size) const
+{
+  const auto rect = geometry::Rectangle(position, size);
+  for (auto&& hazard : hazards)
+  {
+    if (geometry::isColliding(rect, geometry::Rectangle(hazard->position, hazard->size)))
+    {
+      return hazard.get();
+    }
+  }
+  return nullptr;
+}
+
 /**
  * Checks if given position and size collides with any enemy.
  *

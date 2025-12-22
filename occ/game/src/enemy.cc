@@ -587,7 +587,7 @@ void Robot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const g
     // Spawn laser
     if (!child_)
     {
-      geometry::Position child_pos = position + geometry::Position((left_ ? -16 : 16) + 4, 4);
+      geometry::Position child_pos = position + geometry::Position(left_ ? -16 : 16, 0);
       child_ = new LaserBeam(child_pos, left_, *this, false);
       level.hazards.emplace_back(child_);
     }
@@ -635,7 +635,7 @@ void Robot::remove_child(Level& level)
   // Respawn laser immediately if zapping
   if (zapping_)
   {
-    geometry::Position child_pos = position + geometry::Position((left_ ? -16 : 16) + 4, 4);
+    geometry::Position child_pos = position + geometry::Position(left_ ? -16 : 16, 0);
     child_ = new LaserBeam(child_pos, left_, *this, false);
     level.hazards.emplace_back(child_);
   }
@@ -651,27 +651,6 @@ void Robot::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[may
   {
     child_->kill();
   }
-}
-
-void Projectile::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                        [[maybe_unused]] const geometry::Rectangle& player_rect,
-                        Level& level)
-{
-  frame_++;
-  if (frame_ == num_sprites())
-  {
-    frame_ = 0;
-  }
-  position += geometry::Position(left_ ? -get_speed() : get_speed(), 0);
-  if (level.collides_solid(position, size))
-  {
-    health = 0;
-  }
-}
-
-std::vector<std::pair<geometry::Position, Sprite>> Projectile::get_sprites([[maybe_unused]] const Level& level) const
-{
-  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(get_sprite()) + frame_))};
 }
 
 void EyeMonster::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
@@ -742,10 +721,10 @@ void EyeMonster::update(AbstractSoundManager& sound_manager, const geometry::Rec
   {
     next_shoot_--;
   }
-  if (next_shoot_ == 0 && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+  if (next_shoot_ == 0 && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
     sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
-    level.enemies.emplace_back(new Eyeball(position, left_));
+    level.hazards.emplace_back(new Eyeball(position, left_, *this));
     // Shoot infrequently (every 5-15 seconds)
     // TODO: find out what the logic is; it seems very inconsistent and not based on eyes opening
     next_shoot_ = 17 * misc::random<int>(5, 15);
@@ -858,4 +837,12 @@ std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[may
       get_eye_sprite(
         right_health_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_R_1, Sprite::SPRITE_EYE_MONSTER_EYE_STUB_R_1, right_frame_, frame_)),
   };
+}
+
+void EyeMonster::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+{
+  if (child_)
+  {
+    child_->kill();
+  }
 }

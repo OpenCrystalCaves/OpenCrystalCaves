@@ -74,6 +74,20 @@ bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectan
         break;
       }
 
+      auto hazard = level.collides_hazard(collision_position, size);
+      if (hazard && hazard->on_hit(crect, sound_manager, player_rect, level, is_power))
+      {
+        alive = false;
+        // If hazard killed, spawn explosion
+        auto explosion_sprites = hazard->get_explosion_sprites();
+        if (explosion_sprites && !hazard->is_alive())
+        {
+          level.particles.emplace_back(new Explosion(position, *explosion_sprites, right ? 2 : -2));
+          killed_enemy = true;
+        }
+        break;
+      }
+
       if (level.collides_solid(collision_position, size))
       {
         alive = false;

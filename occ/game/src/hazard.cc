@@ -7,7 +7,7 @@ void Laser::update(AbstractSoundManager& sound_manager, const geometry::Rectangl
 {
   if ((level.switch_flags & SWITCH_FLAG_LASERS) && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
-    geometry::Position child_pos = position + geometry::Position((left_ ? -6 : 6) + 4, 3);
+    geometry::Position child_pos = position + geometry::Position(left_ ? -6 : 6, -1);
     child_ = new LaserBeam(child_pos, left_, *this);
     level.hazards.emplace_back(child_);
     sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
@@ -66,26 +66,45 @@ std::vector<geometry::Rectangle> Laser::get_detection_rects(const Level& level) 
   return rects;
 }
 
-void LaserBeam::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                       [[maybe_unused]] const geometry::Rectangle& player_rect,
-                       Level& level)
+void Projectile::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                        [[maybe_unused]] const geometry::Rectangle& player_rect,
+                        Level& level)
 {
-  frame_++;
   // TODO: reduce hitbox
+  frame_++;
+  if (frame_ == num_sprites())
+  {
+    frame_ = 0;
+  }
+  position += geometry::Position(left_ ? -get_speed() : get_speed(), 0);
+  if (level.collides_solid(position, size))
+  {
+    alive_ = false;
+    parent_.remove_child(level);
+  }
+}
+
+std::vector<std::pair<geometry::Position, Sprite>> Projectile::get_sprites([[maybe_unused]] const Level& level) const
+{
+  return {std::make_pair(position - geometry::Size(4, 4), static_cast<Sprite>(static_cast<int>(get_sprite()) + frame_))};
+}
+
+void LaserBeam::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
+{
   if (moving_)
   {
-    position += geometry::Position(left_ ? -4 : 4, 0);
-    // TODO: kill outside window
-    if (level.collides_solid(position + geometry::Position(0, 1), size))
-    {
-      alive_ = false;
-      parent_.remove_child(level);
-    }
+    Projectile::update(sound_manager, player_rect, level);
   }
   else
   {
     // Kill after 2 frames
-    if (frame_ == 3)
+    frame_++;
+    if (frame_ == num_sprites())
+    {
+      frame_ = 0;
+    }
+    kill_frame_++;
+    if (kill_frame_ == 3)
     {
       alive_ = false;
       parent_.remove_child(level);

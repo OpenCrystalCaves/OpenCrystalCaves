@@ -85,15 +85,15 @@ class Actor
                                                           const int max_len = 0) const;
 };
 
-class LaserBeam;
+class Projectile;
 
-class LaserBeamParent
+class ProjectileParent
 {
  public:
   virtual void remove_child([[maybe_unused]] Level& level) { child_ = nullptr; }
 
  protected:
-  LaserBeam* child_ = nullptr;
+  Projectile* child_ = nullptr;
 };
 
 class Lever : public Actor
