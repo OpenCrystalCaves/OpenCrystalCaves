@@ -457,17 +457,20 @@ void Snoozer::update(AbstractSoundManager& sound_manager, const geometry::Rectan
       left_ = !left_;
     }
     // Shoot balls
-    if (next_shoot_ > 0)
+    if (child_ == nullptr)
     {
-      next_shoot_--;
-    }
-    if (next_shoot_ == 0 && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
-    {
-      sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
-      child_ = new Blueball(position, left_, *this);
-      level.hazards.emplace_back(child_);
-      // Shoot semi-frequently (every 5 seconds)
-      next_shoot_ = 17 * 5;
+      if (next_shoot_ > 0)
+      {
+        next_shoot_--;
+      }
+      if (next_shoot_ == 0 && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+      {
+        sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
+        child_ = new Blueball(position, left_, *this);
+        level.hazards.emplace_back(child_);
+        // Shoot semi-frequently (1 second after last shot)
+        next_shoot_ = 17 * 1;
+      }
     }
   }
 }
@@ -748,18 +751,20 @@ void EyeMonster::update(AbstractSoundManager& sound_manager, const geometry::Rec
     position -= d;
   }
   // Shoot eyeballs
-  if (next_shoot_ > 0)
+  if (child_ == nullptr)
   {
-    next_shoot_--;
-  }
-  if (next_shoot_ == 0 && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
-  {
-    sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
-    child_ = new Eyeball(position, left_, *this);
-    level.hazards.emplace_back(child_);
-    // Shoot infrequently (every 5-15 seconds)
-    // TODO: find out what the logic is; it seems very inconsistent and not based on eyes opening
-    next_shoot_ = 17 * misc::random<int>(5, 15);
+    if (next_shoot_ > 0)
+    {
+      next_shoot_--;
+    }
+    if (next_shoot_ == 0 && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+    {
+      sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
+      child_ = new Eyeball(position, left_, *this);
+      level.hazards.emplace_back(child_);
+      // Shoot 1 second after last shot
+      next_shoot_ = 17;
+    }
   }
 }
 
