@@ -127,6 +127,27 @@ class Eyeball : public HittableProjectile
   virtual int num_sprites() const override { return 4; }
 };
 
+class Blueball : public HittableProjectile
+{
+  // ➖➖➖➖➖➖➖⚫⚫➖➖➖➖➖➖➖
+  // ➖➖➖➖➖⚫⚫🇪🇺🇪🇺⚫⚫➖➖➖➖➖
+  // ➖➖➖➖⚫🇪🇺🇪🇺🟦🟦🇪🇺🇪🇺⚫➖➖➖➖
+  // ➖➖➖➖⚫🇪🇺🟦🟦🟦🟦🇪🇺⚫➖➖➖➖
+  // ➖➖➖⚫🇪🇺🟦🟦⬜⬜🟦🟦🇪🇺⚫➖➖➖
+  // ➖➖➖⚫🇪🇺🟦🟦⬜⬜🟦🟦🇪🇺⚫➖➖➖
+  // ➖➖➖➖⚫🇪🇺🟦🟦🟦🟦🇪🇺⚫➖➖➖➖
+  // ➖➖➖➖⚫🇪🇺🇪🇺🟦🟦🇪🇺🇪🇺⚫➖➖➖➖
+  // ➖➖➖➖➖⚫⚫🇪🇺🇪🇺⚫⚫➖➖➖➖➖
+  // ➖➖➖➖➖➖➖⚫⚫➖➖➖➖➖➖➖
+ public:
+  using HittableProjectile::HittableProjectile;
+
+ protected:
+  virtual int get_speed() const override { return 6; }
+  virtual Sprite get_sprite() const override { return Sprite::SPRITE_BLUE_BALL; }
+  virtual int num_sprites() const override { return 1; }
+};
+
 class TriceratopsShot : public HittableProjectile
 {
   // ➖➖➖➖➖⚫➖➖➖➖⚫➖➖➖➖➖

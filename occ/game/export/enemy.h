@@ -335,7 +335,9 @@ class Caterpillar : public Enemy
   Caterpillar* child_ = nullptr;
 };
 
-class Snoozer : public Enemy
+class Snoozer
+  : public ProjectileParent
+  , public FacePlayerOnHit
 {
   // ⬛⬛⬛⬛⬛🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⬛⬛⬛⬛⬛
   // ⬛⬛⬛🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⬛⬛⬛
@@ -353,18 +355,22 @@ class Snoozer : public Enemy
   // ⬛⬛⬛⬛⬛🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⬛⬛⬛⬛⬛
   // Moves left/right and sleeps occasionally, can only be harmed when sleeping
  public:
-  Snoozer(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 3) {}
+  Snoozer(geometry::Position position) : FacePlayerOnHit(position, geometry::Size(16, 16), 3) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 5000; }
   virtual bool is_tough() const override { return pause_frame_ == 0; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(left_ ? -1 : 1, 0, level);
+  }
 
  private:
-  bool left_ = false;
   int frame_ = 0;
   int pause_frame_ = 1;
+  int next_shoot_ = 0;
 };
 
 class Triceratops

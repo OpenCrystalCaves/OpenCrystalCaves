@@ -431,9 +431,7 @@ void Caterpillar::set_child(Caterpillar& child)
   child.frame_ = child.rank_ * 2;
 }
 
-void Snoozer::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                     [[maybe_unused]] const geometry::Rectangle& player_rect,
-                     Level& level)
+void Snoozer::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   if (pause_frame_ > 0)
   {
@@ -458,9 +456,20 @@ void Snoozer::update([[maybe_unused]] AbstractSoundManager& sound_manager,
       position -= d;
       left_ = !left_;
     }
+    // Shoot balls
+    if (next_shoot_ > 0)
+    {
+      next_shoot_--;
+    }
+    if (next_shoot_ == 0 && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+    {
+      sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
+      child_ = new Blueball(position, left_, *this);
+      level.hazards.emplace_back(child_);
+      // Shoot semi-frequently (every 5 seconds)
+      next_shoot_ = 17 * 5;
+    }
   }
-
-  // TODO: shoot at player
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Snoozer::get_sprites([[maybe_unused]] const Level& level) const
