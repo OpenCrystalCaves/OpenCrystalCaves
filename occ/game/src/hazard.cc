@@ -70,7 +70,6 @@ void Projectile::update([[maybe_unused]] AbstractSoundManager& sound_manager,
                         [[maybe_unused]] const geometry::Rectangle& player_rect,
                         Level& level)
 {
-  // TODO: reduce hitbox
   frame_++;
   if (frame_ == num_sprites())
   {
@@ -79,8 +78,7 @@ void Projectile::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   position += geometry::Position(left_ ? -get_speed() : get_speed(), 0);
   if (level.collides_solid(position, size))
   {
-    alive_ = false;
-    parent_.remove_child(level);
+    kill(level);
   }
 }
 
@@ -141,6 +139,12 @@ void SpiderWeb::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     alive_ = false;
     parent_.remove_child();
   }
+}
+
+void SpiderWeb::kill()
+{
+  alive_ = false;
+  parent_.remove_child();
 }
 
 void Faucet::update([[maybe_unused]] AbstractSoundManager& sound_manager,

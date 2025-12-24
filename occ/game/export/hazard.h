@@ -73,7 +73,11 @@ class Projectile : public Hazard
     return TouchType::TOUCH_TYPE_HURT;
   }
   virtual bool is_alive() const override { return alive_; }
-  void kill() { alive_ = false; }
+  void kill(Level& level)
+  {
+    alive_ = false;
+    parent_.remove_child(level);
+  }
 
  protected:
   virtual int get_speed() const = 0;
@@ -94,10 +98,10 @@ class HittableProjectile : public Projectile
   virtual bool on_hit([[maybe_unused]] const geometry::Rectangle& rect,
                       AbstractSoundManager& sound_manager,
                       [[maybe_unused]] const geometry::Rectangle& player_rect,
-                      [[maybe_unused]] Level& level,
+                      Level& level,
                       [[maybe_unused]] const bool power) override
   {
-    alive_ = false;
+    kill(level);
     sound_manager.play_sound(SoundType::SOUND_ENEMY_DIE);
     return true;
   }
@@ -121,6 +125,25 @@ class Eyeball : public HittableProjectile
   virtual int get_speed() const override { return 4; }
   virtual Sprite get_sprite() const override { return left_ ? Sprite::SPRITE_EYEBALL_L_1 : Sprite::SPRITE_EYEBALL_R_1; }
   virtual int num_sprites() const override { return 4; }
+};
+
+class TriceratopsShot : public HittableProjectile
+{
+  // ➖➖➖➖➖⚫➖➖➖➖⚫➖➖➖➖➖
+  // ➖➖➖➖⚫🟥⚫➖➖⚫🟥⚫➖➖➖➖
+  // ➖➖➖➖➖⚫🟥⚫⚫🟥⚫➖➖➖➖➖
+  // ➖➖➖➖➖➖⚫🟨🟨⚫➖➖➖➖➖➖
+  // ➖➖➖➖➖➖⚫🟨🟨⚫➖➖➖➖➖➖
+  // ➖➖➖➖➖⚫🟥⚫⚫🟥⚫➖➖➖➖➖
+  // ➖➖➖➖⚫🟥⚫➖➖⚫🟥⚫➖➖➖➖
+  // ➖➖➖➖➖⚫➖➖➖➖⚫➖➖➖➖➖
+ public:
+  using HittableProjectile::HittableProjectile;
+
+ protected:
+  virtual int get_speed() const override { return 8; }
+  virtual Sprite get_sprite() const override { return Sprite::SPRITE_TRICERATOPS_SHOT_1; }
+  virtual int num_sprites() const override { return 2; }
 };
 
 class LaserBeam : public Projectile
@@ -220,6 +243,7 @@ class SpiderWeb : public Hazard
     // TODO: sound
     return TouchType::TOUCH_TYPE_HURT;
   }
+  void kill();
 
  private:
   Spider& parent_;

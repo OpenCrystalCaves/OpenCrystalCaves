@@ -41,7 +41,22 @@ class Enemy : public Actor
   virtual bool should_reverse(const Level& level) const;
 };
 
-class Bigfoot : public Enemy
+class FacePlayerOnHit : public Enemy
+{
+  // ABC for enemies that face the player when hit
+ public:
+  using Enemy::Enemy;
+  virtual bool on_hit(const geometry::Rectangle& rect,
+                      AbstractSoundManager& sound_manager,
+                      const geometry::Rectangle& player_rect,
+                      Level& level,
+                      const bool power) override;
+
+ protected:
+  bool left_ = false;
+};
+
+class Bigfoot : public FacePlayerOnHit
 {
   // ⚫⚫⚫⚫⚫⚫🟩🟩🟩⚫⚫⚫⚫⚫⚫⚫
   // ⚫⚫⚫⚫🟩🟩🟢🟢🟢🟢🟢⚫⚫⚫⚫⚫
@@ -75,7 +90,7 @@ class Bigfoot : public Enemy
   // ⚫⚫⚫⚫⚫⚫🟢⚫⚫⬛🟢⬛🟢⬛🟢⚫
   // 2-tile tall enemy, runs if they see player
  public:
-  Bigfoot(geometry::Position position) : Enemy(position - geometry::Position(0, 16), geometry::Size(16, 32), 5) {}
+  Bigfoot(geometry::Position position) : FacePlayerOnHit(position - geometry::Position(0, 16), geometry::Size(16, 32), 5) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
@@ -92,7 +107,6 @@ class Bigfoot : public Enemy
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
  private:
-  bool left_ = false;
   bool running_ = false;
   int frame_ = 0;
 };
@@ -209,6 +223,7 @@ class Spider : public Enemy
   void remove_child() { child_ = nullptr; }
   virtual int get_points() const override { return 100; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
+  virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
 
  private:
   bool up_ = false;
@@ -352,7 +367,9 @@ class Snoozer : public Enemy
   int pause_frame_ = 1;
 };
 
-class Triceratops : public Enemy
+class Triceratops
+  : public ProjectileParent
+  , public FacePlayerOnHit
 {
   // ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🚨🚨⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🚨🟥🟥🟥🟥⬛⬛⬛
   // ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🟥🚨⬛⬛⬛⬛⬛🚨🚨🚨🚨🟥🟥🟥🟥🟥🟥⬛⬛
@@ -370,15 +387,18 @@ class Triceratops : public Enemy
   // ⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🚨🟥🟥🟥⬛⬛⬛⬛⬛🚨🟥🟥🟥⬛⬛⬛⬛⬛⬛⬛⬛🚨🟥🟥🟥🟥🟥🟥⬛⬛⬛
   // Moves left/right, fires projectiles
  public:
-  Triceratops(geometry::Position position) : Enemy(position, geometry::Size(48, 16), 5) {}
+  Triceratops(geometry::Position position) : FacePlayerOnHit(position, geometry::Size(48, 16), 5) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 5000; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(left_ ? -1 : 1, 0, level);
+  }
 
  private:
-  bool left_ = false;
   int frame_ = 0;
 };
 
@@ -519,7 +539,7 @@ class Birdlet : public Flier
 };
 
 class Robot
-  : public Enemy
+  : public FacePlayerOnHit
   , public ProjectileParent
 {
   // ➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖
@@ -539,7 +559,7 @@ class Robot
   // ➖➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖➖
   // Moves left and right erratically, zaps player when they are close
  public:
-  Robot(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 3) {}
+  Robot(geometry::Position position) : FacePlayerOnHit(position, geometry::Size(16, 16), 3) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
@@ -558,7 +578,6 @@ class Robot
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
 
  private:
-  bool left_ = false;
   int frame_ = 0;
   int next_reverse_ = 0;
   bool zapping_ = false;

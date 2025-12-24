@@ -46,6 +46,20 @@ bool Enemy::should_reverse(const Level& level) const
   return false;
 }
 
+bool FacePlayerOnHit::on_hit(const geometry::Rectangle& rect,
+                             AbstractSoundManager& sound_manager,
+                             const geometry::Rectangle& player_rect,
+                             Level& level,
+                             const bool power)
+{
+  // Turn to face player
+  if (left_ ^ (player_rect.position.x() < position.x()))
+  {
+    left_ = !left_;
+  }
+  return Enemy::on_hit(rect, sound_manager, player_rect, level, power);
+}
+
 void Bigfoot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
@@ -69,19 +83,14 @@ void Bigfoot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const
   }
 }
 
-bool Bigfoot::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
+bool Bigfoot::on_hit(const geometry::Rectangle& rect,
                      AbstractSoundManager& sound_manager,
                      const geometry::Rectangle& player_rect,
                      Level& level,
                      const bool power)
 {
   running_ = true;
-  // Turn to face player
-  if (left_ ^ (player_rect.position.x() < position.x()))
-  {
-    left_ = !left_;
-  }
-  return Enemy::on_hit(rect, sound_manager, player_rect, level, power);
+  return FacePlayerOnHit::on_hit(rect, sound_manager, player_rect, level, power);
 }
 
 std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites([[maybe_unused]] const Level& level) const
@@ -238,9 +247,7 @@ void Snake::on_death(AbstractSoundManager& sound_manager, Level& level)
   // TODO: authentic mode, align corpse to tile coord
 }
 
-void Spider::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                    [[maybe_unused]] const geometry::Rectangle& player_rect,
-                    [[maybe_unused]] Level& level)
+void Spider::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ == 8)
@@ -259,6 +266,7 @@ void Spider::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   {
     child_ = new SpiderWeb(position, *this);
     level.hazards.emplace_back(child_);
+    sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
   }
 }
 
@@ -266,6 +274,14 @@ std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites([[maybe_u
 {
   return {std::make_pair(position,
                          static_cast<Sprite>(static_cast<int>(up_ ? Sprite::SPRITE_SPIDER_UP_1 : Sprite::SPRITE_SPIDER_DOWN_1) + frame_))};
+}
+
+void Spider::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+{
+  if (child_)
+  {
+    child_->kill();
+  }
 }
 
 void Rockman::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
@@ -475,8 +491,6 @@ void Triceratops::update([[maybe_unused]] AbstractSoundManager& sound_manager,
                          [[maybe_unused]] const geometry::Rectangle& player_rect,
                          Level& level)
 {
-  // TODO: shoot at the player
-  // TODO: face player once hit
   frame_++;
   const auto d = geometry::Position(left_ ? -2 : 2, 0);
   position += d;
@@ -484,6 +498,13 @@ void Triceratops::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   {
     position -= d;
     left_ = !left_;
+  }
+  // Shoot player immediately
+  if (child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+  {
+    sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
+    child_ = new TriceratopsShot(position, left_, *this);
+    level.hazards.emplace_back(child_);
   }
 }
 
@@ -615,19 +636,20 @@ std::vector<std::pair<geometry::Position, Sprite>> Robot::get_sprites([[maybe_un
   return {std::make_pair(position, sprite)};
 }
 
-bool Robot::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
+bool Robot::on_hit(const geometry::Rectangle& rect,
                    AbstractSoundManager& sound_manager,
                    const geometry::Rectangle& player_rect,
                    Level& level,
                    const bool power)
 {
-  // Turn to face player
-  if (left_ ^ (player_rect.position.x() < position.x()))
+  const bool old_left = left_;
+  const bool result = FacePlayerOnHit::on_hit(rect, sound_manager, player_rect, level, power);
+  if (left_ != old_left)
   {
-    left_ = !left_;
+    // Change directions every 1-19 seconds
     next_reverse_ = 17 * (1 + static_cast<int>(rand() % 19));
   }
-  return Enemy::on_hit(rect, sound_manager, player_rect, level, power);
+  return result;
 }
 
 void Robot::remove_child(Level& level)
@@ -645,11 +667,11 @@ void Robot::remove_child(Level& level)
   }
 }
 
-void Robot::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+void Robot::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, Level& level)
 {
   if (child_)
   {
-    child_->kill();
+    child_->kill(level);
   }
 }
 
@@ -724,7 +746,8 @@ void EyeMonster::update(AbstractSoundManager& sound_manager, const geometry::Rec
   if (next_shoot_ == 0 && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
     sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
-    level.hazards.emplace_back(new Eyeball(position, left_, *this));
+    child_ = new Eyeball(position, left_, *this);
+    level.hazards.emplace_back(child_);
     // Shoot infrequently (every 5-15 seconds)
     // TODO: find out what the logic is; it seems very inconsistent and not based on eyes opening
     next_shoot_ = 17 * misc::random<int>(5, 15);
@@ -839,10 +862,10 @@ std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[may
   };
 }
 
-void EyeMonster::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+void EyeMonster::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, Level& level)
 {
   if (child_)
   {
-    child_->kill();
+    child_->kill(level);
   }
 }
