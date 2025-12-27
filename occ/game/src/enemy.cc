@@ -276,8 +276,9 @@ std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites([[maybe_u
                          static_cast<Sprite>(static_cast<int>(up_ ? Sprite::SPRITE_SPIDER_UP_1 : Sprite::SPRITE_SPIDER_DOWN_1) + frame_))};
 }
 
-void Spider::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+void Spider::on_death(AbstractSoundManager& sound_manager, Level& level)
 {
+  Enemy::on_death(sound_manager, level);
   if (child_)
   {
     child_->kill();
@@ -601,8 +602,9 @@ void Bird::update(AbstractSoundManager& sound_manager, const geometry::Rectangle
   }
 }
 
-void Birdlet::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level)
+void Birdlet::on_death(AbstractSoundManager& sound_manager, Level& level)
 {
+  Enemy::on_death(sound_manager, level);
   parent_.remove_child();
 }
 
@@ -679,8 +681,9 @@ void Robot::remove_child(Level& level)
   }
 }
 
-void Robot::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, Level& level)
+void Robot::on_death(AbstractSoundManager& sound_manager, Level& level)
 {
+  Enemy::on_death(sound_manager, level);
   if (child_)
   {
     child_->kill(level);
@@ -876,8 +879,9 @@ std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[may
   };
 }
 
-void EyeMonster::on_death([[maybe_unused]] AbstractSoundManager& sound_manager, Level& level)
+void EyeMonster::on_death(AbstractSoundManager& sound_manager, Level& level)
 {
+  Enemy::on_death(sound_manager, level);
   if (child_)
   {
     child_->kill(level);
