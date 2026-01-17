@@ -186,6 +186,7 @@ enum class TileMode
   EXIT,
   COLUMN,
   CRATE,
+  CRATE_SECOND_ROW,
   HAMMER_RAIL,
   HAMMER,
   GLASS_BALL,
@@ -473,6 +474,29 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             mode = TileMode::NONE;
             break;
           default:
+            break;
+        }
+        break;
+      case TileMode::CRATE_SECOND_ROW:
+        switch (level->tile_ids[i - level->width])
+        {
+          case 'n':
+            if (level->tile_ids[i + 1] != 'n')
+            {
+              sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
+              mode = TileMode::NONE;
+            }
+            else
+            {
+              sprite = static_cast<int>(Sprite::SPRITE_CRATE_D2);
+            }
+            break;
+          case 'y':
+            sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
+            mode = TileMode::NONE;
+            break;
+          default:
+            sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
             break;
         }
         break;
@@ -793,6 +817,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                     case 'y':
                       // Bottom left of crate
                       sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
+                      mode = TileMode::CRATE_SECOND_ROW;
                       break;
                     case 'c':
                       // Bottom left of hazard crate
@@ -818,11 +843,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                   // Air tank (bottom)
                   level->actors.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, false));
                   break;
-                case 'b':
-                case 'g':  // Fallthrough
-                  // Bottom of crate
-                  sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
-                  break;
                 case 'c':
                   // Bottom right of hazard crate
                   sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_DR);
@@ -841,19 +861,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                   {
                     switch (level->tile_ids[ci])
                     {
-                      case 'b':
-                      case 'g':  // Fallthrough
-                        if (level->tile_ids[i + 1] == 'n')
-                        {
-                          // Bottom of crate
-                          sprite = static_cast<int>(Sprite::SPRITE_CRATE_D2);
-                        }
-                        else
-                        {
-                          // Bottom right of crate
-                          sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
-                        }
-                        break;
                       case 'X':
                         // Bottom-right of exit
                         sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
@@ -881,10 +888,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
                 case 'X':
                   // Bottom-left of exit
                   // Ignore - we've already added an exit
-                  break;
-                case 'y':
-                  // Bottom right of crate
-                  sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
                   break;
                 case -8:
                   // Glass ball thing
