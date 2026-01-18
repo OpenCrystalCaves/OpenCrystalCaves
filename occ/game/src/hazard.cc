@@ -5,7 +5,8 @@
 
 void Laser::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
-  if ((level.switch_flags & SWITCH_FLAG_LASERS) && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+  const bool can_fire = moving_ || (level.switch_flags & SWITCH_FLAG_LASERS);
+  if (can_fire && child_ == nullptr && geometry::is_any_colliding(get_detection_rects(level), player_rect))
   {
     geometry::Position child_pos = position + geometry::Position(left_ ? -6 : 6, -1);
     child_ = new LaserBeam(child_pos, left_, *this);
@@ -46,7 +47,7 @@ std::vector<geometry::Rectangle> Laser::get_detection_rects(const Level& level) 
       r = r_new;
     }
   }
-  else if (left_)
+  else  // Right
   {
     geometry::Rectangle r{position.x() + size.x(), y, 0, 0};
     for (;;)

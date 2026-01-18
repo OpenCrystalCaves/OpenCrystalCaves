@@ -1454,6 +1454,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             }
             flags |= TILE_RENDER_IN_FRONT;
             break;
+          case -124:
+            // Right laser
+            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
+            break;
           case -126:
             // Right laser
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
