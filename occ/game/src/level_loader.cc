@@ -19,6 +19,7 @@ static const std::unordered_set<LevelId> completedLevels{
   LevelId::LEVEL_7,
   LevelId::LEVEL_8,
   LevelId::LEVEL_9,
+  LevelId::LEVEL_10,
 };
 
 namespace LevelLoader
@@ -706,6 +707,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             // Mine cart
             level->enemies.emplace_back(new MineCart(geometry::Position{x * 16, y * 16}));
             break;
+          case 'a':
+            // Moving left laser
+            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true, true));
+            break;
           case 'B':
             // Clear block
             level->actors.emplace_back(new ClearBlock(geometry::Position{x * 16, y * 16}));
@@ -952,7 +957,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
             break;
           case 's':
-            // Moving laser
+            // Moving right laser
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false, true));
             break;
           case 'S':
