@@ -19,7 +19,10 @@ struct Color
 class Window
 {
  public:
-  static std::unique_ptr<Window> create(const std::string& title, geometry::Size size, const std::filesystem::path& icon_path);
+  static std::unique_ptr<Window> create(const std::string& title,
+                                        geometry::Size size,
+                                        const std::filesystem::path& icon_path,
+                                        const int flags = 0);
 
   virtual ~Window() = default;
 

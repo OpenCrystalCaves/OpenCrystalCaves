@@ -90,10 +90,13 @@ SDL_Rect to_sdl_rect(const geometry::Rectangle& rect)
   return {rect.position.x(), rect.position.y(), rect.size.x(), rect.size.y()};
 }
 
-std::unique_ptr<Window> Window::create(const std::string& title, geometry::Size size, const std::filesystem::path& icon_path)
+std::unique_ptr<Window> Window::create(const std::string& title,
+                                       geometry::Size size,
+                                       const std::filesystem::path& icon_path,
+                                       const int flags)
 {
   auto sdl_window = std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>(
-    SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, size.x(), size.y(), SDL_WINDOW_SHOWN),
+    SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, size.x(), size.y(), SDL_WINDOW_SHOWN | flags),
     SDL_DestroyWindow);
   if (!sdl_window)
   {

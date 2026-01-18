@@ -50,7 +50,7 @@ const uint32_t colors[] = {
   0xFFFFFFFF,  // "⬜",
 };
 // Map all light colours to dark, and darks/greys to black
-const std::unordered_map<uint32_t, uint32_t> cga_dark = {
+const std::unordered_map<uint32_t, uint32_t> ega_dark = {
   {0xFF000000, 0xFF000000},
   {0xFF555555, 0xFF000000},
   {0xFFAAAAAA, 0xFF000000},
@@ -86,6 +86,44 @@ const std::unordered_map<uint32_t, uint32_t> blue_night = {
   {0xFFFF55FF, 0xFF242472},
   {0xFFAA5500, 0xFF000000},
   {0xFFFFFF55, 0xFF242472},
+};
+// Map all non-black colours to white
+const std::unordered_map<uint32_t, uint32_t> ega_white = {
+  {0xFF000000, 0xFF000000},
+  {0xFF555555, 0xFFFFFFFF},
+  {0xFFAAAAAA, 0xFFFFFFFF},
+  {0xFFFFFFFF, 0xFFFFFFFF},
+  {0xFF0000AA, 0xFFFFFFFF},
+  {0xFF5555FF, 0xFFFFFFFF},
+  {0xFF00AA00, 0xFFFFFFFF},
+  {0xFF55FF55, 0xFFFFFFFF},
+  {0xFF00AAAA, 0xFFFFFFFF},
+  {0xFF55FFFF, 0xFFFFFFFF},
+  {0xFFAA0000, 0xFFFFFFFF},
+  {0xFFFF5555, 0xFFFFFFFF},
+  {0xFFAA00AA, 0xFFFFFFFF},
+  {0xFFFF55FF, 0xFFFFFFFF},
+  {0xFFAA5500, 0xFFFFFFFF},
+  {0xFFFFFF55, 0xFFFFFFFF},
+};
+// Bright palette (https://lospec.com/palette-list/peelyweelybananyicecreamy + https://lospec.com/palette-list/cherry-blossom-gb)
+const std::unordered_map<uint32_t, uint32_t> banana_cherry = {
+  {0xFF000000, 0xFF000000},
+  {0xFF555555, 0xFFC48533},
+  {0xFFAAAAAA, 0xFFE0983A},
+  {0xFFFFFFFF, 0xFFFFFFFF},
+  {0xFF0000AA, 0xFFE2E298},
+  {0xFF5555FF, 0xFFFFD3E1},
+  {0xFF00AA00, 0xFFFFFFAA},
+  {0xFF55FF55, 0xFFFFFFAA},
+  {0xFF00AAAA, 0xFFFFFFD3},
+  {0xFF55FFFF, 0xFFFFD3E1},
+  {0xFFAA0000, 0xFFFFEFFE},
+  {0xFFFF5555, 0xFFFFD3E1},
+  {0xFFAA00AA, 0xFFE2C298},
+  {0xFFFF55FF, 0xFFFFEFFE},
+  {0xFFAA5500, 0xFFE0A659},
+  {0xFFFFFF55, 0xFFFFFFE8},
 };
 
 int read_sprite_count(std::ifstream& input, const int filler)
@@ -231,12 +269,15 @@ std::unique_ptr<Surface> load_surface(const std::filesystem::path& path,
     return nullptr;
   }
   // Duplicate the pixels and recolour/map them
-  // The surfaces are now stacked vetically:
+  // The surfaces are now stacked vertically:
   // - normal
-  // - CGA dark
+  // - EGA dark
   // - Blue Night
-  const auto all_pixels = one_pixels + swap_pixels(one_pixels, cga_dark) + swap_pixels(one_pixels, blue_night);
-  sheet_h *= 3;
+  // - EGA white
+  // - Banana Cherry
+  const auto all_pixels = one_pixels + swap_pixels(one_pixels, ega_dark) + swap_pixels(one_pixels, blue_night) +
+    swap_pixels(one_pixels, ega_white) + swap_pixels(one_pixels, banana_cherry);
+  sheet_h *= 5;
   auto surface = Surface::from_pixels(sheet_w, sheet_h, (uint32_t*)all_pixels.data(), window);
   if (!surface)
   {
