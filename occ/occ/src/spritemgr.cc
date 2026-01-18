@@ -272,11 +272,11 @@ std::unique_ptr<Surface> load_surface(const std::filesystem::path& path,
   // The surfaces are now stacked vertically:
   // - normal
   // - EGA dark
-  // - Blue Night
   // - EGA white
+  // - Blue Night
   // - Banana Cherry
-  const auto all_pixels = one_pixels + swap_pixels(one_pixels, ega_dark) + swap_pixels(one_pixels, blue_night) +
-    swap_pixels(one_pixels, ega_white) + swap_pixels(one_pixels, banana_cherry);
+  const auto all_pixels = one_pixels + swap_pixels(one_pixels, ega_dark) + swap_pixels(one_pixels, ega_white) +
+    swap_pixels(one_pixels, blue_night) + swap_pixels(one_pixels, banana_cherry);
   sheet_h *= 5;
   auto surface = Surface::from_pixels(sheet_w, sheet_h, (uint32_t*)all_pixels.data(), window);
   if (!surface)
@@ -395,8 +395,8 @@ void SpriteManager::render_tile(const int sprite,
     return;
   }
 
-  // Use alternate dark sprites for remaster gfx
-  const int sprite_remaster = remaster && sprite >= SPRITE_TOTAL ? sprite + SPRITE_TOTAL : sprite;
+  // Use alternate sprites for remaster gfx
+  const int sprite_remaster = remaster && sprite >= SPRITE_TOTAL ? sprite + SPRITE_TOTAL * 2 : sprite;
   const auto src_rect = get_rect_for_tile(sprite_remaster);
   const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), SPRITE_W, SPRITE_H};
   get_surface()->blit_surface(src_rect, dest_rect, false, color);

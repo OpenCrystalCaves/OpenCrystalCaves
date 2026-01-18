@@ -328,8 +328,7 @@ void GameRenderer::render_player() const
     }
     else if (game_->get_player().is_flashing())
     {
-      // TODO: draw white sprite
-      window_.fill_rect(dest_rect, {255u, 255u, 255u});
+      render_tile(sprite, player_render_pos, {0xff, 0xff, 0xff}, true);
     }
     else
     {
@@ -539,9 +538,13 @@ void GameRenderer::render_statusbar() const
   }
 }
 
-void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, const Color color) const
+void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, const Color color, const bool bright) const
 {
-  if (!(game_->get_level().switch_flags & SWITCH_FLAG_LIGHTS))
+  if (bright)
+  {
+    sprite_manager_->render_tile(sprite + SPRITE_TOTAL * 2, pos, game_camera_.position, color);
+  }
+  else if (!(game_->get_level().switch_flags & SWITCH_FLAG_LIGHTS))
   {
     sprite_manager_->render_tile(sprite + SPRITE_TOTAL, pos, game_camera_.position, color);
   }

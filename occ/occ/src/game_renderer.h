@@ -29,7 +29,10 @@ class GameRenderer
   void render_enemies(unsigned game_tick) const;
   void render_complete_border() const;
   void render_statusbar() const;
-  void render_tile(const int sprite, const geometry::Position& pos, const Color color = {0xff, 0xff, 0xff}) const;
+  void render_tile(const int sprite,
+                   const geometry::Position& pos,
+                   const Color color = {0xff, 0xff, 0xff},
+                   const bool bright = false) const;
 
   Game* game_;
   SpriteManager* sprite_manager_;
