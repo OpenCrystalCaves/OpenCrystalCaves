@@ -14,10 +14,11 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include "logger.h"
 #include "sdl_wrapper.h"
 
-void draw(Window& window, const Surface& surface, int x, int y, const Input& input, SpriteManager& sprite_manager)
+void draw(Window& window, const Surface& surface, const int page_index, int x, int y, const Input& input, SpriteManager& sprite_manager)
 {
-  window.fill_rect(geometry::Rectangle(0, 0, surface.size()), {33u, 33u, 33u});
-  surface.blit_surface();
+  window.fill_rect(geometry::Rectangle(0, 0, geometry::Size{surface.width(), SPRITE_ROWS * SPRITE_H}), {33u, 33u, 33u});
+  surface.blit_surface({0, page_index * SPRITE_ROWS * SPRITE_H, surface.width(), SPRITE_ROWS * SPRITE_H},
+                       {0, 0, surface.width(), SPRITE_ROWS * SPRITE_H});
   // Show hovered sprite and draw its index
   const geometry::Rectangle rect{{x * SPRITE_W, y * SPRITE_H}, {SPRITE_W, SPRITE_H}};
   window.render_rectangle(rect, {255, 255, 255, 255});
@@ -59,7 +60,7 @@ int main(int argc, char* argv[])
     LOG_CRITICAL("Could not initialize SDLWrapper");
     return 1;
   }
-  auto window = Window::create("OpenCrystalCaves", geometry::Size(832, 368), "");
+  auto window = Window::create("OpenCrystalCaves", geometry::Size(SPRITE_STRIDE * SPRITE_W, SPRITE_ROWS * SPRITE_H), "");
   if (!window)
   {
     LOG_CRITICAL("Could not create Window");
@@ -72,7 +73,7 @@ int main(int argc, char* argv[])
     return 1;
   }
   const auto surface = sprite_manager.get_surface();
-  window->set_size(surface->size());
+  const int pages = surface->height() / (SPRITE_H * SPRITE_ROWS);
   auto event = Event::create();
   if (!event)
   {
@@ -81,6 +82,8 @@ int main(int argc, char* argv[])
   }
 
   Input input;
+  int index = 0;
+  int last_index = -1;
   int last_mx = -1;
   int last_my = -1;
   while (true)
@@ -90,14 +93,31 @@ int main(int argc, char* argv[])
     {
       break;
     }
+    if (input.left.pressed() || input.up.pressed())
+    {
+      index--;
+      if (index < 0)
+      {
+        index = pages - 1;
+      }
+    }
+    else if (input.right.pressed() || input.down.pressed())
+    {
+      index++;
+      if (index == pages)
+      {
+        index = 0;
+      }
+    }
 
     const int mx = input.mouse.x() / SPRITE_W;
     const int my = input.mouse.y() / SPRITE_H;
-    if (mx != last_mx || my != last_my)
+    if (mx != last_mx || my != last_my || index != last_index)
     {
-      draw(*window, *surface, mx, my, input, sprite_manager);
+      draw(*window, *surface, index, mx, my, input, sprite_manager);
       last_mx = mx;
       last_my = my;
+      last_index = index;
     }
     sdl->delay(10);
   }
