@@ -83,9 +83,10 @@ void Projectile::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Projectile::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Projectile::get_sprites([[maybe_unused]] const Level& level) const
 {
-  return {std::make_pair(position - geometry::Size(4, 4), static_cast<Sprite>(static_cast<int>(get_sprite()) + frame_))};
+  // TODO: check if remaster
+  return {{position - geometry::Size(4, 4), static_cast<int>(get_sprite()) + frame_, !!(frame_ & 1)}};
 }
 
 void LaserBeam::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
@@ -243,10 +244,10 @@ void Flame::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Flame::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Flame::get_sprites([[maybe_unused]] const Level& level) const
 {
   if (!is_on())
-    return {std::make_pair(position, Sprite::SPRITE_FLAME_0)};
+    return {{position, static_cast<int>(Sprite::SPRITE_FLAME_0), false}};
   const int d = (frame_ - FLAME_OFF_FRAMES) / 2;
   int sprite = static_cast<int>(Sprite::SPRITE_FLAME_4) + (d % 4);
   if (d <= 2)
@@ -257,7 +258,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Flame::get_sprites([[maybe_un
   {
     sprite = static_cast<int>(Sprite::SPRITE_FLAME_1) + ((FLAME_FRAME_TOTAL - FLAME_OFF_FRAMES) / 2 - d);
   }
-  return {std::make_pair(position, static_cast<Sprite>(sprite))};
+  return {{position, sprite, false}};
 }
 
 bool Flame::is_on() const
@@ -292,21 +293,20 @@ void AirPipe::update([[maybe_unused]] AbstractSoundManager& sound_manager, const
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> AirPipe::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> AirPipe::get_sprites([[maybe_unused]] const Level& level) const
 {
   if (is_left_)
   {
     return {
-      std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_L_1) + (frame_ % 3))),
-      std::make_pair(position + geometry::Position(16, 0),
-                     static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_PIPE_L_1) + (frame_ % 2))),
+      {position, static_cast<int>(Sprite::SPRITE_AIR_L_1) + (frame_ % 3), false},
+      {position + geometry::Position(16, 0), static_cast<int>(Sprite::SPRITE_AIR_PIPE_L_1) + (frame_ % 2), false},
     };
   }
   else
   {
     return {
-      std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_PIPE_R_1) + (frame_ % 2))),
-      std::make_pair(position + geometry::Position(16, 0), static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_R_1) + (frame_ % 3))),
+      {position, static_cast<int>(Sprite::SPRITE_AIR_PIPE_R_1) + (frame_ % 2), false},
+      {position + geometry::Position(16, 0), static_cast<int>(Sprite::SPRITE_AIR_R_1) + (frame_ % 3), false},
     };
   }
 }
@@ -404,12 +404,12 @@ void FallingSign::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> FallingSign::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> FallingSign::get_sprites([[maybe_unused]] const Level& level) const
 {
-  std::vector<std::pair<geometry::Position, Sprite>> result;
+  std::vector<ObjectDef> result;
   for (size_t i = 0; i < sprites_.size(); i++)
   {
-    result.emplace_back(position + geometry::Position(static_cast<int>(i) * 16, 0), sprites_[i]);
+    result.emplace_back(position + geometry::Position(static_cast<int>(i) * 16, 0), static_cast<int>(sprites_[i]), false);
   }
   return result;
 }

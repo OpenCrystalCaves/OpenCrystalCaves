@@ -93,7 +93,7 @@ bool Bigfoot::on_hit(const geometry::Rectangle& rect,
   return FacePlayerOnHit::on_hit(rect, sound_manager, player_rect, level, power);
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Bigfoot::get_sprites([[maybe_unused]] const Level& level) const
 {
   Sprite s = Sprite::SPRITE_BIGFOOT_HEAD_R_1;
   if (left_)
@@ -102,8 +102,8 @@ std::vector<std::pair<geometry::Position, Sprite>> Bigfoot::get_sprites([[maybe_
   }
   const auto frame = running_ ? frame_ % 4 : frame_ / 2;
   return {
-    std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame)),
-    std::make_pair(position + geometry::Position(0, 16), static_cast<Sprite>(static_cast<int>(s) + 4 + frame)),
+    {position, static_cast<int>(s) + frame, false},
+    {position + geometry::Position(0, 16), static_cast<int>(s) + 4 + frame, false},
   };
 }
 
@@ -132,9 +132,9 @@ void Hopper::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   next_reverse_--;
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Hopper::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Hopper::get_sprites([[maybe_unused]] const Level& level) const
 {
-  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_HOPPER_1) + frame_))};
+  return {{position, static_cast<int>(Sprite::SPRITE_HOPPER_1) + frame_, false}};
 }
 
 void Slime::update([[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -178,7 +178,7 @@ void Slime::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Slime::get_sprites([[maybe_unused]] const Level& level) const
 {
   Sprite s = Sprite::SPRITE_SLIME_R_1;
   if (dx_ == 1)
@@ -197,7 +197,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Slime::get_sprites([[maybe_un
   {
     s = Sprite::SPRITE_SLIME_U_1;
   }
-  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame_))};
+  return {{position, static_cast<int>(s) + frame_, false}};
 }
 
 void Snake::update([[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -232,11 +232,11 @@ void Snake::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Snake::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Snake::get_sprites([[maybe_unused]] const Level& level) const
 {
   const auto s = paused_ ? Sprite::SPRITE_SNAKE_PAUSE_1 : (left_ ? Sprite::SPRITE_SNAKE_WALK_L_1 : Sprite::SPRITE_SNAKE_WALK_R_1);
   const int frame = frame_ % (paused_ ? 7 : 9);
-  return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(s) + frame))};
+  return {{position, static_cast<int>(s) + frame, false}};
 }
 
 void Snake::on_death(AbstractSoundManager& sound_manager, Level& level)
@@ -270,10 +270,9 @@ void Spider::update(AbstractSoundManager& sound_manager, const geometry::Rectang
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Spider::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Spider::get_sprites([[maybe_unused]] const Level& level) const
 {
-  return {std::make_pair(position,
-                         static_cast<Sprite>(static_cast<int>(up_ ? Sprite::SPRITE_SPIDER_UP_1 : Sprite::SPRITE_SPIDER_DOWN_1) + frame_))};
+  return {{position, static_cast<int>(up_ ? Sprite::SPRITE_SPIDER_UP_1 : Sprite::SPRITE_SPIDER_DOWN_1) + frame_, false}};
 }
 
 void Spider::on_death(AbstractSoundManager& sound_manager, Level& level)
@@ -327,10 +326,10 @@ void Rockman::update([[maybe_unused]] AbstractSoundManager& sound_manager, const
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Rockman::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Rockman::get_sprites([[maybe_unused]] const Level& level) const
 {
   const int frame = static_cast<int>(Sprite::SPRITE_ROCKMAN_L_1) + frame_ + (left_ ? 0 : 12);
-  return {std::make_pair(position, static_cast<Sprite>(frame))};
+  return {{position, frame, false}};
 }
 
 std::vector<geometry::Rectangle> Rockman::get_detection_rects(const Level& level) const
@@ -367,11 +366,11 @@ void MineCart::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> MineCart::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> MineCart::get_sprites([[maybe_unused]] const Level& level) const
 {
-  return {std::make_pair(position,
-                         pause_frame_ > 0 ? Sprite::SPRITE_MINE_CART_1
-                                          : static_cast<Sprite>((static_cast<int>(Sprite::SPRITE_MINE_CART_1) + frame_)))};
+  return {{position,
+           pause_frame_ > 0 ? static_cast<int>(Sprite::SPRITE_MINE_CART_1) : static_cast<int>(Sprite::SPRITE_MINE_CART_1) + frame_,
+           false}};
 }
 
 Caterpillar::Caterpillar(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
@@ -394,7 +393,7 @@ void Caterpillar::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Caterpillar::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Caterpillar::get_sprites([[maybe_unused]] const Level& level) const
 {
   Sprite base_sprite = Sprite::SPRITE_CATERPILLAR_L_HEAD_1;
   int flip_d = 10;
@@ -409,7 +408,7 @@ std::vector<std::pair<geometry::Position, Sprite>> Caterpillar::get_sprites([[ma
     flip_d = 6;
   }
   const int frame = static_cast<int>(base_sprite) + (frame_ / 2 & 0x1) + (left_ ? 0 : flip_d);
-  return {std::make_pair(position, static_cast<Sprite>(frame))};
+  return {{position, frame, false}};
 }
 
 
@@ -476,7 +475,7 @@ void Snoozer::update(AbstractSoundManager& sound_manager, const geometry::Rectan
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Snoozer::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Snoozer::get_sprites([[maybe_unused]] const Level& level) const
 {
   int frame = static_cast<int>(Sprite::SPRITE_SNOOZER_SLEEP);
   int dy = 0;
@@ -490,12 +489,11 @@ std::vector<std::pair<geometry::Position, Sprite>> Snoozer::get_sprites([[maybe_
     }
     frame = static_cast<int>(left_ ? Sprite::SPRITE_SNOOZER_L_1 : Sprite::SPRITE_SNOOZER_R_1) + df;
   }
-  std::vector<std::pair<geometry::Position, Sprite>> sprites = {
-    std::make_pair(position + geometry::Position{0, dy}, static_cast<Sprite>(frame))};
+  std::vector<ObjectDef> sprites = {{position + geometry::Position{0, dy}, frame, false}};
   if (pause_frame_ > 0)
   {
     const int z_frame = static_cast<int>(Sprite::SPRITE_SNOOZER_Z_1) + ((pause_frame_ / 3) % 4);
-    sprites.push_back(std::make_pair(position - geometry::Position{0, 16}, static_cast<Sprite>(z_frame)));
+    sprites.push_back({position - geometry::Position{0, 16}, z_frame, false});
   }
   return sprites;
 }
@@ -521,13 +519,13 @@ void Triceratops::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Triceratops::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Triceratops::get_sprites([[maybe_unused]] const Level& level) const
 {
   int frame = static_cast<int>(left_ ? Sprite::SPRITE_TRICERATOPS_HEAD_L_1 : Sprite::SPRITE_TRICERATOPS_TAIL_R_1) + ((frame_ / 2) % 4);
   int df = left_ ? 4 : -4;
-  return {std::make_pair(position, static_cast<Sprite>(frame)),
-          std::make_pair(position + geometry::Position{16, 0}, static_cast<Sprite>(frame + df)),
-          std::make_pair(position + geometry::Position{32, 0}, static_cast<Sprite>(frame + df * 2))};
+  return {{position, frame, false},
+          {position + geometry::Position{16, 0}, frame + df, false},
+          {position + geometry::Position{32, 0}, frame + df * 2, false}};
 }
 
 void Flier::update([[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -583,10 +581,9 @@ void WallMonster::update([[maybe_unused]] AbstractSoundManager& sound_manager, c
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> WallMonster::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> WallMonster::get_sprites([[maybe_unused]] const Level& level) const
 {
-  return {std::make_pair(position,
-                         static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_WALL_MONSTER_R_1) + (left_ ? 9 : 0) + std::min(frame_, 8)))};
+  return {{position, static_cast<int>(Sprite::SPRITE_WALL_MONSTER_R_1) + (left_ ? 9 : 0) + std::min(frame_, 8), false}};
 }
 
 void Bird::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
@@ -642,12 +639,11 @@ void Robot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const g
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Robot::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Robot::get_sprites([[maybe_unused]] const Level& level) const
 {
-  const auto sprite = zapping_
-    ? (left_ ? Sprite::SPRITE_ROBOT_ZAP_L : Sprite::SPRITE_ROBOT_ZAP_R)
-    : (static_cast<Sprite>(static_cast<int>(left_ ? Sprite::SPRITE_ROBOT_L_1 : Sprite::SPRITE_ROBOT_R_1) + frame_));
-  return {std::make_pair(position, sprite)};
+  const auto sprite = zapping_ ? static_cast<int>(left_ ? Sprite::SPRITE_ROBOT_ZAP_L : Sprite::SPRITE_ROBOT_ZAP_R)
+                               : static_cast<int>(left_ ? Sprite::SPRITE_ROBOT_L_1 : Sprite::SPRITE_ROBOT_R_1) + frame_;
+  return {{position, sprite, false}};
 }
 
 bool Robot::on_hit(const geometry::Rectangle& rect,
@@ -843,21 +839,21 @@ bool EyeMonster::on_hit(const geometry::Rectangle& rect,
   return true;
 }
 
-Sprite get_eye_sprite(const int health, const Sprite closed_sprite, const Sprite stub_sprite, const int eye_frame, const int frame)
+int get_eye_sprite(const int health, const Sprite closed_sprite, const Sprite stub_sprite, const int eye_frame, const int frame)
 {
   if (health == 0)
   {
-    return stub_sprite;
+    return static_cast<int>(stub_sprite);
   }
   if (eye_frame == 8)
   {
     // Eye fully open
-    return static_cast<Sprite>(static_cast<int>(closed_sprite) + 4 + frame / 2);
+    return static_cast<int>(closed_sprite) + 4 + frame / 2;
   }
-  return static_cast<Sprite>(static_cast<int>(closed_sprite) + eye_frame / 2);
+  return static_cast<int>(closed_sprite) + eye_frame / 2;
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> EyeMonster::get_sprites([[maybe_unused]] const Level& level) const
 {
   // Adjust draw position if left eye is gone
   auto draw_position = position;
@@ -866,16 +862,14 @@ std::vector<std::pair<geometry::Position, Sprite>> EyeMonster::get_sprites([[may
     draw_position -= geometry::Position(16, 0);
   }
   return {
-    std::make_pair(
-      draw_position,
-      get_eye_sprite(
-        left_health_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_L_1, Sprite::SPRITE_EYE_MONSTER_EYE_STUB_L_1, left_frame_, frame_)),
-    std::make_pair(draw_position + geometry::Position(16, 0),
-                   static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_EYE_MONSTER_BODY_1) + frame_ / 2)),
-    std::make_pair(
-      draw_position + geometry::Position(32, 0),
-      get_eye_sprite(
-        right_health_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_R_1, Sprite::SPRITE_EYE_MONSTER_EYE_STUB_R_1, right_frame_, frame_)),
+    {draw_position,
+     get_eye_sprite(left_health_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_L_1, Sprite::SPRITE_EYE_MONSTER_EYE_STUB_L_1, left_frame_, frame_),
+     false},
+    {draw_position + geometry::Position(16, 0), static_cast<int>(Sprite::SPRITE_EYE_MONSTER_BODY_1) + frame_ / 2, false},
+    {draw_position + geometry::Position(32, 0),
+     get_eye_sprite(
+       right_health_, Sprite::SPRITE_EYE_MONSTER_EYE_CLOSING_R_1, Sprite::SPRITE_EYE_MONSTER_EYE_STUB_R_1, right_frame_, frame_),
+     false},
   };
 }
 

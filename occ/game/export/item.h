@@ -22,9 +22,9 @@ class Item : public Actor
     sound_manager.play_sound(sound_);
     return touch_type_;
   }
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {{position, sprite_}};
+    return {{position, static_cast<int>(sprite_), false}};
   }
 
  private:

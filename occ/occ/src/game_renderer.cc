@@ -404,7 +404,7 @@ void GameRenderer::render_objects() const
     if (geometry::isColliding(geometry::Rectangle(object.position, object_size), game_camera_))
     {
       const auto sprite_id = object.get_sprite(game_tick_);
-      render_tile(sprite_id, object.position);
+      render_tile(sprite_id, object.position, {0xff, 0xff, 0xff}, object.bright);
 
       if (debug_)
       {
@@ -440,7 +440,7 @@ void GameRenderer::render_enemies(unsigned game_tick) const
         if (game_->get_player().stop_tick == 0 ||
             (game_->get_player().stop_tick < 2 * FPS / FRAMES_PER_TICK ? (game_tick % 4) < 3 : (game_tick % 10) < 7))
         {
-          render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
+          render_tile(sprite_pos.sprite_id, sprite_pos.position, {255, 255, 255}, sprite_pos.bright);
         }
 
         if (debug_)

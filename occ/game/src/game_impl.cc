@@ -131,7 +131,7 @@ void GameImpl::update_level()
   // Add moving platforms to objects_
   for (auto& platform : level_->moving_platforms)
   {
-    objects_.emplace_back(platform.position, platform.get_sprite(), 1, false);
+    objects_.emplace_back(platform.position, platform.get_sprite(), false, 1, false);
   }
 
   // Add entrances
@@ -152,7 +152,7 @@ void GameImpl::update_level()
       }
     }
     entrance.update();
-    objects_.emplace_back(entrance.position, entrance.get_sprite(), 1, false);
+    objects_.emplace_back(entrance.position, entrance.get_sprite(), false, 1, false);
   }
 
   // Add exit
@@ -172,7 +172,7 @@ void GameImpl::update_level()
     level_->exit->update();
     for (const auto& sprite_pos : level_->exit->get_sprites())
     {
-      objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
+      objects_.emplace_back(sprite_pos.position, sprite_pos.sprite_id, sprite_pos.bright, 1, false);
     }
   }
 
@@ -336,7 +336,7 @@ void GameImpl::update_missile()
     }
     else
     {
-      objects_.emplace_back(p->position, p->get_sprite(), 1, false);
+      objects_.emplace_back(p->position, p->get_sprite(), false, 1, false);
       it++;
     }
   }
@@ -367,7 +367,7 @@ void GameImpl::update_missile()
   // Add missile to objects_ if alive
   if (missile_.alive)
   {
-    objects_.emplace_back(missile_.position, missile_.get_sprite(), missile_.get_num_sprites(), false);
+    objects_.emplace_back(missile_.position, missile_.get_sprite(), false, missile_.get_num_sprites(), false);
   }
 }
 
@@ -432,7 +432,7 @@ void GameImpl::update_hazards()
     {
       for (const auto& sprite_pos : h->get_sprites(*level_))
       {
-        objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
+        objects_.emplace_back(sprite_pos.position, sprite_pos.sprite_id, sprite_pos.bright, 1, false);
       }
       i++;
     }
@@ -466,7 +466,7 @@ void GameImpl::update_actors()
     {
       for (const auto& sprite_pos : a->get_sprites(*level_))
       {
-        objects_.emplace_back(sprite_pos.first, static_cast<int>(sprite_pos.second), 1, false);
+        objects_.emplace_back(sprite_pos.position, sprite_pos.sprite_id, sprite_pos.bright, 1, false);
       }
       it++;
     }

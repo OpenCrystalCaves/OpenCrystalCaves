@@ -130,11 +130,11 @@ bool Lever::interact(AbstractSoundManager& sound_manager, Level& level)
   return false;
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Lever::get_sprites(const Level& level) const
+std::vector<ObjectDef> Lever::get_sprites(const Level& level) const
 {
   const int sprite =
     static_cast<int>(Sprite::SPRITE_LEVER_R_OFF) + level.lever_on.test(static_cast<size_t>(color_)) + 2 * static_cast<int>(color_);
-  return {{position, static_cast<Sprite>(sprite)}};
+  return {{position, sprite, false}};
 }
 
 bool Door::is_solid(const Level& level) const
@@ -142,15 +142,15 @@ bool Door::is_solid(const Level& level) const
   return !level.lever_on.test(static_cast<size_t>(color_));
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Door::get_sprites(const Level& level) const
+std::vector<ObjectDef> Door::get_sprites(const Level& level) const
 {
   if (level.lever_on.test(static_cast<size_t>(color_)))
   {
     // Open
     const int sprite = static_cast<int>(Sprite::SPRITE_DOOR_OPEN_R_1) + 2 * static_cast<int>(color_);
     return {
-      {position, static_cast<Sprite>(sprite)},
-      {position + geometry::Position(0, 16), static_cast<Sprite>(sprite + 1)},
+      {position, sprite, false},
+      {position + geometry::Position(0, 16), sprite + 1, false},
     };
   }
   else
@@ -158,8 +158,8 @@ std::vector<std::pair<geometry::Position, Sprite>> Door::get_sprites(const Level
     // Closed
     const int sprite = static_cast<int>(Sprite::SPRITE_DOOR_CLOSED_R_1) + static_cast<int>(color_);
     return {
-      {position, static_cast<Sprite>(sprite)},
-      {position + geometry::Position(0, 16), static_cast<Sprite>(sprite + 4)},
+      {position, sprite, false},
+      {position + geometry::Position(0, 16), sprite + 4, false},
     };
   }
 }
@@ -171,9 +171,9 @@ bool Switch::interact(AbstractSoundManager& sound_manager, Level& level)
   return true;
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Switch::get_sprites(const Level& level) const
+std::vector<ObjectDef> Switch::get_sprites(const Level& level) const
 {
-  return {{position, static_cast<Sprite>(static_cast<int>(sprite_) + static_cast<int>(!!(level.switch_flags & switch_flag_)))}};
+  return {{position, static_cast<int>(sprite_) + static_cast<int>(!!(level.switch_flags & switch_flag_)), false}};
 }
 
 TouchType Chest::on_touch([[maybe_unused]] const Player& player, AbstractSoundManager& sound_manager, Level& level)
@@ -188,9 +188,9 @@ TouchType Chest::on_touch([[maybe_unused]] const Player& player, AbstractSoundMa
   return TouchType::TOUCH_TYPE_NONE;
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> Chest::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> Chest::get_sprites([[maybe_unused]] const Level& level) const
 {
-  return {{position, collected_ ? Sprite::SPRITE_CHEST_OPEN : Sprite::SPRITE_CHEST_CLOSED}};
+  return {{position, static_cast<int>(collected_ ? Sprite::SPRITE_CHEST_OPEN : Sprite::SPRITE_CHEST_CLOSED), false}};
 }
 
 void BumpPlatform::on_collide(const Player& player, AbstractSoundManager& sound_manager, Level& level)
@@ -207,10 +207,10 @@ void BumpPlatform::on_collide(const Player& player, AbstractSoundManager& sound_
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> BumpPlatform::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> BumpPlatform::get_sprites([[maybe_unused]] const Level& level) const
 {
   const int dy = frame_ > 4 ? frame_ - 9 : -frame_;
-  return {{position + geometry::Position(0, dy), sprite_}};
+  return {{position + geometry::Position(0, dy), static_cast<int>(sprite_), false}};
 }
 
 void BumpPlatform::update([[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -278,10 +278,11 @@ void AirTank::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<std::pair<geometry::Position, Sprite>> AirTank::get_sprites([[maybe_unused]] const Level& level) const
+std::vector<ObjectDef> AirTank::get_sprites([[maybe_unused]] const Level& level) const
 {
-  return {std::make_pair(
-    position, top_ ? static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_AIR_TANK_TOP_1) + frame_ / 2) : Sprite::SPRITE_AIR_TANK_BOTTOM)};
+  return {{position,
+           top_ ? static_cast<int>(Sprite::SPRITE_AIR_TANK_TOP_1) + frame_ / 2 : static_cast<int>(Sprite::SPRITE_AIR_TANK_BOTTOM),
+           false}};
 }
 
 bool AirTank::on_hit([[maybe_unused]] const geometry::Rectangle& rect,

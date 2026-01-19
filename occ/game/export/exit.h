@@ -1,6 +1,7 @@
 #pragma once
 
 #include "geometry.h"
+#include "object.h"
 #include "sprite.h"
 
 struct Exit
@@ -12,5 +13,5 @@ struct Exit
   int counter = 0;
 
   void update();
-  std::vector<std::pair<geometry::Position, Sprite>> get_sprites() const;
+  std::vector<ObjectDef> get_sprites() const;
 };

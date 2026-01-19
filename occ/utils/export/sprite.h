@@ -1,5 +1,9 @@
 #pragma once
 
+#define SPRITE_STRIDE 52
+#define SPRITE_ROWS 23
+#define SPRITE_TOTAL (SPRITE_STRIDE * SPRITE_ROWS)
+
 enum class Sprite : int
 {
   SPRITE_NONE = -1,

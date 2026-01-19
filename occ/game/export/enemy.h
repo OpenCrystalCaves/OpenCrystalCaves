@@ -93,7 +93,7 @@ class Bigfoot : public FacePlayerOnHit
   Bigfoot(geometry::Position position) : FacePlayerOnHit(position - geometry::Position(0, 16), geometry::Size(16, 32), 5) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
@@ -127,7 +127,7 @@ class Hopper : public Enemy
   Hopper(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 100; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
@@ -153,7 +153,7 @@ class Slime : public Enemy
   Slime(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 100; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
 
@@ -183,7 +183,7 @@ class Snake : public Enemy
   Snake(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 2) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
   virtual int get_points() const override { return 100; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
@@ -215,7 +215,7 @@ class Spider : public Enemy
   Spider(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
     return create_detection_rects(0, 1, level);
@@ -252,7 +252,7 @@ class Rockman : public Enemy
   Rockman(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override;
   virtual int get_points() const override { return 100; }
   virtual bool is_tough() const override { return true; }
@@ -283,7 +283,7 @@ class MineCart : public Enemy
   MineCart(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   // TODO: confirm points
   virtual int get_points() const override { return 100; }
   virtual bool is_tough() const override { return true; }
@@ -317,7 +317,7 @@ class Caterpillar : public Enemy
   Caterpillar(geometry::Position position);
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 1000; }
   virtual bool is_tough() const override
   {  // only head of caterpillar vulnerable
@@ -358,7 +358,7 @@ class Snoozer
   Snoozer(geometry::Position position) : FacePlayerOnHit(position, geometry::Size(16, 16), 3) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 5000; }
   virtual bool is_tough() const override { return pause_frame_ == 0; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
@@ -396,7 +396,7 @@ class Triceratops
   Triceratops(geometry::Position position) : FacePlayerOnHit(position, geometry::Size(48, 16), 5) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 5000; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
@@ -415,9 +415,9 @@ class Flier : public Enemy
   Flier(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 1) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(get_sprite()) + frame_))};
+    return {{position, static_cast<int>(get_sprite()) + frame_, false}};
   }
   virtual int get_points() const override { return 100; }
   virtual bool flying() const { return true; }
@@ -473,7 +473,7 @@ class WallMonster : public Enemy
   WallMonster(geometry::Position position, bool left) : Enemy(position, geometry::Size(16, 16), 1), left_(left) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 100; }
   virtual bool is_tough() const override { return true; }
   virtual std::vector<geometry::Rectangle> get_detection_rects([[maybe_unused]] const Level& level) const override
@@ -568,7 +568,7 @@ class Robot
   Robot(geometry::Position position) : FacePlayerOnHit(position, geometry::Size(16, 16), 3) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual bool on_hit(const geometry::Rectangle& rect,
                       AbstractSoundManager& sound_manager,
                       const geometry::Rectangle& player_rect,
@@ -613,7 +613,7 @@ class EyeMonster
   EyeMonster(geometry::Position position) : Enemy(position, geometry::Size(48, 16), 2) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual int get_points() const override { return 5000; }
   virtual bool on_hit(const geometry::Rectangle& rect,
                       AbstractSoundManager& sound_manager,

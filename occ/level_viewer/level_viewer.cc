@@ -41,21 +41,21 @@ void draw(Window& window, Level& level, SpriteManager& sprite_manager, const int
       {
         for (const auto& sprite_pos : enemy->get_sprites(level))
         {
-          sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
+          sprite_manager.render_tile(sprite_pos.sprite_id, sprite_pos.position);
         }
       }
       for (const auto& hazard : level.hazards)
       {
         for (const auto& sprite_pos : hazard->get_sprites(level))
         {
-          sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
+          sprite_manager.render_tile(sprite_pos.sprite_id, sprite_pos.position);
         }
       }
       for (const auto& a : level.actors)
       {
         for (const auto& sprite_pos : a->get_sprites(level))
         {
-          sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
+          sprite_manager.render_tile(sprite_pos.sprite_id, sprite_pos.position);
         }
       }
       for (const auto& platform : level.moving_platforms)
@@ -70,7 +70,7 @@ void draw(Window& window, Level& level, SpriteManager& sprite_manager, const int
       {
         for (const auto& sprite_pos : level.exit->get_sprites())
         {
-          sprite_manager.render_tile(static_cast<int>(sprite_pos.second), sprite_pos.first);
+          sprite_manager.render_tile(sprite_pos.sprite_id, sprite_pos.position);
         }
       }
       sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT) + (level.reverse_gravity ? 104 : 0), level.player_spawn);

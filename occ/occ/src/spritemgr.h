@@ -7,10 +7,6 @@
 #include "graphics.h"
 
 // TODO: Rename files to sprite_manager.cc/h ?
-#define SPRITE_STRIDE 52
-#define SPRITE_ROWS 23
-#define SPRITE_TOTAL (SPRITE_STRIDE * SPRITE_ROWS)
-
 #define CHAR_W 8
 #define CHAR_H 8
 

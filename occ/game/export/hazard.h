@@ -41,9 +41,9 @@ class Laser
   Laser(geometry::Position position, bool left, bool moving = false) : Hazard(position), left_(left), moving_(moving) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, left_ ? Sprite::SPRITE_LASER_L : Sprite::SPRITE_LASER_R)};
+    return {{position, static_cast<int>(left_ ? Sprite::SPRITE_LASER_L : Sprite::SPRITE_LASER_R), false}};
   }
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override;
 
@@ -65,7 +65,7 @@ class Projectile : public Hazard
   }
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,
                              [[maybe_unused]] Level& level) override
@@ -211,9 +211,9 @@ class Thorn : public Hazard
   Thorn(geometry::Position position) : Hazard(position) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_THORN_1) + frame_))};
+    return {{position, static_cast<int>(Sprite::SPRITE_THORN_1) + frame_, false}};
   }
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
@@ -252,9 +252,9 @@ class SpiderWeb : public Hazard
   SpiderWeb(geometry::Position position, Spider& parent) : Hazard(position), parent_(parent) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, Sprite::SPRITE_SPIDER_WEB)};
+    return {{position, static_cast<int>(Sprite::SPRITE_SPIDER_WEB), false}};
   }
   virtual bool is_alive() const override { return alive_; }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
@@ -285,9 +285,9 @@ class CorpseSlime : public Hazard
  public:
   CorpseSlime(geometry::Position position, Sprite sprite) : Hazard(position), sprite_(sprite) {}
 
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, sprite_)};
+    return {{position, static_cast<int>(sprite_), false}};
   }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -326,9 +326,9 @@ class Faucet : public Hazard
   Faucet(geometry::Position position) : Hazard(position) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_FAUCET_1) + frame_))};
+    return {{position, static_cast<int>(Sprite::SPRITE_FAUCET_1) + frame_, false}};
   }
   void remove_child() { child_ = nullptr; }
 
@@ -358,9 +358,9 @@ class Droplet : public Hazard
   Droplet(geometry::Position position, Faucet& parent) : Hazard(position), parent_(parent) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, frame_ == 0 ? Sprite::SPRITE_DROPLET_1 : Sprite::SPRITE_DROPLET_2)};
+    return {{position, static_cast<int>(frame_ == 0 ? Sprite::SPRITE_DROPLET_1 : Sprite::SPRITE_DROPLET_2), false}};
   }
   virtual bool is_alive() const override { return alive_; }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
@@ -414,13 +414,13 @@ class Hammer : public Hazard
   Hammer(geometry::Position position) : Hazard(position, geometry::Size(32, 32)) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {
-      std::make_pair(position, Sprite::SPRITE_HAMMER_1),
-      std::make_pair(position + geometry::Position(16, 0), Sprite::SPRITE_HAMMER_2),
-      std::make_pair(position + geometry::Position(0, 16), Sprite::SPRITE_HAMMER_3),
-      std::make_pair(position + +geometry::Position(16, 16), Sprite::SPRITE_HAMMER_4),
+      {position, static_cast<int>(Sprite::SPRITE_HAMMER_1), false},
+      {position + geometry::Position(16, 0), static_cast<int>(Sprite::SPRITE_HAMMER_2), false},
+      {position + geometry::Position(0, 16), static_cast<int>(Sprite::SPRITE_HAMMER_3), false},
+      {position + +geometry::Position(16, 16), static_cast<int>(Sprite::SPRITE_HAMMER_4), false},
     };
   }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
@@ -459,7 +459,7 @@ class Flame : public Hazard
   Flame(geometry::Position position) : Hazard(position) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,
                              [[maybe_unused]] Level& level) override
@@ -496,9 +496,9 @@ class Stalactite : public Hazard
 
   virtual bool is_alive() const override { return position.y() < 1000; }
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, Sprite::SPRITE_STALACTITE_1)};
+    return {{position, static_cast<int>(Sprite::SPRITE_STALACTITE_1), false}};
   }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -539,7 +539,7 @@ class AirPipe : public Hazard
   AirPipe(geometry::Position position, bool is_left) : Hazard(position), is_left_(is_left) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
@@ -573,9 +573,9 @@ class Speleothem : public Hazard
  public:
   Speleothem(geometry::Position position, const Sprite sprite) : Hazard(position), sprite_(sprite) {}
 
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {{position, sprite_}};
+    return {{position, static_cast<int>(sprite_), false}};
   }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -616,9 +616,9 @@ class FallingRock : public Hazard
   {
     position += geometry::Position{0, 6};
   }
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {{position, Sprite::SPRITE_FALLING_ROCK}};
+    return {{position, static_cast<int>(Sprite::SPRITE_FALLING_ROCK), false}};
   }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -644,9 +644,9 @@ class BirdEgg : public Hazard
   BirdEgg(geometry::Position position, Bird& parent) : Hazard(position), parent_(parent) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, Sprite::SPRITE_BIRD_EGG)};
+    return {{position, static_cast<int>(Sprite::SPRITE_BIRD_EGG), false}};
   }
   virtual bool is_alive() const override { return alive_; }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
@@ -704,7 +704,7 @@ class FallingSign : public Hazard
   {
   }
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
   {
     return create_detection_rects(0, 1, level, true);

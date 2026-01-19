@@ -4,6 +4,7 @@
 
 #include "geometry.h"
 #include "misc.h"
+#include "object.h"
 #include "sound.h"
 #include "sprite.h"
 
@@ -51,7 +52,7 @@ class Actor
   {
   }
   virtual bool interact([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level) { return false; };
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const = 0;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const = 0;
   virtual std::vector<geometry::Rectangle> get_detection_rects([[maybe_unused]] const Level& level) const { return {}; }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -118,7 +119,7 @@ class Lever : public Actor
   Lever(geometry::Position position, LeverColor color) : Actor(position, geometry::Size(16, 16)), color_(color) {}
 
   virtual bool interact(AbstractSoundManager& sound_manager, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
 
  private:
   LeverColor color_;
@@ -164,7 +165,7 @@ class Door : public Actor
 
   virtual bool is_solid(const Level& level) const override;
 
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
 
  private:
   LeverColor color_;
@@ -196,7 +197,7 @@ class Switch : public Actor
   }
 
   virtual bool interact(AbstractSoundManager& sound_manager, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
 
  private:
   Sprite sprite_;
@@ -223,7 +224,7 @@ class Chest : public Actor
   Chest(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
 
   virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual bool is_alive() const override { return !collected_; }
   virtual int get_points() const override
   {
@@ -258,9 +259,9 @@ class OpenChest : public Actor
  public:
   OpenChest(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
 
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {{position, Sprite::SPRITE_CHEST_OPEN}};
+    return {{position, static_cast<int>(Sprite::SPRITE_CHEST_OPEN), false}};
   }
 };
 
@@ -292,7 +293,7 @@ class BumpPlatform : public Actor
 
   virtual void on_collide(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
   virtual bool is_solid([[maybe_unused]] const Level& level) const override { return true; }
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
 
  private:
@@ -323,9 +324,9 @@ class ClearBlock : public Actor
 
   virtual bool is_alive() const override { return is_alive_; }
   virtual bool is_solid([[maybe_unused]] const Level& level) const override { return true; }
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, Sprite::SPRITE_CLEAR_BLOCK)};
+    return {{position, static_cast<int>(Sprite::SPRITE_CLEAR_BLOCK), false}};
   }
   virtual bool on_hit(const geometry::Rectangle& rect,
                       AbstractSoundManager& sound_manager,
@@ -358,13 +359,13 @@ class HiddenBlock : public Actor
   HiddenBlock(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
 
   virtual bool is_solid([[maybe_unused]] const Level& level) const override { return !is_hidden_; }
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
     if (is_hidden_)
     {
       return {};
     }
-    return {std::make_pair(position, Sprite::SPRITE_HIDDEN_BLOCK)};
+    return {{position, static_cast<int>(Sprite::SPRITE_HIDDEN_BLOCK), false}};
   }
   virtual TouchType on_touch(const Player& player, AbstractSoundManager& sound_manager, Level& level) override;
 
@@ -393,9 +394,9 @@ class HiddenCrystal : public Actor
   HiddenCrystal(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
 
   virtual bool is_alive() const override { return frame_ > 0; }
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites([[maybe_unused]] const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {std::make_pair(position, Sprite::SPRITE_CRYSTAL_HIDDEN)};
+    return {{position, static_cast<int>(Sprite::SPRITE_CRYSTAL_HIDDEN), false}};
   }
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual int get_points() const override { return 5000; }
@@ -442,7 +443,7 @@ class AirTank : public Actor
   AirTank(geometry::Position position, bool top) : Actor(position, geometry::Size(16, 16)), top_(top) {}
 
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<std::pair<geometry::Position, Sprite>> get_sprites(const Level& level) const override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
   virtual bool on_hit(const geometry::Rectangle& rect,
                       AbstractSoundManager& sound_manager,
                       const geometry::Rectangle& player_rect,
