@@ -540,7 +540,10 @@ void GameRenderer::render_statusbar() const
 
 void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, const Color color, const bool bright) const
 {
-  if (bright)
+  // Show projectiles as bright if remaster since they can be hard to see
+  const bool flash_projectile = sprite_manager_->remaster && (game_tick_ & 1) &&
+    (sprite == static_cast<int>(Sprite::SPRITE_LASER_BEAM_1) || sprite == static_cast<int>(Sprite::SPRITE_LASER_BEAM_2));
+  if (bright || flash_projectile)
   {
     sprite_manager_->render_tile(sprite + SPRITE_TOTAL * 2, pos, game_camera_.position, color);
   }

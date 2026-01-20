@@ -85,8 +85,7 @@ void Projectile::update([[maybe_unused]] AbstractSoundManager& sound_manager,
 
 std::vector<ObjectDef> Projectile::get_sprites([[maybe_unused]] const Level& level) const
 {
-  // TODO: check if remaster
-  return {{position - geometry::Size(4, 4), static_cast<int>(get_sprite()) + frame_, !!(frame_ & 1)}};
+  return {{position - geometry::Size(4, 4), static_cast<int>(get_sprite()) + frame_, false}};
 }
 
 void LaserBeam::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)

@@ -13,6 +13,7 @@ https://moddingwiki.shikadi.net/wiki/ProGraphx_Toolbox_tileset_format
 #include "graphics.h"
 #include "logger.h"
 #include "sdl_wrapper.h"
+#include "sprite.h"
 
 void draw(Window& window, const Surface& surface, const int page_index, int x, int y, const Input& input, SpriteManager& sprite_manager)
 {
