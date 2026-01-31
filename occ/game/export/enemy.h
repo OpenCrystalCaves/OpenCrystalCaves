@@ -641,7 +641,9 @@ class EyeMonster
   int next_shoot_ = 0;
 };
 
-class Ostrich : public Enemy
+class Ostrich
+  : public Enemy
+  , public ProjectileParent
 {
   // ➖➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖
   // ➖⚫🟦🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⚫➖➖
@@ -661,7 +663,7 @@ class Ostrich : public Enemy
  public:
   Ostrich(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 2) {}
   virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {{position, static_cast<int>(left_ ? Sprite::SPRITE_OSTRICH_L_1 : Sprite::SPRITE_OSTRICH_R_1) + frame_, false}};
   }
@@ -674,4 +676,5 @@ class Ostrich : public Enemy
  private:
   int frame_ = 0;
   bool left_ = false;
+  int next_shoot_ = 0;
 };

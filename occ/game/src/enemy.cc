@@ -882,9 +882,7 @@ void EyeMonster::on_death(AbstractSoundManager& sound_manager, Level& level)
   }
 }
 
-void Ostrich::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                     [[maybe_unused]] const geometry::Rectangle& player_rect,
-                     Level& level)
+void Ostrich::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;
   if (frame_ == 12)
@@ -899,5 +897,19 @@ void Ostrich::update([[maybe_unused]] AbstractSoundManager& sound_manager,
     position -= d;
   }
 
-  // TODO: shoot
+  if (child_ == nullptr)
+  {
+    if (next_shoot_ > 0)
+    {
+      next_shoot_--;
+    }
+    if (next_shoot_ == 0 && geometry::is_any_colliding(get_detection_rects(level), player_rect))
+    {
+      sound_manager.play_sound(SoundType::SOUND_LASER_FIRE);
+      child_ = new Bullet(position, left_, *this);
+      level.hazards.emplace_back(child_);
+      // Shoot shortly after last shot
+      next_shoot_ = 10;
+    }
+  }
 }

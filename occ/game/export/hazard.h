@@ -167,6 +167,23 @@ class TriceratopsShot : public HittableProjectile
   virtual int num_sprites() const override { return 2; }
 };
 
+class Bullet : public HittableProjectile
+{
+  // ➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖
+  // ➖➖➖➖➖⚫🪦🪦🪦🪦⚫➖➖➖➖➖
+  // ➖➖➖➖⚫🪦⚪⬜⬜⚪🪦⚫➖➖➖➖
+  // ➖➖➖➖⚫🪦⚪⬜⬜⚪🪦⚫➖➖➖➖
+  // ➖➖➖➖➖⚫🪦🪦🪦🪦⚫➖➖➖➖➖
+  // ➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖
+ public:
+  using HittableProjectile::HittableProjectile;
+
+ protected:
+  virtual int get_speed() const override { return 8; }
+  virtual Sprite get_sprite() const override { return Sprite::SPRITE_BULLET; }
+  virtual int num_sprites() const override { return 1; }
+};
+
 class LaserBeam : public Projectile
 {
   // 🟥⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🟥
