@@ -796,6 +796,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
           case 'm':
             level->has_earth = true;
             break;
+          case 'M':
+            // Ostrich
+            level->enemies.emplace_back(new Ostrich(geometry::Position{x * 16, y * 16}));
+            break;
           case 'n':
           {
             bool handled = false;
@@ -1304,6 +1308,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             break;
           case -58:
             sprite = static_cast<int>(Sprite::SPRITE_SIGN_DOWN);
+            break;
+          case -66:
+            sprite = static_cast<int>(Sprite::SPRITE_LEDGE_L);
+            flags |= TILE_SOLID_TOP;
             break;
           case -67:
             sprite = static_cast<int>(Sprite::SPRITE_LEDGE_R);

@@ -881,3 +881,23 @@ void EyeMonster::on_death(AbstractSoundManager& sound_manager, Level& level)
     child_->kill(level);
   }
 }
+
+void Ostrich::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                     [[maybe_unused]] const geometry::Rectangle& player_rect,
+                     Level& level)
+{
+  frame_++;
+  if (frame_ == 12)
+  {
+    frame_ = 0;
+  }
+  const auto d = geometry::Position(left_ ? -2 : 2, 0);
+  position += d;
+  if (should_reverse(level))
+  {
+    left_ = !left_;
+    position -= d;
+  }
+
+  // TODO: shoot
+}

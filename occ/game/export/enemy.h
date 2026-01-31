@@ -640,3 +640,38 @@ class EyeMonster
   int right_frame_ = 0;
   int next_shoot_ = 0;
 };
+
+class Ostrich : public Enemy
+{
+  // ➖➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖➖➖
+  // ➖⚫🟦🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⚫➖➖
+  // ⚫🟦🇪🇺⚫⚫🇪🇺🇪🇺🇪🇺🇪🇺⚫🇪🇺⚫🇪🇺🇪🇺⚫➖
+  // ➖⚫🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⚫🇪🇺⚫🇪🇺⚫➖
+  // ➖⚫🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⚫➖
+  // ⚫🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⚫📘⚫🇪🇺🇪🇺🇪🇺🇪🇺⚫➖
+  // ➖⚫🇪🇺🇪🇺🇪🇺🇪🇺⚫⬜📘📘⚫🇪🇺🇪🇺⚫➖➖
+  // ➖➖⚫⚫⚫⚫⚫⬜📘📘⚫📘🪦⚫➖➖
+  // ➖➖➖➖➖➖➖⚫⬜📘📘⚫📘🪦⚫➖
+  // ➖➖➖➖➖➖➖➖⚫⬜📘📘⚫📘🪦⚫
+  // ➖➖➖➖➖➖➖⚫⬜📘📘⚫📘🪦⚫➖
+  // ➖➖➖➖➖➖⚫⬜📘📘⚫📘🪦⚫➖➖
+  // ➖➖➖⚫⚫⚫⬜📘📘⚫📘🪦⚫➖➖➖
+  // ➖➖⚫⬜⬜⬜📘📘⚫📘🪦⚫➖➖➖➖
+  // Walks left/right, shoots fast projectiles when player is in front (doesn't turn on hit)
+ public:
+  Ostrich(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 2) {}
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override
+  {
+    return {{position, static_cast<int>(left_ ? Sprite::SPRITE_OSTRICH_L_1 : Sprite::SPRITE_OSTRICH_R_1) + frame_, false}};
+  }
+  virtual int get_points() const override { return 100; }
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
+  {
+    return create_detection_rects(left_ ? -1 : 1, 0, level);
+  }
+
+ private:
+  int frame_ = 0;
+  bool left_ = false;
+};
