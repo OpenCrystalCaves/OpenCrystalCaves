@@ -20,6 +20,7 @@ static const std::unordered_set<LevelId> completedLevels{
   LevelId::LEVEL_8,
   LevelId::LEVEL_9,
   LevelId::LEVEL_10,
+  LevelId::LEVEL_11,
 };
 
 namespace LevelLoader
@@ -1285,6 +1286,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
             sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
             sprite_count = 4;
             flags |= TILE_ANIMATED;
+            break;
+          case -48:
+            sprite = static_cast<int>(Sprite::SPRITE_METER);
             break;
           case -50:
             // Grass
