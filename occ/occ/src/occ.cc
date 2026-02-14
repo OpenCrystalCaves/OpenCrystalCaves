@@ -12,6 +12,7 @@
 #include "spritemgr.h"
 #include "state.h"
 #include "utils.h"
+#include <cfgpath.h>
 
 // From utils
 #include "geometry.h"
@@ -100,6 +101,19 @@ int main()
     return 1;
   }
   LOG_INFO("Sounds loaded");
+
+  // Load config file
+  // Dummy implementation: just check that it exists
+  char cfgfile[MAX_PATH];
+  get_user_config_file(cfgfile, sizeof(cfgfile), "OpenCrystalCaves");
+  if (cfgfile[0] == 0)
+  {
+    LOG_INFO("Could not find config file, using defaults");
+  }
+  else
+  {
+    LOG_INFO("Using config file at %s", cfgfile);
+  }
 
   // Create Game
   std::unique_ptr<Game> game = Game::create();

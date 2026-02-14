@@ -63,6 +63,7 @@ target_compile_options(utils PRIVATE ${COMPILE_OPTIONS})
 add_subdirectory("occ")
 target_compile_options(occ PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(occ PUBLIC
+  "external/cfgpath"
   "sdl_wrapper/export"
   "game/export"
   "utils/export"
