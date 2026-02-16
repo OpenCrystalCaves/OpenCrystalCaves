@@ -64,6 +64,7 @@ add_subdirectory("occ")
 target_compile_options(occ PRIVATE ${COMPILE_OPTIONS})
 target_include_directories(occ PUBLIC
   "external/cfgpath"
+  "external/simpleini"
   "sdl_wrapper/export"
   "game/export"
   "utils/export"

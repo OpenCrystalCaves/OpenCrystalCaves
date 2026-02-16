@@ -12,6 +12,7 @@
 #include "spritemgr.h"
 #include "state.h"
 #include "utils.h"
+#include <SimpleIni.h>
 #include <cfgpath.h>
 
 // From utils
@@ -113,6 +114,13 @@ int main()
   else
   {
     LOG_INFO("Using config file at %s", cfgfile);
+    // Write dummy file
+    CSimpleIniA ini;
+    ini.SetValue("dummy_section", "dummy_key", "dummy_value");
+    if (ini.SaveFile(cfgfile) != SI_OK)
+    {
+      LOG_ERROR("Could not write to config file at %s", cfgfile);
+    }
   }
 
   // Create Game

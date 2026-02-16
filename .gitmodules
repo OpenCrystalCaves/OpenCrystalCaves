@@ -13,3 +13,6 @@
 [submodule "occ/external/unlzexe"]
 	path = occ/external/unlzexe
 	url = https://github.com/cxong/unlzexe.git
+[submodule "occ/external/simpleini"]
+	path = occ/external/simpleini
+	url = https://github.com/brofield/simpleini.git
