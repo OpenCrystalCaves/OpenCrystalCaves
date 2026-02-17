@@ -10,6 +10,8 @@ add_executable(occ
   "src/occ.cc"
   "src/panel.cc"
   "src/panel.h"
+  "src/player_state.cc"
+  "src/player_state.h"
   "src/soundmgr.cc"
   "src/soundmgr.h"
   "src/spritemgr.cc"

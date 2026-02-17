@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "game_renderer.h"
 #include "imagemgr.h"
+#include "player_state.h"
 #include "spritemgr.h"
 #include "state.h"
 #include "utils.h"
@@ -105,6 +106,8 @@ int main()
 
   // Load config file
   // Dummy implementation: just check that it exists
+  // TODO: load to PlayerState
+  // PlayerState player_state(name, episode);
   char cfgfile[MAX_PATH];
   get_user_config_file(cfgfile, sizeof(cfgfile), "OpenCrystalCaves");
   if (cfgfile[0] == 0)
