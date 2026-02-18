@@ -498,6 +498,15 @@ std::vector<ObjectDef> Snoozer::get_sprites([[maybe_unused]] const Level& level)
   return sprites;
 }
 
+void Snoozer::on_death(AbstractSoundManager& sound_manager, Level& level)
+{
+  Enemy::on_death(sound_manager, level);
+  if (child_)
+  {
+    child_->kill(level);
+  }
+}
+
 void Triceratops::update([[maybe_unused]] AbstractSoundManager& sound_manager,
                          [[maybe_unused]] const geometry::Rectangle& player_rect,
                          Level& level)
@@ -526,6 +535,15 @@ std::vector<ObjectDef> Triceratops::get_sprites([[maybe_unused]] const Level& le
   return {{position, frame, false},
           {position + geometry::Position{16, 0}, frame + df, false},
           {position + geometry::Position{32, 0}, frame + df * 2, false}};
+}
+
+void Triceratops::on_death(AbstractSoundManager& sound_manager, Level& level)
+{
+  Enemy::on_death(sound_manager, level);
+  if (child_)
+  {
+    child_->kill(level);
+  }
 }
 
 void Flier::update([[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -911,5 +929,14 @@ void Ostrich::update(AbstractSoundManager& sound_manager, const geometry::Rectan
       // Shoot shortly after last shot
       next_shoot_ = 10;
     }
+  }
+}
+
+void Ostrich::on_death(AbstractSoundManager& sound_manager, Level& level)
+{
+  Enemy::on_death(sound_manager, level);
+  if (child_)
+  {
+    child_->kill(level);
   }
 }

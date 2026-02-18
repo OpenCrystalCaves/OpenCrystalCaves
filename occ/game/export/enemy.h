@@ -366,6 +366,7 @@ class Snoozer
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
   }
+  virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
 
  private:
   int frame_ = 0;
@@ -403,6 +404,7 @@ class Triceratops
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
   }
+  virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
 
  private:
   int frame_ = 0;
@@ -491,6 +493,7 @@ class WallMonster : public Enemy
   bool left_;
 };
 
+// TODO: make bird children orphanable
 class Bird : public Flier
 {
   // ➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖
@@ -672,6 +675,7 @@ class Ostrich
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
   }
+  virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
 
  private:
   int frame_ = 0;
