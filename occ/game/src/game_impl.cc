@@ -17,7 +17,7 @@ std::unique_ptr<Game> Game::create()
   return std::make_unique<GameImpl>();
 }
 
-bool GameImpl::init(AbstractSoundManager& sound_manager, const ExeData& exe_data, const LevelId level)
+bool GameImpl::init(AbstractSoundManager& sound_manager, const ExeData& exe_data, const LevelId level, const PlayerState& player_state)
 {
   sound_manager_ = &sound_manager;
   level_ = LevelLoader::load(exe_data, level);
@@ -30,8 +30,8 @@ bool GameImpl::init(AbstractSoundManager& sound_manager, const ExeData& exe_data
   player_.position = level_->player_spawn;
   entering_level = level;
 
-  score_ = 0u;
-  num_ammo_ = 5u;
+  score_ = player_state.score;
+  num_ammo_ = player_state.ammo;
 
   missile_.alive = false;
 

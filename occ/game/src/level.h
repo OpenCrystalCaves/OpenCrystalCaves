@@ -44,6 +44,7 @@ struct Level
   Hazard* collides_hazard(const geometry::Position& position, const geometry::Size& size) const;
   Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size) const;
   bool player_on_platform(const geometry::Position& position, const geometry::Size& size) const;
+  bool is_complete() const { return crystals == 0; }
 
   // Helper fields for the level viewer
   std::vector<int> tile_ids;

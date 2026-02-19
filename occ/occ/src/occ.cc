@@ -107,7 +107,9 @@ int main()
   // Load config file
   // Dummy implementation: just check that it exists
   // TODO: load to PlayerState
-  // PlayerState player_state(name, episode);
+  PlayerState player_state;
+  player_state.name = "Mylo Steamwitz";
+  player_state.episode = episode;
   char cfgfile[MAX_PATH];
   get_user_config_file(cfgfile, sizeof(cfgfile), "OpenCrystalCaves");
   if (cfgfile[0] == 0)
@@ -134,7 +136,7 @@ int main()
     return 1;
   }
   ExeData exe_data{episode};
-  if (!game->init(sound_manager, exe_data, LevelId::INTRO))
+  if (!game->init(sound_manager, exe_data, LevelId::INTRO, player_state))
   {
     LOG_CRITICAL("Could not initialize Game");
     return 1;
@@ -150,10 +152,10 @@ int main()
   title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());
   TitleState title{sprite_manager, sound_manager, *game_surface, title_images, *window, exe_data};
   splash.set_next(title);
-  GameState game_state(*game, sprite_manager, sound_manager, *game_surface, *window, exe_data);
+  GameState game_state(*game, sprite_manager, sound_manager, *game_surface, *window, exe_data, player_state);
   title.set_next(game_state);
   game_state.set_next(title);
-  State* state = &splash;
+  State* state = &game_state;
   state->reset();
 
   // Game loop

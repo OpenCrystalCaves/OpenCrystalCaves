@@ -3,6 +3,7 @@
 #include "event.h"
 #include "game_renderer.h"
 #include "graphics.h"
+#include "player_state.h"
 #include "sdl_wrapper.h"
 #include "soundmgr.h"
 #include "spritemgr.h"
@@ -121,7 +122,8 @@ class GameState : public State
             SoundManager& sound_manager,
             Surface& game_surface,
             Window& window,
-            ExeData& exe_data);
+            ExeData& exe_data,
+            PlayerState& player_state);
 
   virtual void reset() override;
   virtual void update(const Input& input) override;
@@ -135,10 +137,11 @@ class GameState : public State
   SoundManager& sound_manager_;
   GameRenderer game_renderer_;
   ExeData& exe_data_;
+  PlayerState& player_state_;
   bool debug_info_ = false;
   bool paused_ = false;
   unsigned game_tick_ = 0;
-  LevelId level_ = LevelId::MAIN_LEVEL;
+  LevelId level_ = LevelId::LEVEL_12;
   Panel panel_;
   Panel warp_panel_;
   Panel* panel_current_ = nullptr;

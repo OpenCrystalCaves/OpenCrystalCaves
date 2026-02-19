@@ -340,7 +340,8 @@ GameState::GameState(Game& game,
                      SoundManager& sound_manager,
                      Surface& game_surface,
                      Window& window,
-                     ExeData& exe_data)
+                     ExeData& exe_data,
+                     PlayerState& player_state)
   : State(FADE_IN_TICKS, FADE_OUT_TICKS, window),
     game_(game),
     game_surface_(game_surface),
@@ -348,6 +349,7 @@ GameState::GameState(Game& game,
     sound_manager_(sound_manager),
     game_renderer_(&game, &sprite_manager, &game_surface, window),
     exe_data_(exe_data),
+    player_state_(player_state),
     panel_(
       {
         L"OpenCrystalCaves Game Menu",
@@ -382,10 +384,18 @@ GameState::GameState(Game& game,
 void GameState::reset()
 {
   State::reset();
+  if (game_.get_level().is_complete())
+  {
+    // Save levels completed and update player state
+    player_state_.levels_completed[static_cast<int>(game_.get_level().level_id)] = true;
+    player_state_.score = game_.get_score();
+    player_state_.ammo = game_.get_num_ammo();
+    player_state_.set_time();
+  }
   paused_ = false;
   panel_current_ = nullptr;
   panel_next_ = nullptr;
-  if (!game_.init(sound_manager_, exe_data_, level_))
+  if (!game_.init(sound_manager_, exe_data_, level_, player_state_))
   {
     LOG_CRITICAL("Could not initialize Game level %d", static_cast<int>(level_));
     finish();
