@@ -1018,7 +1018,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             }
             level->entrances.push_back({geometry::Position{x * 16, y * 16},
                                         entrance_level,
-                                        state.levels_completed[static_cast<int>(level_id)] ? EntranceState::COMPLETE : EntranceState::CLOSED});
+                                        state.levels_completed[entrance_level] ? EntranceState::COMPLETE : EntranceState::CLOSED});
             entrance_level++;
             break;
           case 'X':
