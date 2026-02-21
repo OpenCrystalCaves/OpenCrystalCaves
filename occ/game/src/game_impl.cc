@@ -20,7 +20,7 @@ std::unique_ptr<Game> Game::create()
 bool GameImpl::init(AbstractSoundManager& sound_manager, const ExeData& exe_data, const LevelId level, const PlayerState& player_state)
 {
   sound_manager_ = &sound_manager;
-  level_ = LevelLoader::load(exe_data, level);
+  level_ = LevelLoader::load(exe_data, level, player_state);
   if (!level_)
   {
     return false;

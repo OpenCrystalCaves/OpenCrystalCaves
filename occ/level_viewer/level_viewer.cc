@@ -8,6 +8,7 @@ Display Crystal Caves levels
 
 #include <SDL.h>
 
+#include "../game/export/player_state.h"
 #include "../game/src/level.h"
 #include "../game/src/level_loader.h"
 #include "../occ/src/spritemgr.h"
@@ -138,10 +139,11 @@ int main(int argc, char* argv[])
     return 1;
   }
   ExeData exe_data{episode};
+  PlayerState state{"Mylo", episode};
   std::vector<std::unique_ptr<Level>> levels;
   for (int level_id = static_cast<int>(LevelId::INTRO); level_id <= static_cast<int>(LevelId::LEVEL_16); level_id++)
   {
-    auto l = LevelLoader::load(exe_data, static_cast<LevelId>(level_id));
+    auto l = LevelLoader::load(exe_data, static_cast<LevelId>(level_id), state);
     levels.emplace_back(std::move(l));
   }
   int index = 0;

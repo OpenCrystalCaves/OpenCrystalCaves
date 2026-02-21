@@ -12,7 +12,7 @@ struct PlayerState
   int episode;  // Player state limited to one episode
   int score = 0;
   int ammo = 5;
-  bool levels_completed[16] = {false};
+  std::array<bool, 20> levels_completed = {};
   bool used_lever = false;
   bool used_switch = false;
   bool got_reverse_gravity = false;

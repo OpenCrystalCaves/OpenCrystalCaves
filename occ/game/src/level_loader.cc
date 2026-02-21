@@ -199,7 +199,7 @@ enum class TileMode
   HAZARD_CRATE
 };
 
-std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
+std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, const PlayerState& state)
 {
   LOG_INFO("Loading level %d", static_cast<int>(level_id));
   // Find the location in exe data of the level
@@ -1016,7 +1016,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id)
               sprite = static_cast<int>(Sprite::SPRITE_CONES);
               flags |= TILE_RENDER_IN_FRONT;
             }
-            level->entrances.push_back({geometry::Position{x * 16, y * 16}, entrance_level, EntranceState::CLOSED});
+            level->entrances.push_back({geometry::Position{x * 16, y * 16},
+                                        entrance_level,
+                                        state.levels_completed[static_cast<int>(level_id)] ? EntranceState::COMPLETE : EntranceState::CLOSED});
             entrance_level++;
             break;
           case 'X':

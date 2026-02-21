@@ -8,10 +8,11 @@
 
 enum class LevelId;
 struct Level;
+struct PlayerState;
 
 namespace LevelLoader
 {
 
-std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id);
+std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, const PlayerState& state);
 
 }
