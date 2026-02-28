@@ -391,6 +391,7 @@ void GameState::reset()
     player_state_.score = game_.get_score();
     player_state_.ammo = game_.get_num_ammo();
     player_state_.set_time();
+    player_state_.save();
   }
   paused_ = false;
   panel_current_ = nullptr;

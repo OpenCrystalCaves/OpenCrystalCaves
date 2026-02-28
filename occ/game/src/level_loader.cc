@@ -21,7 +21,6 @@ static const std::unordered_set<LevelId> completedLevels{
   LevelId::LEVEL_9,
   LevelId::LEVEL_10,
   LevelId::LEVEL_11,
-  LevelId::LEVEL_12,
 };
 
 namespace LevelLoader
@@ -708,7 +707,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
           case '8':
             // Big chain
             sprite = static_cast<int>(Sprite::SPRITE_BIG_CHAIN);
-			flags |= TILE_RENDER_IN_FRONT;
+            flags |= TILE_RENDER_IN_FRONT;
             break;
           case '9':
             // Mine cart

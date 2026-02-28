@@ -21,5 +21,8 @@ struct PlayerState
   bool got_stop_time = false;
   bool got_tough = false;
 
+  PlayerState(const int episode);
+  void save();
+
   void set_time() { time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()); }
 };

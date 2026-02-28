@@ -13,8 +13,6 @@
 #include "spritemgr.h"
 #include "state.h"
 #include "utils.h"
-#include <SimpleIni.h>
-#include <cfgpath.h>
 
 // From utils
 #include "geometry.h"
@@ -104,29 +102,8 @@ int main()
   }
   LOG_INFO("Sounds loaded");
 
-  // Load config file
-  // Dummy implementation: just check that it exists
-  // TODO: load to PlayerState
-  PlayerState player_state;
-  player_state.name = "Mylo Steamwitz";
-  player_state.episode = episode;
-  char cfgfile[MAX_PATH];
-  get_user_config_file(cfgfile, sizeof(cfgfile), "OpenCrystalCaves");
-  if (cfgfile[0] == 0)
-  {
-    LOG_INFO("Could not find config file, using defaults");
-  }
-  else
-  {
-    LOG_INFO("Using config file at %s", cfgfile);
-    // Write dummy file
-    CSimpleIniA ini;
-    ini.SetValue("dummy_section", "dummy_key", "dummy_value");
-    if (ini.SaveFile(cfgfile) != SI_OK)
-    {
-      LOG_ERROR("Could not write to config file at %s", cfgfile);
-    }
-  }
+  // Load player state from config file
+  PlayerState player_state{episode};
 
   // Create Game
   std::unique_ptr<Game> game = Game::create();
