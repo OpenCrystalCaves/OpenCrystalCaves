@@ -936,6 +936,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                   sprite = static_cast<int>(Sprite::SPRITE_VINE);
                   flags |= TILE_RENDER_IN_FRONT;
                   break;
+                case -122:
+                  // Small chains
+                  sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS);
+                  flags |= TILE_RENDER_IN_FRONT;
+                  break;
                 default:
                   handled = false;
                   break;
@@ -1470,6 +1475,20 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             {
               // Vine loop
               sprite = static_cast<int>(Sprite::SPRITE_VINE_LOOP);
+            }
+            flags |= TILE_RENDER_IN_FRONT;
+            break;
+          case -122:
+            // Small chains
+            if (i < level->width * (level->height - 1) && level->tile_ids[i + level->width] == -122)
+            {
+              // Continuing chains
+              sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS);
+            }
+            else
+            {
+              // Chain end
+              sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS_END);
             }
             flags |= TILE_RENDER_IN_FRONT;
             break;
