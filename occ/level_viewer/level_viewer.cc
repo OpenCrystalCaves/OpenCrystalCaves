@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
     return 1;
   }
   ExeData exe_data{episode};
-  PlayerState state{"Mylo", episode};
+  PlayerState state{episode};
   std::vector<std::unique_ptr<Level>> levels;
   for (int level_id = static_cast<int>(LevelId::INTRO); level_id <= static_cast<int>(LevelId::LEVEL_16); level_id++)
   {

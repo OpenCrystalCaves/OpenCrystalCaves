@@ -21,6 +21,7 @@ static const std::unordered_set<LevelId> completedLevels{
   LevelId::LEVEL_9,
   LevelId::LEVEL_10,
   LevelId::LEVEL_11,
+  LevelId::LEVEL_12,
 };
 
 namespace LevelLoader
@@ -712,6 +713,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
           case '9':
             // Mine cart
             level->enemies.emplace_back(new MineCart(geometry::Position{x * 16, y * 16}));
+            break;
+          case '?':
+            // Tentacle
+            level->enemies.emplace_back(new Tentacle(geometry::Position{x * 16, y * 16}));
             break;
           case 'a':
             // Moving left laser

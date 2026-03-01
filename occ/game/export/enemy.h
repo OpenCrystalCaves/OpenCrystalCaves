@@ -163,7 +163,30 @@ class Slime : public Enemy
   int frame_ = 0;
 };
 
-class Snake : public Enemy
+class SlimeLeaver : public Enemy
+{
+  // Moves left/right, pauses, leaves slime
+ public:
+  SlimeLeaver(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 2) {}
+
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
+  virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
+  virtual int get_points() const override { return 100; }
+
+ protected:
+  virtual Sprite get_slime_sprite() const = 0;
+  virtual Sprite get_pause_sprite() const = 0;
+  virtual Sprite get_walk_left_sprite() const = 0;
+  virtual Sprite get_walk_right_sprite() const = 0;
+  virtual int num_pause_frames() const = 0;
+  virtual int num_walk_frames() const = 0;
+  bool left_ = false;
+  bool paused_ = false;
+  int frame_ = 0;
+};
+
+class Snake : public SlimeLeaver
 {
   // ⚫⚫⚫⚫🟪🟨🟪🟪⚫⚫⚫⚫⚫⚫⚫⚫
   // ⚫⚫⚫🟪🟪🟪🟪🟪🟪🟪⚫⚫⚫⚫⚫⚫
@@ -180,18 +203,48 @@ class Snake : public Enemy
   // ⚫⚫⚫🟣🟪🟪🟪🟪⚫⚫🟪🟪🟪🟪🟪⚫
   // Moves left/right, pauses, leaves slime
  public:
-  Snake(geometry::Position position) : Enemy(position, geometry::Size(16, 16), 2) {}
+  Snake(geometry::Position position) : SlimeLeaver(position) {}
 
-  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
-  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override;
-  virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
-  virtual int get_points() const override { return 100; }
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_bones; }
 
- private:
-  bool left_ = false;
-  bool paused_ = false;
-  int frame_ = 0;
+ protected:
+  virtual Sprite get_slime_sprite() const override { return Sprite::SPRITE_SNAKE_SLIME; }
+  virtual Sprite get_pause_sprite() const override { return Sprite::SPRITE_SNAKE_PAUSE_1; }
+  virtual Sprite get_walk_left_sprite() const override { return Sprite::SPRITE_SNAKE_WALK_L_1; }
+  virtual Sprite get_walk_right_sprite() const override { return Sprite::SPRITE_SNAKE_WALK_R_1; }
+  virtual int num_pause_frames() const override { return 7; }
+  virtual int num_walk_frames() const override { return 9; }
+};
+
+class Tentacle : public SlimeLeaver
+{
+  // ➖➖⚫⚫➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖
+  // ➖⚫➖➖⚫🚨🟩🟩🟩🟩🦚⚫➖➖➖➖
+  // ➖➖➖⚫⬜⬜🦚🦚🦚🦚🟩🦚⚫➖➖➖
+  // ➖➖⚫🟦⬜⬜🟩🟩🟩🟩🦚🟩🦚⚫➖➖
+  // ➖➖⚫🟦⬜⬜🦚🦚🦚🟩🟩🦚🟩🦚⚫➖
+  // ➖➖➖⚫⬜⬜🟩🟩🟩🦚🟩🟩🦚🟩⚫➖
+  // ➖➖➖➖⚫🚨🦚🦚🦚🟩🦚🟩🦚🟩⚫➖
+  // ➖➖➖➖⚫⚫⚫⚫🦚🟩🦚🟩🦚🟩⚫➖
+  // ➖➖➖⚫➖➖➖⚫🦚🦚🦚🟩🦚🦚🦚⚫
+  // ➖➖➖➖⚫➖➖➖⚫🟩🦚🟩🦚🟩⚫➖
+  // ➖➖➖➖➖➖➖⚫🦚🦚🦚🟩🦚🦚🦚⚫
+  // ➖➖➖➖➖➖➖➖⚫🟩🦚🟩🦚🟩⚫➖
+  // ➖➖➖➖➖➖➖⚫🦚🦚🦚🟩🦚🦚🦚⚫
+  // ➖➖➖➖➖➖➖➖⚫⚫⚫⚫⚫⚫⚫➖
+  // Moves left/right, pauses, leaves slime
+ public:
+  Tentacle(geometry::Position position) : SlimeLeaver(position) {}
+
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
+
+ protected:
+  virtual Sprite get_slime_sprite() const override { return Sprite::SPRITE_TENTACLE_SLIME; }
+  virtual Sprite get_pause_sprite() const override { return Sprite::SPRITE_TENTACLE_PAUSE_1; }
+  virtual Sprite get_walk_left_sprite() const override { return Sprite::SPRITE_TENTACLE_WALK_L_1; }
+  virtual Sprite get_walk_right_sprite() const override { return Sprite::SPRITE_TENTACLE_WALK_R_1; }
+  virtual int num_pause_frames() const override { return 7; }
+  virtual int num_walk_frames() const override { return 16; }
 };
 
 class Spider : public Enemy

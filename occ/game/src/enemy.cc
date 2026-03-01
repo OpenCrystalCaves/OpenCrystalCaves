@@ -200,9 +200,9 @@ std::vector<ObjectDef> Slime::get_sprites([[maybe_unused]] const Level& level) c
   return {{position, static_cast<int>(s) + frame_, false}};
 }
 
-void Snake::update([[maybe_unused]] AbstractSoundManager& sound_manager,
-                   [[maybe_unused]] const geometry::Rectangle& player_rect,
-                   Level& level)
+void SlimeLeaver::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                         [[maybe_unused]] const geometry::Rectangle& player_rect,
+                         Level& level)
 {
   // State changes / pause
   frame_++;
@@ -232,19 +232,19 @@ void Snake::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   }
 }
 
-std::vector<ObjectDef> Snake::get_sprites([[maybe_unused]] const Level& level) const
-{
-  const auto s = paused_ ? Sprite::SPRITE_SNAKE_PAUSE_1 : (left_ ? Sprite::SPRITE_SNAKE_WALK_L_1 : Sprite::SPRITE_SNAKE_WALK_R_1);
-  const int frame = frame_ % (paused_ ? 7 : 9);
-  return {{position, static_cast<int>(s) + frame, false}};
-}
-
-void Snake::on_death(AbstractSoundManager& sound_manager, Level& level)
+void SlimeLeaver::on_death(AbstractSoundManager& sound_manager, Level& level)
 {
   Enemy::on_death(sound_manager, level);
   // Create a corpse
-  level.hazards.emplace_back(new CorpseSlime(position, Sprite::SPRITE_SNAKE_SLIME));
+  level.hazards.emplace_back(new CorpseSlime(position, get_slime_sprite()));
   // TODO: authentic mode, align corpse to tile coord
+}
+
+std::vector<ObjectDef> SlimeLeaver::get_sprites([[maybe_unused]] const Level& level) const
+{
+  const auto s = paused_ ? get_pause_sprite() : (left_ ? get_walk_left_sprite() : get_walk_right_sprite());
+  const int frame = frame_ % (paused_ ? num_pause_frames() : num_walk_frames());
+  return {{position, static_cast<int>(s) + frame, false}};
 }
 
 void Spider::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
