@@ -141,7 +141,7 @@ class GameState : public State
   bool debug_info_ = false;
   bool paused_ = false;
   unsigned game_tick_ = 0;
-  LevelId level_ = LevelId::LEVEL_12;
+  LevelId level_ = LevelId::MAIN_LEVEL;
   Panel panel_;
   Panel warp_panel_;
   Panel* panel_current_ = nullptr;

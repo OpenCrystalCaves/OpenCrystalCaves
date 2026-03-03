@@ -21,7 +21,8 @@ class GameImpl : public Game
   virtual bool init(AbstractSoundManager& sound_manager,
                     const ExeData& exe_data,
                     const LevelId level,
-                    const PlayerState& player_state) override;
+                    const PlayerState& player_state,
+                    const LevelId previous_level) override;
   void update(unsigned game_tick, const PlayerInput& player_input) override;
 
   const Player& get_player() const override { return player_; }

@@ -164,3 +164,20 @@ bool Level::player_on_platform(const geometry::Position& position, const geometr
 
   return false;
 }
+
+geometry::Position Level::get_player_start_pos(const LevelId previous_level) const
+{
+  for (const auto& entrance : entrances)
+  {
+    if (entrance.level == static_cast<int>(previous_level))
+    {
+      // Find free position to left or right of entrance
+      if (!collides_solid(entrance.position + geometry::Position(-SPRITE_W, 0), {SPRITE_W, SPRITE_H}))
+      {
+        return entrance.position + geometry::Position(-SPRITE_W, 0);
+      }
+      return entrance.position + geometry::Position(SPRITE_W, 0);
+    }
+  }
+  return player_spawn;
+}

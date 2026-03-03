@@ -113,7 +113,7 @@ int main()
     return 1;
   }
   ExeData exe_data{episode};
-  if (!game->init(sound_manager, exe_data, LevelId::INTRO, player_state))
+  if (!game->init(sound_manager, exe_data, LevelId::INTRO, player_state, LevelId::INTRO))
   {
     LOG_CRITICAL("Could not initialize Game");
     return 1;
@@ -132,7 +132,7 @@ int main()
   GameState game_state(*game, sprite_manager, sound_manager, *game_surface, *window, exe_data, player_state);
   title.set_next(game_state);
   game_state.set_next(title);
-  State* state = &game_state;
+  State* state = &splash;
   state->reset();
 
   // Game loop

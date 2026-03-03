@@ -384,10 +384,12 @@ GameState::GameState(Game& game,
 void GameState::reset()
 {
   State::reset();
+  LevelId previous_level = level_;
   if (game_.get_level().is_complete())
   {
     // Save levels completed and update player state
-    player_state_.levels_completed[static_cast<int>(game_.get_level().level_id)] = true;
+    previous_level = game_.get_level().level_id;
+    player_state_.levels_completed[static_cast<int>(previous_level)] = true;
     player_state_.score = game_.get_score();
     player_state_.ammo = game_.get_num_ammo();
     player_state_.set_time();
@@ -396,7 +398,7 @@ void GameState::reset()
   paused_ = false;
   panel_current_ = nullptr;
   panel_next_ = nullptr;
-  if (!game_.init(sound_manager_, exe_data_, level_, player_state_))
+  if (!game_.init(sound_manager_, exe_data_, level_, player_state_, previous_level))
   {
     LOG_CRITICAL("Could not initialize Game level %d", static_cast<int>(level_));
     finish();

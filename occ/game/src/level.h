@@ -45,6 +45,7 @@ struct Level
   Enemy* collides_enemy(const geometry::Position& position, const geometry::Size& size) const;
   bool player_on_platform(const geometry::Position& position, const geometry::Size& size) const;
   bool is_complete() const { return crystals == 0; }
+  geometry::Position get_player_start_pos(const LevelId previous_level) const;
 
   // Helper fields for the level viewer
   std::vector<int> tile_ids;
