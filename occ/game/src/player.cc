@@ -182,7 +182,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
       if (is_reverse ? velocity.y() > 0 : velocity.y() < 0)
       {
         // Player hit something while jumping up
-        const auto position_below = position - geometry::Position(0, is_reverse ? step_y : -step_y);
+        const auto position_below = position - geometry::Position(0, is_reverse ? -step_y : step_y);
         if (level.collides_solid(position_below, size) || level.player_on_platform(position_below, size))
         {
           // If player already on platform, stop jumping immediately
