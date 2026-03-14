@@ -85,7 +85,8 @@ class TitleState : public State
              Surface& game_surface,
              std::vector<Surface*>& images,
              Window& window,
-             ExeData& exe_data);
+             ExeData& exe_data,
+             PlayerState& player_state);
 
   virtual void reset() override
   {
@@ -109,6 +110,7 @@ class TitleState : public State
   SoundManager& sound_manager_;
   Surface& game_surface_;
   std::vector<Surface*>& images_;
+  PlayerState& player_state_;
   unsigned scroll_ticks_ = 0;
   Panel panel_;
   Panel* panel_current_ = nullptr;

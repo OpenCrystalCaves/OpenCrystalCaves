@@ -9,10 +9,28 @@
 
 PlayerState::PlayerState(const int episode) : episode(episode)
 {
+  reset();
+}
+
+void PlayerState::reset()
+{
   // Use default name
   // TODO: get player name somehow
   name = "<unnamed>";
+  time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  score = 0;
+  ammo = 5;
+  levels_completed.fill(false);
+  used_lever = false;
+  used_switch = false;
+  got_reverse_gravity = false;
+  got_power = false;
+  got_stop_time = false;
+  got_tough = false;
+}
 
+void PlayerState::load()
+{
   // Load from file
   char cfgfile[MAX_PATH];
   get_user_config_file(cfgfile, sizeof(cfgfile), CONFIG_NAME);

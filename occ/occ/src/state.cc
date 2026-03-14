@@ -167,19 +167,21 @@ TitleState::TitleState(SpriteManager& sprite_manager,
                        Surface& game_surface,
                        std::vector<Surface*>& images,
                        Window& window,
-                       ExeData& exe_data)
+                       ExeData& exe_data,
+                       PlayerState& player_state)
   : State(FADE_IN_TICKS, FADE_OUT_TICKS, window),
     sprite_manager_(sprite_manager),
     sound_manager_(sound_manager),
     game_surface_(game_surface),
     images_(images),
+    player_state_(player_state),
     panel_(
       // TODO: add options menu here
       {
         L"Welcome to OpenCrystalCaves!",
         L"----------------------------",
         L"     New Game",
-        L"     Restore Game",
+        L"     Continue Game",   // TODO: dynamically disable if no save file
         L"     Ordering Info.",  // TODO: hide if retail version detected
         L"     Instructions",
         L"     Story",
@@ -190,7 +192,7 @@ TitleState::TitleState(SpriteManager& sprite_manager,
       },
       {
         {2, {PanelType::PANEL_TYPE_NEW_GAME}},
-        {3, {PanelType::PANEL_TYPE_DISABLED}},
+        {3, {PanelType::PANEL_TYPE_CONTINUE_GAME}},
         // Check if we have the registered version (randomly load a episode 2 file)
         // If so disable the ordering instructions panel
         {4, get_data_path("CC2.APG").empty() ? Panel(PanelText::PANEL_TEXT_ORDER_3, exe_data) : Panel(PanelType::PANEL_TYPE_DISABLED)},
@@ -241,6 +243,16 @@ void TitleState::update(const Input& input)
     switch (panel_current_->get_type())
     {
       case PanelType::PANEL_TYPE_NEW_GAME:
+        player_state_.reset();
+        if (fade_out_start_ticks_ == 0)
+        {
+          sound_manager_.play_sound(SoundType::SOUND_START_GAME);
+        }
+        finish();
+        break;
+      case PanelType::PANEL_TYPE_CONTINUE_GAME:
+        // Load player state from disk
+        player_state_.load();
         if (fade_out_start_ticks_ == 0)
         {
           sound_manager_.play_sound(SoundType::SOUND_START_GAME);
@@ -389,11 +401,14 @@ void GameState::reset()
   {
     // Save levels completed and update player state
     previous_level = game_.get_level().level_id;
-    player_state_.levels_completed[static_cast<int>(previous_level)] = true;
-    player_state_.score = game_.get_score();
-    player_state_.ammo = game_.get_num_ammo();
-    player_state_.set_time();
-    player_state_.save();
+    if (previous_level >= LevelId::LEVEL_1)
+    {
+      player_state_.levels_completed[static_cast<int>(previous_level)] = true;
+      player_state_.score = game_.get_score();
+      player_state_.ammo = game_.get_num_ammo();
+      player_state_.set_time();
+      player_state_.save();
+    }
   }
   paused_ = false;
   panel_current_ = nullptr;

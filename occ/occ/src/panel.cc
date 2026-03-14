@@ -336,7 +336,7 @@ void Panel::draw(const SpriteManager& sprite_manager) const
     children_[index_].second.draw(sprite_manager);
     return;
   }
-  else if (type_ == PanelType::PANEL_TYPE_NEW_GAME)
+  else if (type_ == PanelType::PANEL_TYPE_NEW_GAME || type_ == PanelType::PANEL_TYPE_CONTINUE_GAME)
   {
     return;
   }
@@ -421,7 +421,8 @@ void Panel::draw(const SpriteManager& sprite_manager) const
         const auto first_char_idx = string.find_first_not_of(L" ");
         if (first_char_idx != std::string::npos)
         {
-          sprite_manager.render_icon(q_icons[q_frame], geometry::Position(x + (static_cast<int>(first_char_idx) - 2) * CHAR_W, y), q_flip[q_frame]);
+          sprite_manager.render_icon(
+            q_icons[q_frame], geometry::Position(x + (static_cast<int>(first_char_idx) - 2) * CHAR_W, y), q_flip[q_frame]);
         }
       }
       else
