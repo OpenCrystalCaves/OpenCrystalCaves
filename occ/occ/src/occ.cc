@@ -122,12 +122,12 @@ int main()
 
   // Create game states
   // TODO: more episodes
-  auto splash_images = image_manager.get_images(1, CCImage::IMAGE_APOGEE);
+  auto splash_images = image_manager.get_images(episode, CCImage::IMAGE_APOGEE);
   SplashState splash{sound_manager, splash_images, *window};
-  auto title_images = image_manager.get_images(1, CCImage::IMAGE_TITLE);
-  auto credits_images = image_manager.get_images(1, CCImage::IMAGE_CREDITS);
+  auto title_images = image_manager.get_images(episode, CCImage::IMAGE_TITLE);
+  auto credits_images = image_manager.get_images(episode, CCImage::IMAGE_CREDITS);
   title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());
-  TitleState title{sprite_manager, sound_manager, *game_surface, title_images, *window, exe_data, player_state};
+  TitleState title{episode, sprite_manager, sound_manager, *game_surface, title_images, *window, exe_data, player_state};
   splash.set_next(title);
   GameState game_state(*game, sprite_manager, sound_manager, *game_surface, *window, exe_data, player_state);
   title.set_next(game_state);

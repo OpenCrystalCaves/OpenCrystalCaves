@@ -29,7 +29,13 @@ void PlayerState::reset()
   got_tough = false;
 }
 
-void PlayerState::load()
+bool PlayerState::can_load(const int episode)
+{
+  PlayerState state{episode};
+  return state.load();
+}
+
+bool PlayerState::load()
 {
   // Load from file
   char cfgfile[MAX_PATH];
@@ -37,33 +43,32 @@ void PlayerState::load()
   if (cfgfile[0] == 0)
   {
     LOG_INFO("Could not find config file, using defaults");
+    return false;
   }
-  else
+  LOG_INFO("Using config file at %s", cfgfile);
+  // Load from file
+  CSimpleIniA ini;
+  if (ini.LoadFile(cfgfile) != SI_OK)
   {
-    LOG_INFO("Using config file at %s", cfgfile);
-    // Load from file
-    CSimpleIniA ini;
-    if (ini.LoadFile(cfgfile) != SI_OK)
-    {
-      LOG_ERROR("Could not load config file at %s, using defaults", cfgfile);
-      return;
-    }
-    // Use section with the same player name and episode
-    const auto section = std::format("{}_{}", name, episode);
-    time = std::stoll(ini.GetValue(section.c_str(), "time", std::to_string(time).c_str()));
-    score = std::stoi(ini.GetValue(section.c_str(), "score", std::to_string(score).c_str()));
-    ammo = std::stoi(ini.GetValue(section.c_str(), "ammo", std::to_string(ammo).c_str()));
-    for (size_t i = 0; i < levels_completed.size(); i++)
-    {
-      levels_completed[i] = std::stoi(ini.GetValue(section.c_str(), std::format("level_completed_{}", i).c_str(), "0")) != 0;
-    }
-    used_lever = std::stoi(ini.GetValue(section.c_str(), "used_lever", "0")) != 0;
-    used_switch = std::stoi(ini.GetValue(section.c_str(), "used_switch", "0")) != 0;
-    got_reverse_gravity = std::stoi(ini.GetValue(section.c_str(), "got_reverse_gravity", "0")) != 0;
-    got_power = std::stoi(ini.GetValue(section.c_str(), "got_power", "0")) != 0;
-    got_stop_time = std::stoi(ini.GetValue(section.c_str(), "got_stop_time", "0")) != 0;
-    got_tough = std::stoi(ini.GetValue(section.c_str(), "got_tough", "0")) != 0;
+    LOG_ERROR("Could not load config file at %s, using defaults", cfgfile);
+    return false;
   }
+  // Use section with the same player name and episode
+  const auto section = std::format("{}_{}", name, episode);
+  time = std::stoll(ini.GetValue(section.c_str(), "time", std::to_string(time).c_str()));
+  score = std::stoi(ini.GetValue(section.c_str(), "score", std::to_string(score).c_str()));
+  ammo = std::stoi(ini.GetValue(section.c_str(), "ammo", std::to_string(ammo).c_str()));
+  for (size_t i = 0; i < levels_completed.size(); i++)
+  {
+    levels_completed[i] = std::stoi(ini.GetValue(section.c_str(), std::format("level_completed_{}", i).c_str(), "0")) != 0;
+  }
+  used_lever = std::stoi(ini.GetValue(section.c_str(), "used_lever", "0")) != 0;
+  used_switch = std::stoi(ini.GetValue(section.c_str(), "used_switch", "0")) != 0;
+  got_reverse_gravity = std::stoi(ini.GetValue(section.c_str(), "got_reverse_gravity", "0")) != 0;
+  got_power = std::stoi(ini.GetValue(section.c_str(), "got_power", "0")) != 0;
+  got_stop_time = std::stoi(ini.GetValue(section.c_str(), "got_stop_time", "0")) != 0;
+  got_tough = std::stoi(ini.GetValue(section.c_str(), "got_tough", "0")) != 0;
+  return true;
 }
 
 void PlayerState::save()

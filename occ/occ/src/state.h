@@ -80,7 +80,8 @@ class SplashState : public SkipState
 class TitleState : public State
 {
  public:
-  TitleState(SpriteManager& sprite_manager,
+  TitleState(const int episode,
+             SpriteManager& sprite_manager,
              SoundManager& sound_manager,
              Surface& game_surface,
              std::vector<Surface*>& images,

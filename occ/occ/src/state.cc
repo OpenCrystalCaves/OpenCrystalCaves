@@ -162,7 +162,8 @@ void SplashState::reset()
 #define OS_NAME "Linux"
 #endif
 
-TitleState::TitleState(SpriteManager& sprite_manager,
+TitleState::TitleState(const int episode,
+                       SpriteManager& sprite_manager,
                        SoundManager& sound_manager,
                        Surface& game_surface,
                        std::vector<Surface*>& images,
@@ -192,7 +193,7 @@ TitleState::TitleState(SpriteManager& sprite_manager,
       },
       {
         {2, {PanelType::PANEL_TYPE_NEW_GAME}},
-        {3, {PanelType::PANEL_TYPE_CONTINUE_GAME}},
+        {3, {PlayerState::can_load(episode) ? PanelType::PANEL_TYPE_CONTINUE_GAME : PanelType::PANEL_TYPE_DISABLED}},
         // Check if we have the registered version (randomly load a episode 2 file)
         // If so disable the ordering instructions panel
         {4, get_data_path("CC2.APG").empty() ? Panel(PanelText::PANEL_TEXT_ORDER_3, exe_data) : Panel(PanelType::PANEL_TYPE_DISABLED)},

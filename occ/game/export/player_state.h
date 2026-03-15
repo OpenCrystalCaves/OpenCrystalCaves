@@ -22,8 +22,9 @@ struct PlayerState
   bool got_tough;
 
   PlayerState(const int episode);
+  static bool can_load(const int episode);
   void reset();
-  void load();
+  bool load();
   void save();
 
   void set_time() { time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()); }
