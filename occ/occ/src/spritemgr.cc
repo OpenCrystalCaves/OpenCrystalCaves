@@ -367,6 +367,20 @@ bool SpriteManager::load_tilesets(Window& window, const int episode)
       return false;
     }
   }
+  if (input_surfaces_.empty())
+  {
+    const std::vector<std::string> inputs = {"key_left", "key_right", "key_x", "key_z"};
+    for (const auto& input : inputs)
+    {
+      const auto path = get_data_path("../" + input + ".png");
+      auto surface = Surface::from_image(path, window);
+      if (!surface)
+      {
+        return false;
+      }
+      input_surfaces_[input] = std::move(surface);
+    }
+  }
 
   return true;
 }
@@ -443,6 +457,20 @@ void SpriteManager::render_cones(const geometry::Position& pos, const geometry::
 {
   const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), SPRITE_W, SPRITE_H};
   cones_surface_->blit_surface({0, 0, SPRITE_W, SPRITE_H}, dest_rect);
+}
+
+void SpriteManager::render_input(const std::string& input_str,
+                                 const geometry::Position& pos,
+                                 const geometry::Position camera_position) const
+{
+  const auto it = input_surfaces_.find(input_str);
+  if (it == input_surfaces_.end())
+  {
+    return;
+  }
+  const auto surface = it->second.get();
+  const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), surface->width(), surface->height()};
+  surface->blit_surface({0, 0, surface->width(), surface->height()}, dest_rect);
 }
 
 geometry::Rectangle SpriteManager::get_rect_for_number(const char ch) const

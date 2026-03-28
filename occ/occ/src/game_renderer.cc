@@ -190,6 +190,12 @@ void GameRenderer::render_background() const
         render_tile(sprite_id, {30 * SPRITE_W, 2 * SPRITE_H});
       }
     }
+
+    // Render player control hints
+    sprite_manager_->render_input("key_left", {10, 10}, game_camera_.position);
+    sprite_manager_->render_input("key_right", {40, 10}, game_camera_.position);
+    sprite_manager_->render_input("key_x", {70, 10}, game_camera_.position);
+    sprite_manager_->render_input("key_z", {100, 10}, game_camera_.position);
   }
 }
 
