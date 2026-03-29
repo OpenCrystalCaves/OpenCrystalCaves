@@ -192,10 +192,13 @@ void GameRenderer::render_background() const
     }
 
     // Render player control hints
-    sprite_manager_->render_input("key_left", {10, 10}, game_camera_.position);
-    sprite_manager_->render_input("key_right", {40, 10}, game_camera_.position);
-    sprite_manager_->render_input("key_x", {70, 10}, game_camera_.position);
-    sprite_manager_->render_input("key_z", {100, 10}, game_camera_.position);
+    // Movement
+    sprite_manager_->render_input("key_left", {40, 32}, game_camera_.position);
+    sprite_manager_->render_input("key_right", {52, 32}, game_camera_.position);
+    // Jump
+    sprite_manager_->render_input("key_z", {72, 32}, game_camera_.position);
+    // Shoot
+    sprite_manager_->render_input("key_x", {92, 32}, game_camera_.position);
   }
 }
 

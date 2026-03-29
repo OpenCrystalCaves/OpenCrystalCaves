@@ -41,14 +41,18 @@ SDL_Surface* load_image_to_surface(const std::filesystem::path& filename)
   }
 
   const Uint32 amask = channels == 3 ? 0 : 0xFF000000;
-  SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(data, width, height, channels * 8, width * channels, 0x0000FF, 0x00FF00, 0xFF0000, amask);
-
+  SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, channels * 8, 0x0000FF, 0x00FF00, 0xFF0000, amask);
   if (!surface)
   {
     LOG_ERROR("error creating surface: %s", SDL_GetError());
     stbi_image_free(data);
     return nullptr;
   }
+
+  // Copy the data to the surface
+  SDL_LockSurface(surface);
+  memcpy(surface->pixels, data, width * height * channels);
+  SDL_UnlockSurface(surface);
 
   stbi_image_free(data);
   return surface;
@@ -72,14 +76,18 @@ SDL_Surface* load_pcx_image_to_surface(const std::filesystem::path& filename)
   }
 
   const Uint32 amask = channels == 3 ? 0 : 0xFF000000;
-  SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(data, width, height, channels * 8, width * channels, 0x0000FF, 0x00FF00, 0xFF0000, amask);
-
+  SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, channels * 8, 0x0000FF, 0x00FF00, 0xFF0000, amask);
   if (!surface)
   {
     LOG_ERROR("error creating surface: %s", SDL_GetError());
     drpcx_free(data);
     return nullptr;
   }
+
+  // Copy the data to the surface
+  SDL_LockSurface(surface);
+  memcpy(surface->pixels, data, width * height * channels);
+  SDL_UnlockSurface(surface);
 
   drpcx_free(data);
   return surface;
