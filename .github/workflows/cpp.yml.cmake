@@ -125,17 +125,20 @@ jobs:
         # Create a key at https://itch.io/user/settings/api-keys
         # And add the key as a Repository secret to https://github.com/gurka/OpenCrystalCaves/settings/secrets/actions
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      shell: bash
       run: |
         butler push ${{ matrix.build_type }}/OpenCrystalCaves-*-Linux*.tar.gz congusbongus/opencrystalcaves:linux --userversion $VERSION
     - name: Publish to itch.io (macOS)
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'macos-latest'
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      shell: bash
       run: |
         butler push ${{ matrix.build_type }}/OpenCrystalCaves-*-OSX*.dmg congusbongus/opencrystalcaves:mac --userversion $VERSION
     - name: Publish to itch.io (Windows)
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release' && matrix.os == 'windows-latest'
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      shell: bash
       run: |
         butler push ${{ matrix.build_type }}/OpenCrystalCaves-*.zip  congusbongus/opencrystalcaves:win --userversion $VERSION
