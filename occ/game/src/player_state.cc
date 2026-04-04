@@ -1,5 +1,6 @@
 #include "player_state.h"
 
+#include "level_id.h"
 #include "logger.h"
 
 #include <SimpleIni.h>
@@ -102,4 +103,21 @@ void PlayerState::save()
   {
     LOG_ERROR("Could not write to config file at %s", cfgfile);
   }
+}
+
+bool PlayerState::has_completed_any_level() const
+{
+  for (int i = 0; i < static_cast<int>(levels_completed.size()); i++)
+  {
+    // Ignore intro and main levels
+    if (i <= static_cast<int>(LevelId::MAIN_LEVEL))
+    {
+      continue;
+    }
+    if (levels_completed[i])
+    {
+      return true;
+    }
+  }
+  return false;
 }

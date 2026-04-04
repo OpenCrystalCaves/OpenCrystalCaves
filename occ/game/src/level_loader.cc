@@ -222,6 +222,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   }
 
   auto level = std::make_unique<Level>();
+  // Render player control hints if player hasn't completed any level
+  level->show_player_controls = !state.has_completed_any_level();
 
   // Read the tile ids of the level
   level->width = 0;
