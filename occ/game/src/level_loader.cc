@@ -197,7 +197,8 @@ enum class TileMode
   TRI_ENEMY,
   AIR_PIPE,
   METAL_CRATE,
-  HAZARD_CRATE
+  HAZARD_CRATE,
+  ROCKY_PLATFORM,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, const PlayerState& state)
@@ -592,6 +593,24 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
         flags |= TILE_SOLID_TOP;
         sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_UR);
         mode = TileMode::NONE;
+        break;
+      case TileMode::ROCKY_PLATFORM:
+        switch (tile_id)
+        {
+          case 'j':
+            // Rocky platform (mid)
+            sprite = static_cast<int>(Sprite::SPRITE_ROCKY_PLATFORM_MID);
+            flags |= TILE_SOLID_TOP;
+            break;
+          case 'n':
+            // Rocky platform (right)
+            sprite = static_cast<int>(Sprite::SPRITE_ROCKY_PLATFORM_R);
+            flags |= TILE_SOLID_TOP;
+            mode = TileMode::NONE;
+            break;
+          default:
+            break;
+        }
         break;
       default:
         switch (tile_id)
@@ -1016,6 +1035,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             // Inactive rockman
             sprite = static_cast<int>(Sprite::SPRITE_ROCKMAN_R_1);
             flags |= TILE_RENDER_IN_FRONT;
+            break;
+          case 'p':
+            // Rocky platform
+            sprite = static_cast<int>(Sprite::SPRITE_ROCKY_PLATFORM_L);
+            flags |= TILE_SOLID_TOP;
+            mode = TileMode::ROCKY_PLATFORM;
             break;
           case 'q':
             // Left laser
