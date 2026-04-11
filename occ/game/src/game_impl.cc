@@ -361,6 +361,7 @@ void GameImpl::update_missile()
       {
         num_ammo_ -= 1;
       }
+      // TODO: recoil back when low gravity
     }
     else
     {

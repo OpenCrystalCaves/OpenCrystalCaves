@@ -77,6 +77,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   {
     if (jumping)
     {
+      // TODO: low gravity jump velocity
       velocity = Vector<int>(velocity.x(), jump_velocity[jump_tick]);
     }
     else
