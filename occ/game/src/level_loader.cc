@@ -261,6 +261,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   }
   const auto background = levelBGs[static_cast<int>(level_id)];
   const auto block_sprite = blockColors[static_cast<int>(level_id)];
+  const bool block_solid = block_sprite != Sprite::SPRITE_BLOCK_GREEN_NW;
   const int bump_sprite = static_cast<int>(bump_platforms[static_cast<int>(level_id)]);
 
   level->has_earth = false;
@@ -667,15 +668,36 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             // Blocks
           case 'r':
             sprite = static_cast<int>(block_sprite);  // NW
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
+            else
+            {
+              flags |= TILE_SOLID_TOP;
+            }
             break;
           case 't':
             sprite = static_cast<int>(block_sprite) + 1;  // N
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
+            else
+            {
+              flags |= TILE_SOLID_TOP;
+            }
             break;
           case 'y':
             sprite = static_cast<int>(block_sprite) + 2;  // NE
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
+            else
+            {
+              flags |= TILE_SOLID_TOP;
+            }
             break;
           case '2':
             if (level->tile_ids[i + level->width] != '6')
@@ -686,7 +708,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             {
               sprite = static_cast<int>(block_sprite) + 9;  // MID
             }
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
             break;
           case '4':
             if (level->tile_ids[i - 1] != '2')
@@ -697,15 +722,24 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             {
               sprite = static_cast<int>(block_sprite) + 9;  // MID
             }
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
             break;
           case '5':
             sprite = static_cast<int>(block_sprite) + 9;  // MID
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
             break;
           case '6':
             sprite = static_cast<int>(block_sprite) + 10;  // E
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
             break;
           case '8':
             // Big chain
@@ -730,18 +764,27 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             break;
           case 'f':
             sprite = static_cast<int>(block_sprite) + 4;  // SW
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
             break;
           case 'F':
             level->hazards.emplace_back(new Flame(geometry::Position{x * 16, y * 16}));
             break;
           case 'g':
             sprite = static_cast<int>(block_sprite) + 5;  // S
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
             break;
           case 'h':
             sprite = static_cast<int>(block_sprite) + 6;  // SE
-            flags |= TILE_SOLID;
+            if (block_solid)
+            {
+              flags |= TILE_SOLID;
+            }
             break;
             // Bumpable platforms
           case 'D':
