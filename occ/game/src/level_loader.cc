@@ -347,6 +347,18 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             sprite = static_cast<int>(Sprite::SPRITE_WINNERS_2);
             flags |= TILE_SOLID_TOP;
             break;
+          case ':':
+            // [: = pipe top
+            sprite = static_cast<int>(Sprite::SPRITE_PIPE_TOP_R);
+            flags |= TILE_SOLID;
+            mode = TileMode::NONE;
+            break;
+          case ';':
+            // [; = pipe
+            sprite = static_cast<int>(Sprite::SPRITE_PIPE_R);
+            flags |= TILE_SOLID;
+            mode = TileMode::NONE;
+            break;
           case 'd':
             // [d = danger sign
             sprite = static_cast<int>(Sprite::SPRITE_DANGER_2);
@@ -1151,6 +1163,18 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                 // [4n = winners drugs sign
                 sprite = static_cast<int>(Sprite::SPRITE_WINNERS_1);
                 flags |= TILE_SOLID_TOP;
+                mode = TileMode::SIGN;
+                break;
+              case ':':
+                // [: = pipe top
+                sprite = static_cast<int>(Sprite::SPRITE_PIPE_TOP_L);
+                flags |= TILE_SOLID;
+                mode = TileMode::SIGN;
+                break;
+              case ';':
+                // [; = pipe
+                sprite = static_cast<int>(Sprite::SPRITE_PIPE_L);
+                flags |= TILE_SOLID;
                 mode = TileMode::SIGN;
                 break;
               case '=':
