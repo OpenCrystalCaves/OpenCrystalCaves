@@ -358,27 +358,19 @@ bool SpriteManager::load_tilesets(Window& window, const int episode)
       return false;
     }
   }
-  if (!cones_surface_)
+  if (other_surfaces_.empty())
   {
-    const auto path = get_data_path("../cones.png");
-    cones_surface_ = Surface::from_image(path, window);
-    if (!cones_surface_)
+    const std::vector<std::string> names = {
+      "key_left", "key_right", "key_x", "key_z", "icon_walk", "icon_jump", "icon_fire", "cones", "low_gravity_sign"};
+    for (const auto& name : names)
     {
-      return false;
-    }
-  }
-  if (input_surfaces_.empty())
-  {
-    const std::vector<std::string> inputs = {"key_left", "key_right", "key_x", "key_z", "icon_walk", "icon_jump", "icon_fire"};
-    for (const auto& input : inputs)
-    {
-      const auto path = get_data_path("../" + input + ".png");
+      const auto path = get_data_path("../" + name + ".png");
       auto surface = Surface::from_image(path, window);
       if (!surface)
       {
         return false;
       }
-      input_surfaces_[input] = std::move(surface);
+      other_surfaces_[name] = std::move(surface);
     }
   }
 
@@ -405,7 +397,7 @@ void SpriteManager::render_tile(const int sprite,
 {
   if (sprite == static_cast<int>(Sprite::SPRITE_CONES))
   {
-    render_cones(pos, camera_position);
+    render_other("cones", pos, camera_position);
     return;
   }
 
@@ -453,18 +445,10 @@ geometry::Position SpriteManager::render_text(const std::wstring& text, const ge
   return Vector<int>(x, y);
 }
 
-void SpriteManager::render_cones(const geometry::Position& pos, const geometry::Position camera_position) const
+void SpriteManager::render_other(const std::string& name, const geometry::Position& pos, const geometry::Position camera_position) const
 {
-  const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), SPRITE_W, SPRITE_H};
-  cones_surface_->blit_surface({0, 0, SPRITE_W, SPRITE_H}, dest_rect);
-}
-
-void SpriteManager::render_input(const std::string& input_str,
-                                 const geometry::Position& pos,
-                                 const geometry::Position camera_position) const
-{
-  const auto it = input_surfaces_.find(input_str);
-  if (it == input_surfaces_.end())
+  const auto it = other_surfaces_.find(name);
+  if (it == other_surfaces_.end())
   {
     return;
   }

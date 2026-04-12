@@ -94,7 +94,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   {
     if (direction == Direction::right)
     {
-      velocity = Vector<int>(-recoil_tick, velocity.y());
+      velocity = Vector<int>(-static_cast<int>(recoil_tick), velocity.y());
     }
     else
     {

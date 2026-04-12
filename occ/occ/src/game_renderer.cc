@@ -194,15 +194,15 @@ void GameRenderer::render_background() const
     if (game_->get_level().show_player_controls)
     {
       // Movement
-      sprite_manager_->render_input("icon_walk", {46, 16}, game_camera_.position);
-      sprite_manager_->render_input("key_left", {38, 32}, game_camera_.position);
-      sprite_manager_->render_input("key_right", {52, 32}, game_camera_.position);
+      sprite_manager_->render_other("icon_walk", {46, 16}, game_camera_.position);
+      sprite_manager_->render_other("key_left", {38, 32}, game_camera_.position);
+      sprite_manager_->render_other("key_right", {52, 32}, game_camera_.position);
       // Jump
-      sprite_manager_->render_input("icon_jump", {72, 16}, game_camera_.position);
-      sprite_manager_->render_input("key_z", {72, 32}, game_camera_.position);
+      sprite_manager_->render_other("icon_jump", {72, 16}, game_camera_.position);
+      sprite_manager_->render_other("key_z", {72, 32}, game_camera_.position);
       // Shoot
-      sprite_manager_->render_input("icon_fire", {92, 16}, game_camera_.position);
-      sprite_manager_->render_input("key_x", {92, 32}, game_camera_.position);
+      sprite_manager_->render_other("icon_fire", {92, 16}, game_camera_.position);
+      sprite_manager_->render_other("key_x", {92, 32}, game_camera_.position);
     }
   }
 }
@@ -554,6 +554,12 @@ void GameRenderer::render_statusbar() const
 
 void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, const Color color, const bool bright) const
 {
+  // Show alternate low gravity sign
+  if (sprite == static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_2) && sprite_manager_->remaster)
+  {
+    sprite_manager_->render_other("low_gravity_sign", pos - geometry::Position(16, 0), game_camera_.position);
+    return;
+  }
   // Show projectiles as bright if remaster since they can be hard to see
   const bool flash_projectile = sprite_manager_->remaster && (game_tick_ & 1) &&
     (sprite == static_cast<int>(Sprite::SPRITE_LASER_BEAM_1) || sprite == static_cast<int>(Sprite::SPRITE_LASER_BEAM_2));
