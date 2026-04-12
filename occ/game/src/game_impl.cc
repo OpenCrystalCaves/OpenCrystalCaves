@@ -365,7 +365,7 @@ void GameImpl::update_missile()
     }
     else
     {
-      // Play "no ammo" sound when we have audio
+      sound_manager_->play_sound(SoundType::SOUND_NO_AMMO);
     }
   }
 
