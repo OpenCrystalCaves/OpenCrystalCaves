@@ -261,7 +261,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     // Player is still walking in the same direction, just update walk tick
     player_.walk_tick += 1u;
   }
-  else if (player_input.left || player_input.right)
+  else if ((player_input.left || player_input.right) && player_.recoil_tick == 0)
   {
     // Player started to walk
     player_.walking = true;
@@ -361,7 +361,11 @@ void GameImpl::update_missile()
       {
         num_ammo_ -= 1;
       }
-      // TODO: recoil back when low gravity
+      // Recoil back when low gravity
+      if (level_->low_gravity)
+      {
+        player_.recoil_tick = 7;
+      }
     }
     else
     {

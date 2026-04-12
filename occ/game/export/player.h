@@ -47,6 +47,7 @@ struct Player
   unsigned hurt_tick = 0u;
   unsigned health_ = 3u;
   unsigned dying_tick = 0u;
+  unsigned recoil_tick = 0u;
 
   bool noclip = false;
   bool godmode = false;

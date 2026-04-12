@@ -268,7 +268,7 @@ void GameRenderer::render_player() const
       }
       else
       {
-        if (player.shooting)
+        if (player.shooting || player.recoil_tick > 0)
         {
           sprite = sprite_shooting_right;
         }
@@ -297,7 +297,7 @@ void GameRenderer::render_player() const
       }
       else
       {
-        if (player.shooting)
+        if (player.shooting || player.recoil_tick > 0)
         {
           sprite = sprite_shooting_left;
         }

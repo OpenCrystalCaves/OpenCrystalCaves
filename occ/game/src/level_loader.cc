@@ -22,6 +22,8 @@ static const std::unordered_set<LevelId> completedLevels{
   LevelId::LEVEL_10,
   LevelId::LEVEL_11,
   LevelId::LEVEL_12,
+  LevelId::LEVEL_13,
+  LevelId::LEVEL_14,
 };
 
 namespace LevelLoader

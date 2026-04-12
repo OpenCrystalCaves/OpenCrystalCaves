@@ -90,7 +90,19 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
 
   // Set x velocity
-  if (walking)
+  if (recoil_tick > 0)
+  {
+    if (direction == Direction::right)
+    {
+      velocity = Vector<int>(-recoil_tick, velocity.y());
+    }
+    else
+    {
+      velocity = Vector<int>(recoil_tick, velocity.y());
+    }
+    recoil_tick--;
+  }
+  else if (walking)
   {
     // First step is 2 pixels / tick, then 4 pixels / tick
     const auto walk_velocity = walk_tick == 0u ? 2 : 4;
