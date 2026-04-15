@@ -361,11 +361,7 @@ void GameImpl::update_missile()
       {
         num_ammo_ -= 1;
       }
-      // Recoil back when low gravity
-      if (level_->low_gravity)
-      {
-        player_.recoil_tick = 7;
-      }
+      player_.recoil_tick = level_->recoil;
     }
     else
     {

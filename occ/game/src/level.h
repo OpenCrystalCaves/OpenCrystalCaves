@@ -73,6 +73,6 @@ struct Level
   std::vector<geometry::Rectangle> falling_rocks_areas = {};
   int falling_rock_ticks = 0;
   bool reverse_gravity = false;
-  bool low_gravity = false;
+  int recoil = 0;
   bool no_air = false;
 };

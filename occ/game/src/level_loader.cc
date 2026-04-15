@@ -1169,7 +1169,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                 break;
               case '2':
                 // [2 = low gravity sign
-                level->low_gravity = true;
+                // High recoil on odd levels, low recoil on even levels (just a guess)
+                level->recoil = static_cast<int>(level->level_id) & 1 ? 7 : 2;
                 sprite = static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_1);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::SIGN;
