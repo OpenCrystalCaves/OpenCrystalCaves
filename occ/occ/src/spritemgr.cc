@@ -361,7 +361,17 @@ bool SpriteManager::load_tilesets(Window& window, const int episode)
   if (other_surfaces_.empty())
   {
     const std::vector<std::string> names = {
-      "key_left", "key_right", "key_x", "key_z", "icon_walk", "icon_jump", "icon_fire", "cones", "low_gravity_sign"};
+      "key_left",
+      "key_right",
+      "key_x",
+      "key_z",
+      "icon_walk",
+      "icon_jump",
+      "icon_fire",
+      "cones",
+      "light_recoil_sign",
+      "heavy_recoil_sign",
+    };
     for (const auto& name : names)
     {
       const auto path = get_data_path("../" + name + ".png");

@@ -557,7 +557,8 @@ void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, 
   // Show alternate low gravity sign
   if (sprite == static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_2) && sprite_manager_->remaster)
   {
-    sprite_manager_->render_other("low_gravity_sign", pos - geometry::Position(16, 0), game_camera_.position);
+    const char* sign_name = game_->get_level().recoil > 4 ? "heavy_recoil_sign" : "light_recoil_sign";
+    sprite_manager_->render_other(sign_name, pos - geometry::Position(16, 0), game_camera_.position);
     return;
   }
   // Show projectiles as bright if remaster since they can be hard to see
