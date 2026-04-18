@@ -61,6 +61,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Slime and egg positions      | ![](/screenshots/egg_cc.gif?raw=true) Strictly aligned with tile grid                               | ![](/screenshots/egg_occ.gif?raw=true) Dynamic position based on parent                                   |
 | Enemy destructible shots     | ![](/screenshots/blueball_cc.gif?raw=true) Stops shooting if shot goes off screen                   | ![](/screenshots/blueball_occ.gif?raw=true) Keeps shooting                                                |
 | Laser beams                  | ![](/screenshots/flash_cc.gif?raw=true) Can be hard to see                                          | ![](/screenshots/flash_occ.gif?raw=true) Flashing and easy to see                                         |
+| Low gravity sign             | ![](/screenshots/lowgrav_cc.png?raw=true)                                                           | ![](/screenshots/lowgrav_occ.png?raw=true) HEAVY RECOIL or LIGHT RECOIL                                   |
 
 ## Compiling OCC
 
