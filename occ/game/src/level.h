@@ -75,4 +75,5 @@ struct Level
   bool reverse_gravity = false;
   int recoil = 0;
   bool no_air = false;
+  int bonus_counter = 0;
 };

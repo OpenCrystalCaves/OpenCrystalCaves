@@ -298,10 +298,16 @@ bool AirTank::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
 bool Egg::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
                  [[maybe_unused]] AbstractSoundManager& sound_manager,
                  [[maybe_unused]] const geometry::Rectangle& player_rect,
-                 [[maybe_unused]] Level& level,
+                 Level& level,
                  [[maybe_unused]] const bool power)
 {
   is_alive_ = false;
-  // TODO: spawn BONUS
+  // Spawn BONUS
+  // 10k for the S
+  const Sprite sprite = static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_BONUS) + level.bonus_counter);
+  const bool last_bonus = level.bonus_counter == 4;
+  level.actors.emplace_back(
+    new ScoreItem(position, sprite, last_bonus ? SoundType::SOUND_10K : SoundType::SOUND_PICKUP_GUN, last_bonus ? 10000 : 100));
+  level.bonus_counter++;
   return true;
 }

@@ -474,7 +474,7 @@ class Egg : public Actor
   Egg(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
 
   virtual bool is_alive() const override { return is_alive_; }
-  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {{position, static_cast<int>(Sprite::SPRITE_EGG), false}};
   }
@@ -483,16 +483,22 @@ class Egg : public Actor
                       const geometry::Rectangle& player_rect,
                       Level& level,
                       const bool power) override;
-  virtual int get_points() const override { return 1000; }
+  virtual int get_points() const override
+  {
+    // Only give points if collected
+    return is_collected_ ? 1000 : 0;
+  }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              AbstractSoundManager& sound_manager,
                              [[maybe_unused]] Level& level) override
   {
     is_alive_ = false;
+    is_collected_ = true;
     sound_manager.play_sound(SoundType::SOUND_CRYSTAL);
     return TouchType::TOUCH_TYPE_NONE;
   }
 
  private:
   bool is_alive_ = true;
+  bool is_collected_ = false;
 };
