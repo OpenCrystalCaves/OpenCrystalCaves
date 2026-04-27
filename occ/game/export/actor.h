@@ -455,3 +455,44 @@ class AirTank : public Actor
   int frame_ = 0;
   bool is_alive_ = true;
 };
+
+class Egg : public Actor
+{
+  // ➖➖➖➖➖⚫⚫⚫⚫⚫⚫➖➖➖➖➖
+  // ➖➖➖⚫⚫⬜⬜⬜🟣🟣🟣⚫⚫➖➖➖
+  // ➖➖⚫⬜⬜⬜⬜⬜🟣🟣🟣🟣⬜⚫➖➖
+  // ➖⚫⬜⬜⬜⬜⬜⬜⬜🟣🟣⬜⬜⬜⚫➖
+  // ➖⚫⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⚫➖
+  // ⚫⬜⬜⬜🟣🟣⬜⬜⬜⬜⬜⬜⬜⬜🪦⚫
+  // ⚫⬜⬜🟣🟣🟣🟣⬜⬜⬜⬜⬜⬜⬜🪦⚫
+  // ➖⚫⬜🟣🟣🟣🟣⬜⬜⬜⬜⬜⬜🪦⚫➖
+  // ➖⚫⬜⬜🟣🟣⬜⬜⬜⬜⬜⬜⬜🪦⚫➖
+  // ➖➖⚫⬜⬜⬜⬜⬜⬜⬜⬜🪦🪦⚫➖➖
+  // ➖➖➖⚫⚫⬜⬜⬜⬜🪦🪦⚫⚫➖➖➖
+  // Gives a small amount of score, leaves BONUS if shot
+ public:
+  Egg(geometry::Position position) : Actor(position, geometry::Size(16, 16)) {}
+
+  virtual bool is_alive() const override { return is_alive_; }
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override
+  {
+    return {{position, static_cast<int>(Sprite::SPRITE_EGG), false}};
+  }
+  virtual bool on_hit(const geometry::Rectangle& rect,
+                      AbstractSoundManager& sound_manager,
+                      const geometry::Rectangle& player_rect,
+                      Level& level,
+                      const bool power) override;
+  virtual int get_points() const override { return 1000; }
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level) override
+  {
+    is_alive_ = false;
+    sound_manager.play_sound(SoundType::SOUND_CRYSTAL);
+    return TouchType::TOUCH_TYPE_NONE;
+  }
+
+ private:
+  bool is_alive_ = true;
+};

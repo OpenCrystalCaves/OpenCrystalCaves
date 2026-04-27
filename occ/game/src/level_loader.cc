@@ -1491,9 +1491,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             break;
           case -87:
             // Egg
-            // TODO: egg
-            level->actors.emplace_back(
-              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_EGG, SoundType::SOUND_CRYSTAL, 1000));
+            level->actors.emplace_back(new Egg(geometry::Position{x * 16, y * 16}));
             break;
           case -88:
             // Key

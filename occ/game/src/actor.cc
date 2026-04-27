@@ -294,3 +294,14 @@ bool AirTank::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
   is_alive_ = false;
   return true;
 }
+
+bool Egg::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
+                 [[maybe_unused]] AbstractSoundManager& sound_manager,
+                 [[maybe_unused]] const geometry::Rectangle& player_rect,
+                 [[maybe_unused]] Level& level,
+                 [[maybe_unused]] const bool power)
+{
+  is_alive_ = false;
+  // TODO: spawn BONUS
+  return true;
+}
