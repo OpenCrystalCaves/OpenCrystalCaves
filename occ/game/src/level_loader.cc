@@ -352,6 +352,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             flags |= TILE_SOLID_TOP;
             mode = TileMode::NONE;
             break;
+          case '3':
+            // [3 = kilroy sign
+            sprite = static_cast<int>(Sprite::SPRITE_KILROY_2);
+            mode = TileMode::NONE;
+            break;
           case '4':
             // [4n = winners drugs sign
             sprite = static_cast<int>(Sprite::SPRITE_WINNERS_2);
@@ -1191,6 +1196,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                 level->recoil = static_cast<int>(level->level_id) & 1 ? 7 : 2;
                 sprite = static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_1);
                 flags |= TILE_SOLID_TOP;
+                mode = TileMode::SIGN;
+                break;
+              case '3':
+                // [3 = kilroy sign
+                sprite = static_cast<int>(Sprite::SPRITE_KILROY_1);
                 mode = TileMode::SIGN;
                 break;
               case '4':
