@@ -201,6 +201,8 @@ enum class TileMode
   METAL_CRATE,
   HAZARD_CRATE,
   ROCKY_PLATFORM,
+  SECTOR_SIGN,
+  SECTOR_SIGN_SECOND_ROW,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, const PlayerState& state)
@@ -632,6 +634,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             break;
         }
         break;
+      case TileMode::SECTOR_SIGN:
+        sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_TOP_2);
+        flags |= TILE_SOLID_TOP | TILE_RENDER_IN_FRONT;
+        mode = TileMode::NONE;
+        break;
+      case TileMode::SECTOR_SIGN_SECOND_ROW:
+        sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_BOTTOM_2);
+        flags |= TILE_RENDER_IN_FRONT;
+        mode = TileMode::NONE;
+        break;
       default:
         switch (tile_id)
         {
@@ -1007,6 +1019,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                   break;
                 case -93:
                   // Bottom of red door; skip as we should have added it using the top
+                  break;
+                case -128:
+                  // Bottom of sector sign
+                  sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_BOTTOM_1);
+                  flags |= TILE_RENDER_IN_FRONT;
+                  mode = TileMode::SECTOR_SIGN_SECOND_ROW;
                   break;
                 default:
                   handled = false;
@@ -1617,6 +1635,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
           case -126:
             // Right laser
             level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
+            break;
+          case -128:
+            // Sector alpha sign
+            sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_TOP_1);
+            flags |= TILE_SOLID_TOP | TILE_RENDER_IN_FRONT;
+            mode = TileMode::SECTOR_SIGN;
             break;
           default:
             LOG_INFO(
