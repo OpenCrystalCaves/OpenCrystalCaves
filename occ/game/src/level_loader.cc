@@ -203,6 +203,8 @@ enum class TileMode
   ROCKY_PLATFORM,
   SECTOR_SIGN,
   SECTOR_SIGN_SECOND_ROW,
+  STAND_MIXER,
+  STAND_MIXER_SECOND_ROW,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, const PlayerState& state)
@@ -649,6 +651,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
         flags |= TILE_RENDER_IN_FRONT;
         mode = TileMode::NONE;
         break;
+      case TileMode::STAND_MIXER:
+        sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_TOP_2);
+        flags |= TILE_RENDER_IN_FRONT;
+        mode = TileMode::NONE;
+        break;
+      case TileMode::STAND_MIXER_SECOND_ROW:
+        sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_BOTTOM_2);
+        flags |= TILE_RENDER_IN_FRONT | TILE_SOLID_TOP;
+        mode = TileMode::NONE;
+        break;
       default:
         switch (tile_id)
         {
@@ -1016,6 +1028,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                   mode = TileMode::GLASS_BALL;
                   flags |= TILE_RENDER_IN_FRONT;
                   break;
+                case -32:
+                  // Bottom of stand mixer
+                  sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_BOTTOM_1);
+                  flags |= TILE_RENDER_IN_FRONT | TILE_SOLID_TOP;
+                  mode = TileMode::STAND_MIXER_SECOND_ROW;
+                  break;
                 case -91:
                   // Bottom of blue door; skip as we should have added it using the top
                   break;
@@ -1114,9 +1132,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             sprite_count = 4;
             flags |= TILE_ANIMATED;
             mode = TileMode::EJECTA;
-            LOG_INFO(
-              "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
-            level->tile_unknown[i] = true;
             break;
           case 'v':
             // Horizontal toggle switch
@@ -1428,6 +1443,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             break;
           case -24:
             sprite = static_cast<int>(Sprite::SPRITE_PIPE_V);
+            break;
+          case -32:
+            // Stand mixer
+            sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_TOP_1);
+            flags |= TILE_RENDER_IN_FRONT;
+            mode = TileMode::STAND_MIXER;
             break;
           case -40:
             // Switch for turning off laser
