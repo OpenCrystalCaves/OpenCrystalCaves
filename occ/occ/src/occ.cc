@@ -26,6 +26,8 @@ int main()
 {
   LOG_INFO("Starting!");
 
+  srand(time(nullptr));
+
   // Init SDL wrapper
   auto sdl = SDLWrapper::create();
   if (!sdl)

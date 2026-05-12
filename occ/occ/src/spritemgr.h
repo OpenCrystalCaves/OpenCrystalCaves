@@ -41,7 +41,12 @@ enum class Icon : int
 class SpriteManager
 {
  public:
-  SpriteManager() : sprite_surface_(), char_surface_(), other_surfaces_() {}
+  SpriteManager() : sprite_surface_(), char_surface_(), other_surfaces_()
+  {
+    // Generate random indices for the Kilroy and Winners signs, which are used in the remaster mode
+    kilroy_sign_index_ = static_cast<int>(rand() % 3);
+    winners_sign_index_ = static_cast<int>(rand() % 4);
+  }
 
   bool load_tilesets(Window& window, const int episode);
   const Surface* get_surface() const;
@@ -58,6 +63,10 @@ class SpriteManager
   geometry::Rectangle get_rect_for_icon(const int idx) const;
   void render_icon(const Icon icon, const geometry::Position& pos, const bool flip = false, const Color tint = {0xff, 0xff, 0xff}) const;
   void render_other(const std::string& name, const geometry::Position& pos, const geometry::Position camera_position = {0, 0}) const;
+  void render_sign(const std::string& name,
+                   const int i,
+                   const geometry::Position& pos,
+                   const geometry::Position camera_position = {0, 0}) const;
 
   bool remaster = true;
 
@@ -65,4 +74,6 @@ class SpriteManager
   std::unique_ptr<Surface> sprite_surface_;
   std::unique_ptr<Surface> char_surface_;
   std::unordered_map<std::string, std::unique_ptr<Surface>> other_surfaces_;
+  int kilroy_sign_index_;
+  int winners_sign_index_;
 };

@@ -371,6 +371,8 @@ bool SpriteManager::load_tilesets(Window& window, const int episode)
       "cones",
       "light_recoil_sign",
       "heavy_recoil_sign",
+      "kilroy_sign",
+      "winners_sign",
     };
     for (const auto& name : names)
     {
@@ -409,6 +411,25 @@ void SpriteManager::render_tile(const int sprite,
   {
     render_other("cones", pos, camera_position);
     return;
+  }
+  if (remaster)
+  {
+    // Show remaster signs; render whole sign, ignore subsequent sign tiles
+    switch (sprite)
+    {
+      case static_cast<int>(Sprite::SPRITE_KILROY_1):
+        render_sign("kilroy_sign", kilroy_sign_index_, pos, camera_position);
+        return;
+      case static_cast<int>(Sprite::SPRITE_WINNERS_1):
+        render_sign("winners_sign", winners_sign_index_, pos, camera_position);
+        return;
+      case static_cast<int>(Sprite::SPRITE_KILROY_2):
+      case static_cast<int>(Sprite::SPRITE_WINNERS_2):
+      case static_cast<int>(Sprite::SPRITE_WINNERS_3):
+        return;
+      default:
+        break;
+    }
   }
 
   // Use alternate sprites for remaster gfx
@@ -465,6 +486,22 @@ void SpriteManager::render_other(const std::string& name, const geometry::Positi
   const auto surface = it->second.get();
   const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), surface->width(), surface->height()};
   surface->blit_surface({0, 0, surface->width(), surface->height()}, dest_rect);
+}
+
+void SpriteManager::render_sign(const std::string& name,
+                                const int i,
+                                const geometry::Position& pos,
+                                const geometry::Position camera_position) const
+{
+  const auto it = other_surfaces_.find(name);
+  if (it == other_surfaces_.end())
+  {
+    return;
+  }
+  const auto surface = it->second.get();
+  const geometry::Rectangle src_rect{0, i * 16, surface->width(), 16};
+  const geometry::Rectangle dest_rect{pos.x() - camera_position.x(), pos.y() - camera_position.y(), surface->width(), 16};
+  surface->blit_surface(src_rect, dest_rect);
 }
 
 geometry::Rectangle SpriteManager::get_rect_for_number(const char ch) const
