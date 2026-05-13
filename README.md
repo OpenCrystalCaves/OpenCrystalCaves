@@ -62,6 +62,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Enemy destructible shots     | ![](/screenshots/blueball_cc.gif?raw=true) Stops shooting if shot goes off screen                   | ![](/screenshots/blueball_occ.gif?raw=true) Keeps shooting                                                |
 | Laser beams                  | ![](/screenshots/flash_cc.gif?raw=true) Can be hard to see                                          | ![](/screenshots/flash_occ.gif?raw=true) Flashing and easy to see                                         |
 | Low gravity sign             | ![](/screenshots/lowgrav_cc.png?raw=true)                                                           | ![](/screenshots/lowgrav_occ.png?raw=true) HEAVY RECOIL or LIGHT RECOIL                                   |
+| Meme signs                   | ![](/screenshots/meme_cc.png?raw=true) Boomer memes                                                 | ![](/screenshots/meme_occ.png?raw=true) 21st century memes (multiple)                                     |
 
 ## Compiling OCC
 

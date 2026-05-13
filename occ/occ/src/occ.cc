@@ -26,7 +26,7 @@ int main()
 {
   LOG_INFO("Starting!");
 
-  srand(time(nullptr));
+  srand(static_cast<unsigned int>(time(nullptr)));
 
   // Init SDL wrapper
   auto sdl = SDLWrapper::create();
