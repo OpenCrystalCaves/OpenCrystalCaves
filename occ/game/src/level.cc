@@ -152,6 +152,16 @@ bool Level::player_on_platform(const geometry::Position& position, const geometr
     }
   }
 
+  // Check actors that are solid on top
+  for (const auto& a : actors)
+  {
+    if (a->is_solid_top(*this) && (position.y() + size.y() - 1 == a->position.y()) && (position.x() < a->position.x() + a->size.x()) &&
+        (position.x() + size.x() > a->position.x()))
+    {
+      return true;
+    }
+  }
+
   // Check hazards that are solid on top
   for (const auto& hazard : hazards)
   {

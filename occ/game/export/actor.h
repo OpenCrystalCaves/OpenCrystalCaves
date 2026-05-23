@@ -502,3 +502,21 @@ class Egg : public Actor
   bool is_alive_ = true;
   bool is_collected_ = false;
 };
+
+class OneWayPlatform : public Actor
+{
+  // ➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖
+  // ⚫⬜🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🟦🇪🇺⚫
+  // ⚫🟦🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⚫
+  // ⚫🟦🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⚫
+  // ⚫🟦🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺🇪🇺⚫
+  // ➖⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫⚫➖
+ public:
+  OneWayPlatform(geometry::Position position, Sprite sprite) : Actor(position, geometry::Size(16, 16)), sprite_(sprite) {}
+  virtual bool is_solid_top([[maybe_unused]] const Level& level) const override { return true; }
+
+  virtual std::vector<ObjectDef> get_sprites(const Level& level) const override { return {{position, static_cast<int>(sprite_), false}}; }
+
+ private:
+  Sprite sprite_;
+};

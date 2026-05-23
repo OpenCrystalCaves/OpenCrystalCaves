@@ -737,8 +737,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             break;
           case '-':
             // Pipe (H)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_H);
-            flags |= TILE_SOLID_TOP;
+            // Add one way platform as sometimes V pipe also occurs together
+            level->actors.emplace_back(new OneWayPlatform(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_GPIPE_H));
             break;
           case '.':
             // Pipe (L)
@@ -1379,8 +1379,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}));
             break;
           case '_':
-            sprite = static_cast<int>(platforms[static_cast<int>(level_id)]);
-            flags |= TILE_SOLID_TOP;
+            level->actors.emplace_back(new OneWayPlatform(geometry::Position{x * 16, y * 16}, platforms[static_cast<int>(level_id)]));
             break;
           case '|':
             // Stalactite
@@ -1526,9 +1525,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             sprite = static_cast<int>(Sprite::SPRITE_SIGN_DOWN);
             break;
           case -59:
-            // Pipe (V) walkable
+            // Pipes (H+V)
+            level->actors.emplace_back(new OneWayPlatform(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_GPIPE_H));
             sprite = static_cast<int>(Sprite::SPRITE_GPIPE_V);
-            flags |= TILE_SOLID_TOP;
+            flags |= TILE_RENDER_IN_FRONT;
             break;
           case -62:
             // Pipe (UT)
