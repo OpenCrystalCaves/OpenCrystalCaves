@@ -25,6 +25,7 @@ static const std::unordered_set<LevelId> completedLevels{
   LevelId::LEVEL_13,
   LevelId::LEVEL_14,
   LevelId::LEVEL_15,
+  LevelId::LEVEL_16,
 };
 
 namespace LevelLoader
@@ -1489,9 +1490,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             flags |= TILE_ANIMATED;
             break;
           case -47:
-            // Pipe (UT)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_UT);
-            flags |= TILE_SOLID;
+            // Pipe (U)
+            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_U);
+            flags |= TILE_SOLID_TOP | TILE_RENDER_IN_FRONT;
             break;
           case -48:
             sprite = static_cast<int>(Sprite::SPRITE_METER);
@@ -1499,7 +1500,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
           case -49:
             // Pipe (D)
             sprite = static_cast<int>(Sprite::SPRITE_GPIPE_D);
-            flags |= TILE_SOLID;
             break;
           case -50:
             // Grass
