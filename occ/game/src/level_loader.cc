@@ -207,6 +207,7 @@ enum class TileMode
   SECTOR_SIGN_SECOND_ROW,
   STAND_MIXER,
   STAND_MIXER_SECOND_ROW,
+  PLANET_SECOND_ROW,
 };
 
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, const PlayerState& state)
@@ -383,6 +384,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             flags |= TILE_SOLID;
             mode = TileMode::NONE;
             break;
+          case 'A':
+            // [A = planet
+            sprite = static_cast<int>(Sprite::SPRITE_PLANET_UR);
+            mode = TileMode::NONE;
+            break;
+          case 'B':
+            // [B = trading planet
+            sprite = static_cast<int>(Sprite::SPRITE_TRADING_PLANET_2);
+            mode = TileMode::NONE;
+            break;
           case 'd':
             // [d = danger sign
             sprite = static_cast<int>(Sprite::SPRITE_DANGER_2);
@@ -394,7 +405,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             mode = TileMode::NONE;
             break;
           case 'f':
-            // [d = falling rocks sign
+            // [f = falling rocks sign
             sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_2);
             flags |= TILE_SOLID_TOP;
             mode = TileMode::NONE;
@@ -666,6 +677,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       case TileMode::STAND_MIXER_SECOND_ROW:
         sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_BOTTOM_2);
         flags |= TILE_RENDER_IN_FRONT | TILE_SOLID_TOP;
+        mode = TileMode::NONE;
+        break;
+      case TileMode::PLANET_SECOND_ROW:
+        sprite = static_cast<int>(Sprite::SPRITE_PLANET_DR);
         mode = TileMode::NONE;
         break;
       default:
@@ -974,6 +989,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                       sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
                       mode = TileMode::CRATE_SECOND_ROW;
                       break;
+                    case 'A':  // Fallthrough
+                    case 'B':
+                      // Bottom left of planet
+                      sprite = static_cast<int>(Sprite::SPRITE_PLANET_DL);
+                      mode = TileMode::PLANET_SECOND_ROW;
+                      break;
                     case 'c':
                       // Bottom left of hazard crate
                       sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_DL);
@@ -1273,6 +1294,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                 sprite = static_cast<int>(Sprite::SPRITE_CRATE_UL);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::CRATE;
+                break;
+              case 'A':
+                // [A = planet
+                sprite = static_cast<int>(Sprite::SPRITE_PLANET_UL);
+                mode = TileMode::SIGN;
+                break;
+              case 'B':
+                // [B = trading planet
+                sprite = static_cast<int>(Sprite::SPRITE_TRADING_PLANET_1);
+                mode = TileMode::SIGN;
                 break;
               case 'c':
                 // [c = hazard crate, 2x2
