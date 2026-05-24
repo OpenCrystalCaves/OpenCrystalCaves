@@ -71,6 +71,21 @@ bool Level::collides_solid_top(const geometry::Position& position, const geometr
     {
       return true;
     }
+    // Also check actors and hazards that are solid on top
+    for (const auto& a : actors)
+    {
+      if (a->is_solid_top(*this) && geometry::isColliding(geometry::Rectangle(a->position, a->size), {position, size}))
+      {
+        return true;
+      }
+    }
+    for (const auto& hazard : hazards)
+    {
+      if (hazard->is_solid_top(*this) && geometry::isColliding(geometry::Rectangle(hazard->position, hazard->size), {position, size}))
+      {
+        return true;
+      }
+    }
   }
   return false;
 }
