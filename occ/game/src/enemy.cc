@@ -623,6 +623,17 @@ void Birdlet::on_death(AbstractSoundManager& sound_manager, Level& level)
   parent_.remove_child();
 }
 
+std::vector<geometry::Rectangle> Robot::get_detection_rects(const Level& level) const
+{
+  auto rects = create_detection_rects(left_ ? -1 : 1, 0, level, false, 2);
+  // Nudge the rects towards the center so the robot doesn't start zapping too early
+  for (auto& rect : rects)
+  {
+    rect.position += geometry::Position(left_ ? 4 : -4, 0);
+  }
+  return rects;
+}
+
 void Robot::update([[maybe_unused]] AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
   frame_++;

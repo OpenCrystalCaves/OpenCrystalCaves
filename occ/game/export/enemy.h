@@ -631,10 +631,7 @@ class Robot
                       Level& level,
                       const bool power) override;
   virtual int get_points() const override { return 100; }
-  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override
-  {
-    return create_detection_rects(left_ ? -1 : 1, 0, level, false, 2);
-  }
+  virtual std::vector<geometry::Rectangle> get_detection_rects(const Level& level) const override;
   virtual void remove_child(Level& level) override;
   virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
