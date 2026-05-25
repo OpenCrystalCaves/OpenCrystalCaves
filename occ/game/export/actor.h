@@ -523,3 +523,34 @@ class OneWayPlatform : public Actor
  private:
   Sprite sprite_;
 };
+
+class Earth : public Actor
+{
+  // ➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖
+  // ➖➖➖➖⚫⚫🟩🟦🇪🇺🟦⚫⚫➖➖➖➖
+  // ➖➖➖⚫🦚🟩🦚🟩🟦🇪🇺🟦🇪🇺⚫➖➖➖
+  // ➖➖⚫🟦🟩🦚🟩🦚🟩🟦🇪🇺🟦🇪🇺⚫➖➖
+  // ➖⚫🟦🇪🇺🟦🟩🦚🟩🦚🟩🦚🟩🟦🇪🇺⚫➖
+  // ➖⚫🇪🇺🟦🟩🦚🇪🇺🟦🇪🇺🦚🟩🦚🇪🇺🟦⚫➖
+  // ⚫🇪🇺🟦🇪🇺🟦🇪🇺🟦🇪🇺🇪🇺🇪🇺🦚🟩🟦🇪🇺🟦⚫
+  // ⚫🟦🇪🇺🟦🇪🇺🟦🇪🇺🟦🟦🇪🇺🟦🇪🇺🟦🇪🇺🇪🇺⚫
+  // ⚫🇪🇺🟦🇪🇺🦚🇪🇺🟦🇪🇺🇪🇺🟦🇪🇺🟦🇪🇺🟦🇪🇺⚫
+  // ⚫🟦🇪🇺🦚🟩🦚🇪🇺🟦🇪🇺🟦🟦🦚🟩🇪🇺🟩⚫
+  // ➖⚫🦚🟩🦚🟩🟦🇪🇺🟦🇪🇺🇪🇺🟩🦚🟩🦚➖
+  // ➖⚫🟩🦚🟩🦚🇪🇺🟦🟩🟦🇪🇺🟦🟩🦚⚫➖
+  // ➖➖⚫🟩🦚🟩🦚🟩🦚🟩🟦🟦🦚⚫➖➖
+  // ➖➖➖⚫🟩🦚🟩🦚🇪🇺🟦🇪🇺🇪🇺⚫➖➖➖
+  // ➖➖➖➖⚫⚫🦚🟩🦚🇪🇺⚫⚫➖➖➖➖
+  // ➖➖➖➖➖➖⚫⚫⚫⚫➖➖➖➖➖➖
+  // Static or moving actor
+ public:
+  Earth(geometry::Position position, const bool moving) : Actor(position, geometry::Size(16, 16)), moving_(moving) {}
+
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {{position, static_cast<int>(Sprite::SPRITE_EARTH), false}};
+  }
+
+ private:
+  bool moving_;
+};

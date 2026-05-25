@@ -1507,6 +1507,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             flags |= TILE_RENDER_IN_FRONT;
             mode = TileMode::STAND_MIXER;
             break;
+          case -37:
+            // Static earth
+            level->actors.emplace_back(new Earth(geometry::Position{x * 16, y * 16}, false));
+            break;
           case -38:
             // Pipe (UL)
             sprite = static_cast<int>(Sprite::SPRITE_GPIPE_UL);
