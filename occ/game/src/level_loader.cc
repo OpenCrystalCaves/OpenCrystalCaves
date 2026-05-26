@@ -273,9 +273,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   const auto block_sprite = blockColors[static_cast<int>(level_id)];
   const bool block_solid = block_sprite != Sprite::SPRITE_BLOCK_GREEN_NW;
   const int bump_sprite = static_cast<int>(bump_platforms[static_cast<int>(level_id)]);
+  Earth* earth = nullptr;
 
-  level->has_earth = false;
-  level->has_moon = false;
   bool is_stars_row = false;
   bool is_horizon_row = false;
   auto mode = TileMode::NONE;
@@ -955,7 +954,9 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             flags |= TILE_SOLID;
             break;
           case 'm':
-            level->has_earth = true;
+            // Moving earth
+            earth = new Earth(geometry::Position{x * 16, y * 16}, true);
+            level->actors.emplace_back(earth);
             break;
           case 'M':
             // Ostrich
@@ -1133,7 +1134,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
           }
           break;
           case 'N':
-            level->has_moon = true;
+            level->actors.emplace_back(new Moon(geometry::Position{x * 16, y * 16}, *earth));
             break;
           case 'o':
             // Inactive rockman
@@ -1507,9 +1508,14 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             flags |= TILE_RENDER_IN_FRONT;
             mode = TileMode::STAND_MIXER;
             break;
+          case -36:
+            // Static moon
+            level->actors.emplace_back(new Moon(geometry::Position{x * 16, y * 16}, *earth));
+            break;
           case -37:
             // Static earth
-            level->actors.emplace_back(new Earth(geometry::Position{x * 16, y * 16}, false));
+            earth = new Earth(geometry::Position{x * 16, y * 16}, false);
+            level->actors.emplace_back(earth);
             break;
           case -38:
             // Pipe (UL)

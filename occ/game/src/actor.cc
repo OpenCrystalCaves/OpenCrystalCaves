@@ -311,3 +311,26 @@ bool Egg::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
   level.bonus_counter++;
   return true;
 }
+
+void Earth::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                   [[maybe_unused]] const geometry::Rectangle& player_rect,
+                   Level& level)
+{
+  ticks_++;
+  if (!moving_)
+    return;
+  const int earth_orbit_radius = (level.width - 4) * 16 / 2;
+  position =
+    geometry::Position{(level.width - 2) * 16 / 2 + 16 + static_cast<int>(sin(ticks_ / 500.0 - M_PI_2) * earth_orbit_radius), position.y()};
+}
+
+void Moon::update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                  [[maybe_unused]] const geometry::Rectangle& player_rect,
+                  [[maybe_unused]] Level& level)
+{
+  ticks_++;
+  constexpr int moon_orbit_radius = 2 * 16;
+  constexpr double moon_orbit_period = 30.0;
+  position = geometry::Position{earth_.position.x() + static_cast<int>(sin(ticks_ / moon_orbit_period) * moon_orbit_radius), position.y()};
+  in_front_ = cos(ticks_ / moon_orbit_period) <= 0;
+}

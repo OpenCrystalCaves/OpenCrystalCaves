@@ -45,6 +45,7 @@ class Actor
   virtual int get_points() const { return 0; }
   virtual bool is_solid([[maybe_unused]] const Level& level) const { return false; }
   virtual bool is_solid_top([[maybe_unused]] const Level& level) const { return false; }
+  virtual bool is_render_in_front() const { return false; }
 
   virtual void update([[maybe_unused]] AbstractSoundManager& sound_manager,
                       [[maybe_unused]] const geometry::Rectangle& player_rect,
@@ -546,6 +547,8 @@ class Earth : public Actor
  public:
   Earth(geometry::Position position, const bool moving) : Actor(position, geometry::Size(16, 16)), moving_(moving) {}
 
+  virtual bool is_render_in_front() const override { return true; }
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
   virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
     return {{position, static_cast<int>(Sprite::SPRITE_EARTH), false}};
@@ -553,4 +556,35 @@ class Earth : public Actor
 
  private:
   bool moving_;
+  int ticks_ = 0;
+};
+
+class Moon : public Actor
+{
+  // ➖➖➖➖➖➖➖⚫⚫➖➖➖➖➖➖➖
+  // ➖➖➖➖➖⚫⚫🪦🪦⚫⚫➖➖➖➖➖
+  // ➖➖➖➖⚫🪦🪦📘⚪🪦🪦⚫➖➖➖➖
+  // ➖➖➖⚫🪦⚪🩵⚪⬜⚪📘🪦⚫➖➖➖
+  // ➖➖⚫🪦📘🩵🩵🩵⚪⚪⬜⚪🪦⚫➖➖
+  // ➖➖⚫🪦⬜⚪🩵⚪⬜⚪⚪📘🪦⚫➖➖
+  // ➖➖⚫🪦⬜⚪⚪⚪⬜⚪⬜📘🪦⚫➖➖
+  // ➖➖➖⚫🪦⚪⬜⚪⚪⚪📘🪦⚫➖➖➖
+  // ➖➖➖➖⚫🪦🪦⬜⚪🪦🪦⚫➖➖➖➖
+  // ➖➖➖➖➖⚫⚫🪦🪦⚫⚫➖➖➖➖➖
+  // ➖➖➖➖➖➖➖⚫⚫➖➖➖➖➖➖➖
+  // Orbits earth, can be in front or behind
+ public:
+  Moon(geometry::Position position, const Earth& earth) : Actor(position, geometry::Size(16, 16)), earth_(earth) {}
+
+  virtual bool is_render_in_front() const override { return in_front_; }
+  virtual void update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level) override;
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {{position, static_cast<int>(in_front_ ? Sprite::SPRITE_MOON : Sprite::SPRITE_MOON_SMALL), false}};
+  }
+
+ private:
+  bool in_front_ = false;
+  const Earth& earth_;
+  int ticks_ = 0;
 };

@@ -11,12 +11,13 @@ struct ObjectDef
 
 struct Object
 {
-  Object(geometry::Position position, int sprite_id, bool bright, int num_sprites, const bool reverse)
+  Object(geometry::Position position, int sprite_id, bool bright, int num_sprites, const bool reverse, const bool is_render_in_front)
     : position(position),
       sprite_id(sprite_id),
       bright(bright),
       num_sprites(num_sprites),
-      reverse(reverse)
+      reverse(reverse),
+      is_render_in_front(is_render_in_front)
   {
   }
 
@@ -31,4 +32,5 @@ struct Object
   bool bright;
   int num_sprites;
   bool reverse;
+  bool is_render_in_front;
 };

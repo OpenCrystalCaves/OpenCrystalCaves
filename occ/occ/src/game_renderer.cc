@@ -84,10 +84,11 @@ void GameRenderer::render_game(unsigned game_tick) const
   window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), {33u, 33u, 33u});
   render_background();
   render_tiles(false);
-  render_objects();
+  render_objects(false);
   render_enemies(game_tick);
   render_player();
   render_tiles(true);
+  render_objects(true);
   render_complete_border();
   render_statusbar();
   window_.set_render_target(nullptr);
@@ -112,46 +113,6 @@ void GameRenderer::render_background() const
       if (sprite_id != -1)
       {
         render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H});
-      }
-    }
-  }
-
-  if (game_->get_level().has_earth)
-  {
-    const int earth_orbit_radius = (game_->get_tile_width() - 4) * 16 / 2;
-    const int earth_pos_x =
-      (game_->get_tile_width() - 2) * 16 / 2 + 16 + static_cast<int>(sin(game_tick_ / 500.0 - M_PI_2) * earth_orbit_radius);
-    // Assume there's a moon
-    constexpr int moon_orbit_radius = 2 * 16;
-    constexpr double moon_orbit_period = 30.0;
-    const int moon_pos_x = earth_pos_x + static_cast<int>(sin(game_tick_ / moon_orbit_period) * moon_orbit_radius);
-    const bool moon_right = cos(game_tick_ / moon_orbit_period) > 0;
-    const int moon_sprite = static_cast<int>(moon_right ? Sprite::SPRITE_MOON_SMALL : Sprite::SPRITE_MOON);
-
-    const auto earth_rect = geometry::Rectangle(geometry::Position(earth_pos_x, 0), geometry::Size(16, 16));
-    const auto moon_rect = geometry::Rectangle(geometry::Position(moon_pos_x, 0), geometry::Size(16, 16));
-    if (moon_right)
-    {
-      // Moon is behind earth, render moon first
-      if (geometry::isColliding(game_camera_, moon_rect))
-      {
-        render_tile(moon_sprite, moon_rect.position);
-      }
-      if (geometry::isColliding(game_camera_, earth_rect))
-      {
-        render_tile(static_cast<int>(Sprite::SPRITE_EARTH), earth_rect.position);
-      }
-    }
-    else
-    {
-      // Earth is behind moon, render earth first
-      if (geometry::isColliding(game_camera_, earth_rect))
-      {
-        render_tile(static_cast<int>(Sprite::SPRITE_EARTH), earth_rect.position);
-      }
-      if (geometry::isColliding(game_camera_, moon_rect))
-      {
-        render_tile(moon_sprite, moon_rect.position);
       }
     }
   }
@@ -410,10 +371,14 @@ void GameRenderer::render_tiles(bool in_front) const
   }
 }
 
-void GameRenderer::render_objects() const
+void GameRenderer::render_objects(const bool in_front) const
 {
   for (const auto& object : game_->get_objects())
   {
+    if (object.is_render_in_front != in_front)
+    {
+      continue;
+    }
     static constexpr geometry::Size object_size = geometry::Size(16, 16);
     if (geometry::isColliding(geometry::Rectangle(object.position, object_size), game_camera_))
     {
@@ -431,6 +396,10 @@ void GameRenderer::render_objects() const
   {
     for (const auto& hazard : game_->get_level().hazards)
     {
+      if (hazard->is_render_in_front() != in_front)
+      {
+        continue;
+      }
       window_.render_rectangle({hazard->position - game_camera_.position, hazard->size}, {255, 128, 0});
       for (const auto r : hazard->get_detection_rects(game_->get_level()))
       {

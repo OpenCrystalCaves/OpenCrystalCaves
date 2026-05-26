@@ -61,8 +61,6 @@ struct Level
   std::vector<MovingPlatform> moving_platforms;
   std::vector<Entrance> entrances;
   std::unique_ptr<Exit> exit;
-  bool has_earth = false;
-  bool has_moon = false;
   bool show_player_controls = false;
   int switch_flags = SWITCH_FLAG_LASERS | SWITCH_FLAG_LIGHTS;
   bool has_key = false;

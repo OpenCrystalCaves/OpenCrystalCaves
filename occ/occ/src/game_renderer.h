@@ -25,7 +25,7 @@ class GameRenderer
   void render_background() const;
   void render_player() const;
   void render_tiles(bool in_front) const;
-  void render_objects() const;
+  void render_objects(const bool in_front) const;
   void render_enemies(unsigned game_tick) const;
   void render_complete_border() const;
   void render_statusbar() const;
