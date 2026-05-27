@@ -220,6 +220,12 @@ void TitleState::finish()
 void TitleState::update(const Input& input)
 {
   State::update(input);
+
+  if (input.space.pressed())
+  {
+    sprite_manager_.remaster = !sprite_manager_.remaster;
+  }
+
   const auto pinput = input_to_player_input(input);
 
   const auto panel_last = panel_current_;
@@ -338,7 +344,7 @@ void TitleState::draw(Window& window) const
     // Clear window surface
     window.fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), {33u, 33u, 33u, 0u});
 
-    panel_current_->draw(sprite_manager_);
+    panel_current_->draw(sprite_manager_, window);
     window.set_render_target(nullptr);
     // Render game surface to window surface, centered and scaled
     game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
@@ -652,7 +658,7 @@ void GameState::draw(Window& window) const
     // Clear window surface
     window.fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), {33u, 33u, 33u, 0u});
 
-    panel_current_->draw(sprite_manager_);
+    panel_current_->draw(sprite_manager_, window);
     window.set_render_target(nullptr);
     // Render game surface to window surface, centered and scaled
     game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),

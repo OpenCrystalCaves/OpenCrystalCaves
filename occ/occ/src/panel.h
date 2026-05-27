@@ -124,7 +124,7 @@ class Panel
 
   void set_parent(Panel& parent) { parent_ = &parent; }
 
-  void draw(const SpriteManager& sprite_manager) const;
+  void draw(const SpriteManager& sprite_manager, Window& window) const;
 
   PanelType get_type() const { return type_; }
 

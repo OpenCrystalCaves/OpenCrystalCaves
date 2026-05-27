@@ -328,12 +328,12 @@ Panel* Panel::update(const Input& input)
   return next;
 }
 
-void Panel::draw(const SpriteManager& sprite_manager) const
+void Panel::draw(const SpriteManager& sprite_manager, Window& window) const
 {
   if (type_ == PanelType::PANEL_TYPE_PAGES)
   {
     // Draw the current child instead
-    children_[index_].second.draw(sprite_manager);
+    children_[index_].second.draw(sprite_manager, window);
     return;
   }
   else if (type_ == PanelType::PANEL_TYPE_NEW_GAME || type_ == PanelType::PANEL_TYPE_CONTINUE_GAME)
@@ -343,6 +343,12 @@ void Panel::draw(const SpriteManager& sprite_manager) const
   const geometry::Position frame_pos(((SCREEN_SIZE.x() / CHAR_W - size_.x() - 1) / 2 - 1) * CHAR_W,
                                      ((SCREEN_SIZE.y() / CHAR_H - size_.y() - 1) / 2 - 2) * CHAR_H);
   const geometry::Size frame_size = size_ + geometry::Size(2, 2);
+
+  // If remaster, draw semitransparent black shadow
+  if (sprite_manager.remaster)
+  {
+    window.fill_rect({frame_pos + geometry::Position(CHAR_W, CHAR_H), (frame_size + geometry::Size(1, 1)) * CHAR_W}, {0, 0, 0, 192});
+  }
   // Draw frame
   // Top-left corner
   sprite_manager.render_icon(Icon::ICON_FRAME_NW, frame_pos);
@@ -382,15 +388,18 @@ void Panel::draw(const SpriteManager& sprite_manager) const
     }
   }
 
-  // Shadow right edge (incl bottom-right corner)
-  for (int y = 1; y < frame_size.y() + 2; y++)
+  if (!sprite_manager.remaster)
   {
-    sprite_manager.render_icon(Icon::ICON_FRAME_SHADOW, frame_pos + geometry::Position((frame_size.x() + 1) * CHAR_W, y * CHAR_H));
-  }
-  // Shadow bottom edge
-  for (int x = 1; x < frame_size.x() + 1; x++)
-  {
-    sprite_manager.render_icon(Icon::ICON_FRAME_SHADOW, frame_pos + geometry::Position(x * CHAR_W, (frame_size.y() + 1) * CHAR_H));
+    // Shadow right edge (incl bottom-right corner)
+    for (int y = 1; y < frame_size.y() + 2; y++)
+    {
+      sprite_manager.render_icon(Icon::ICON_FRAME_SHADOW, frame_pos + geometry::Position((frame_size.x() + 1) * CHAR_W, y * CHAR_H));
+    }
+    // Shadow bottom edge
+    for (int x = 1; x < frame_size.x() + 1; x++)
+    {
+      sprite_manager.render_icon(Icon::ICON_FRAME_SHADOW, frame_pos + geometry::Position(x * CHAR_W, (frame_size.y() + 1) * CHAR_H));
+    }
   }
 
   // Spinning question mark frame
