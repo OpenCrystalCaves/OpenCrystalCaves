@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
     }
 
     window->fill_rect(geometry::Rectangle(0, 0, SCREEN_SIZE), {33u, 33u, 33u});
-    panels[index].draw(sprite_manager);
+    panels[index].draw(sprite_manager, *window);
     window->refresh();
     sdl->delay(10);
   }
