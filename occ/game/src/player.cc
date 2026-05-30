@@ -160,6 +160,8 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
         (level.collides_solid(new_player_pos, size, false, &collides_actor) ||
          // Don't let the player leave the top of the level
          new_player_pos.y() < 0 ||
+         // Don't let the player leave the bottom of the level (but allow standing on the bottom edge)
+         new_player_pos.y() >= level.height * SPRITE_H - size.y() ||
          // If player is falling down (step_y == 1) we need to check for collision with platforms
          (step_y == 1 && level.player_on_platform(new_player_pos, size))))
     {

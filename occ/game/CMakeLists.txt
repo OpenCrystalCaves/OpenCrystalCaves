@@ -37,6 +37,7 @@ add_library(game
   "src/player.cc"
   "src/tile.cc"
 )
+target_compile_definitions(game PRIVATE _USE_MATH_DEFINES)
 target_link_libraries(game
   "utils"
 )
