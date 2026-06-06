@@ -475,7 +475,7 @@ class Flier : public Enemy
     return {{position, static_cast<int>(get_sprite()) + frame_, false}};
   }
   virtual int get_points() const override { return 100; }
-  virtual bool flying() const { return true; }
+  virtual bool flying() const override { return true; }
 
  protected:
   virtual Sprite get_sprite() const = 0;
@@ -484,7 +484,6 @@ class Flier : public Enemy
 
  private:
   int frame_ = 0;
-  int next_reverse_ = 0;
 };
 
 class Bat : public Flier

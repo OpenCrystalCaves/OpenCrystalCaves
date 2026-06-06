@@ -24,7 +24,7 @@ enum SwitchFlag
   SWITCH_FLAG_LIGHTS = 4,
 };
 
-static constexpr auto GRAVITY = 8u;
+static constexpr int GRAVITY = 8;
 
 struct Level
 {

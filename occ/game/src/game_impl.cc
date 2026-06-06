@@ -272,7 +272,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   }
 
   // Check up / down (noclip)
-  if (player_.noclip)
+  if (player_.is_freemove(*level_))
   {
     if (player_input.up)
     {
@@ -289,7 +289,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   }
 
   // Check jump
-  if (!player_.noclip)
+  if (!player_.is_freemove(*level_))
   {
     if (player_input.jump && !player_.jumping && !player_.falling)
     {

@@ -30,7 +30,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
 
   // Warp player back to last known good position if they are currently colliding
   // This is to allow them to jump into hidden blocks that solidify
-  if (level.collides_solid(position, size) && !noclip)
+  if (!is_freemove(level) && level.collides_solid(position, size))
   {
     position = position_last;
   }
@@ -72,7 +72,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
 
   // Set y velocity
-  if (!noclip)
+  if (!is_freemove(level))
   {
     if (jumping)
     {
@@ -136,7 +136,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   {
     const auto new_player_pos = position + geometry::Position(step_x, 0);
 
-    if (!noclip &&
+    if (!is_freemove(level) &&
         (level.collides_solid(new_player_pos, size) ||
          // collide with world edges
          new_player_pos.x() < 0 || new_player_pos.x() >= level.width * SPRITE_W - size.x()))
@@ -155,7 +155,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     const auto new_player_pos = position + geometry::Position(0, step_y);
 
     Actor* collides_actor = nullptr;
-    if (!noclip &&
+    if (!is_freemove(level) &&
         (level.collides_solid(new_player_pos, size, false, &collides_actor) ||
          // Don't let the player leave the top of the level
          new_player_pos.y() < 0 ||
@@ -233,7 +233,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
 
   // Check if player is falling
-  if (!noclip)
+  if (!is_freemove(level))
   {
     falling = !jumping && (is_reverse ? velocity.y() < 0 : velocity.y() > 0) && !collide_y &&
       !level.collides_solid(position + geometry::Position(0, is_reverse ? 1 : -1), size);
@@ -274,4 +274,10 @@ bool Player::is_flashing() const
 {
   // Flash on/off for 4 ticks
   return hurt_tick > 0 && (((hurt_tick - 1) / 4) & 1);
+}
+
+
+bool Player::is_freemove(const Level& level) const
+{
+  return noclip || level.is_space();
 }

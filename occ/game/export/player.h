@@ -58,4 +58,6 @@ struct Player
   geometry::Rectangle rect() const { return {position, size}; }
   // Get the effective reverse gravity w.r.t. powerups
   bool is_reverse_gravity() const { return gravity_tick > 0; }
+  // Move freely if noclip or in space level
+  bool is_freemove(const Level& level) const;
 };
