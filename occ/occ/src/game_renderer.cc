@@ -192,6 +192,11 @@ void GameRenderer::render_player() const
 
   const int sprite = [this]()
   {
+    if (game_->get_level().is_space())
+    {
+      // Render spaceship instead
+      return static_cast<int>(Sprite::SPRITE_SPACESHIP);
+    }
     const auto& player = game_->get_player();
     int sprite = 0;
 

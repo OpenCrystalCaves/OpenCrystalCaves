@@ -46,6 +46,7 @@ struct Level
   bool player_on_platform(const geometry::Position& position, const geometry::Size& size) const;
   bool is_complete() const { return crystals == 0; }
   geometry::Position get_player_start_pos(const LevelId previous_level) const;
+  bool is_space() const { return level_id == LevelId::INTRO || level_id == LevelId::FINALE; }
 
   // Helper fields for the level viewer
   std::vector<int> tile_ids;
