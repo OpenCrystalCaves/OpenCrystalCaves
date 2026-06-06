@@ -63,6 +63,7 @@ constexpr int levelRows[] = {
 // Some levels have a missing first row (those with levelRows 23)
 // Fill in the first row with block tiles
 const std::string extraRow = "5gggggggggggggggggggggggggggggggggggggg5";
+const std::string emptyRow(40, ' ');
 const std::tuple<Sprite, geometry::Size, int> levelBGs[] = {
   // intro
   {Sprite::SPRITE_STARS_1, {6, 1}, 0},
@@ -232,9 +233,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   }
 
   auto level = std::make_unique<Level>();
+  level->level_id = level_id;
   // Render player control hints if player hasn't completed any level
   level->show_player_controls = !state.has_completed_any_level();
-  if (level_id == LevelId::INTRO || level_id == LevelId::FINALE)
+  if (level->is_space())
   {
     level->gravity = 0;
   }
@@ -251,6 +253,21 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       level->tile_unknown.push_back(false);
     }
   }
+  else if (level->is_space())
+  {
+    // Space levels have a garbage first row, and we want to add extra rows
+    // above and below
+    const int extraRows = 24 - levelRows[l];
+    for (int i = 0; i < extraRows / 2 + 1; i++)
+    {
+      LOG_DEBUG("%s", emptyRow.c_str());
+      for (char c : emptyRow)
+      {
+        level->tile_ids.push_back(static_cast<int>(c));
+        level->tile_unknown.push_back(false);
+      }
+    }
+  }
   for (int row = 0; row < levelRows[l]; row++)
   {
     const int len = *ptr;
@@ -263,15 +280,38 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
     LOG_DEBUG("%s", row_str.c_str());
     for (int i = 0; i < len; i++, ptr++)
     {
+      // Skip first row for space levels
+      if (level->is_space() && row == 0)
+      {
+        continue;
+      }
       level->tile_ids.push_back(static_cast<int>(*ptr));
       level->tile_unknown.push_back(false);
     }
   }
-  level->level_id = level_id;
+  // Insert extra rows below for space levels
+  if (level->is_space())
+  {
+    const int extraRows = 24 - levelRows[l];
+    for (int i = 0; i < (extraRows + 1) / 2; i++)
+    {
+      LOG_DEBUG("%s", emptyRow.c_str());
+      for (char c : emptyRow)
+      {
+        level->tile_ids.push_back(static_cast<int>(c));
+        level->tile_unknown.push_back(false);
+      }
+    }
+  }
   level->height = levelRows[l];
   if (levelRows[l] == 23)
   {
     level->height++;
+  }
+  else if (level->is_space())
+  {
+    const int extraRows = 24 - levelRows[l];
+    level->height += extraRows;
   }
   const auto background = levelBGs[static_cast<int>(level_id)];
   const auto block_sprite = blockColors[static_cast<int>(level_id)];
@@ -292,7 +332,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
     const int x = i % level->width;
     if (x == 0)
     {
-      is_stars_row = false;
+      is_stars_row = level->is_space();
       is_horizon_row = false;
       mode = TileMode::NONE;
       volcano_sprite = -1;
