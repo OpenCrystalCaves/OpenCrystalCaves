@@ -234,6 +234,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   auto level = std::make_unique<Level>();
   // Render player control hints if player hasn't completed any level
   level->show_player_controls = !state.has_completed_any_level();
+  if (level_id == LevelId::INTRO || level_id == LevelId::FINALE)
+  {
+    level->gravity = 0;
+  }
 
   // Read the tile ids of the level
   level->width = 0;
@@ -1244,7 +1248,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                 break;
               case '1':
                 // [1 = reverse gravity sign
-                level->reverse_gravity = true;
+                level->gravity = -GRAVITY;
                 sprite = static_cast<int>(Sprite::SPRITE_REVERSE_GRAVITY_1);
                 flags |= TILE_SOLID_TOP;
                 mode = TileMode::SIGN;

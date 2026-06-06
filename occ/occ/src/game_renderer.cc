@@ -277,7 +277,7 @@ void GameRenderer::render_player() const
         }
       }
     }
-    if (player.is_reverse_gravity() ^ game_->get_level().reverse_gravity)
+    if (player.is_reverse_gravity() ^ (game_->get_level().gravity < 0))
     {
       sprite += 104;
     }

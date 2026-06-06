@@ -5,7 +5,6 @@
 #include "misc.h"
 #include "particle.h"
 
-static constexpr auto GRAVITY = 8u;
 constexpr geometry::Size Player::size;
 static constexpr auto jump_velocity = misc::make_array<int>(-8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 9u;
@@ -81,9 +80,9 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     }
     else
     {
-      velocity = Vector<int>(velocity.x(), GRAVITY);
+      velocity = Vector<int>(velocity.x(), level.gravity);
     }
-    if (is_reverse_gravity() ^ level.reverse_gravity)
+    if (is_reverse_gravity() ^ (level.gravity < 0))
     {
       velocity = Vector<int>(velocity.x(), -velocity.y());
     }
@@ -187,7 +186,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
 
   // Check if player still jumping
-  const bool is_reverse = is_reverse_gravity() ^ level.reverse_gravity;
+  const bool is_reverse = is_reverse_gravity() ^ (level.gravity < 0);
   if (jumping)
   {
     // Check if player hit something while jumping
@@ -220,7 +219,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
       jumping = false;
     }
     else if (jump_tick != 0 &&
-             level.collides_solid(position + geometry::Position(0, (is_reverse_gravity() ^ level.reverse_gravity) ? -1 : 1), size))
+             level.collides_solid(position + geometry::Position(0, (is_reverse_gravity() ^ (level.gravity < 0)) ? -1 : 1), size))
     {
       // Player did not actually collide with the ground, but standing directly above it
       // and this isn't the first tick in the jump, so we can consider the jump to have

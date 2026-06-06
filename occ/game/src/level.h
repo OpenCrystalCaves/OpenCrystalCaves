@@ -24,6 +24,8 @@ enum SwitchFlag
   SWITCH_FLAG_LIGHTS = 4,
 };
 
+static constexpr auto GRAVITY = 8u;
+
 struct Level
 {
   LevelId level_id;
@@ -47,6 +49,7 @@ struct Level
   bool is_complete() const { return crystals == 0; }
   geometry::Position get_player_start_pos(const LevelId previous_level) const;
   bool is_space() const { return level_id == LevelId::INTRO || level_id == LevelId::FINALE; }
+  void reverse_gravity() { gravity = -gravity; }
 
   // Helper fields for the level viewer
   std::vector<int> tile_ids;
@@ -71,7 +74,7 @@ struct Level
   geometry::Position dv;
   std::vector<geometry::Rectangle> falling_rocks_areas = {};
   int falling_rock_ticks = 0;
-  bool reverse_gravity = false;
+  int gravity = GRAVITY;
   int recoil = 0;
   bool no_air = false;
   int bonus_counter = 0;

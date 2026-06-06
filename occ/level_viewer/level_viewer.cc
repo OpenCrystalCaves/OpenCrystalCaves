@@ -74,7 +74,7 @@ void draw(Window& window, Level& level, SpriteManager& sprite_manager, const int
           sprite_manager.render_tile(sprite_pos.sprite_id, sprite_pos.position);
         }
       }
-      sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT) + (level.reverse_gravity ? 104 : 0), level.player_spawn);
+      sprite_manager.render_tile(static_cast<int>(Sprite::SPRITE_STANDING_RIGHT) + (level.gravity < 0 ? 104 : 0), level.player_spawn);
       if (level.tile_unknown[x + y * level.width])
       {
         sprite_manager.render_text(L"?", {x * SPRITE_W, y * SPRITE_H});
