@@ -100,10 +100,12 @@ void GameRenderer::render_background() const
   //       to it _once_, then just keep render that surface (with game_camera offset) until the
   //       level changes.
 
-  const auto start_tile_x = game_camera_.position.x() > 0 ? game_camera_.position.x() / 16 : 0;
-  const auto start_tile_y = game_camera_.position.y() > 0 ? game_camera_.position.y() / 16 : 0;
-  const auto end_tile_x = (game_camera_.position.x() + game_camera_.size.x()) / 16;
-  const auto end_tile_y = (game_camera_.position.y() + game_camera_.size.y()) / 16;
+  // Parallax background rendering
+  const auto cameraPos = game_->get_level().is_space() ? geometry::Position(0, 0) : game_camera_.position;
+  const auto start_tile_x = cameraPos.x() > 0 ? cameraPos.x() / 16 : 0;
+  const auto start_tile_y = cameraPos.y() > 0 ? cameraPos.y() / 16 : 0;
+  const auto end_tile_x = (cameraPos.x() + game_camera_.size.x()) / 16;
+  const auto end_tile_y = (cameraPos.y() + game_camera_.size.y()) / 16;
 
   for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
   {
@@ -112,7 +114,7 @@ void GameRenderer::render_background() const
       const auto sprite_id = game_->get_bg_sprite(tile_x, tile_y);
       if (sprite_id != -1)
       {
-        render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H});
+        sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, cameraPos);
       }
     }
   }
