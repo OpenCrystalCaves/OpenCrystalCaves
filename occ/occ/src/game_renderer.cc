@@ -110,9 +110,21 @@ void GameRenderer::render_background() const
         // Stars get parallax effect
         // In main level, they are infinite distance away, but in space levels they
         // are drawn with random offsets
+        // Horizon tiles get only a horizontal parallax effect
         const bool is_star = sprite_id >= static_cast<int>(Sprite::SPRITE_STARS_1) && sprite_id <= static_cast<int>(Sprite::SPRITE_STARS_6);
-        const double parallax_factor = is_star ? (game_->get_level().is_space() ? (tile_x * 31 ^ tile_y * 7) % 3 * 0.1 : 0) : 1.0;
-        const auto camera_pos = game_camera_.position * parallax_factor;
+        const bool is_horizon =
+          (sprite_id >= static_cast<int>(Sprite::SPRITE_HORIZON_1) && sprite_id <= static_cast<int>(Sprite::SPRITE_HORIZON_4)) ||
+          sprite_id >= static_cast<int>(Sprite::SPRITE_HORIZON_LAMP);
+        geometry::Position camera_pos = game_camera_.position;
+        if (is_star)
+        {
+          const double factor = game_->get_level().is_space() ? (tile_x * 31 ^ tile_y * 7) % 6 * 0.1 : 0;
+          camera_pos *= factor;
+        }
+        else if (is_horizon)
+        {
+          camera_pos = geometry::Position(camera_pos.x() * 0.25, camera_pos.y());
+        }
         sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, camera_pos);
       }
     }

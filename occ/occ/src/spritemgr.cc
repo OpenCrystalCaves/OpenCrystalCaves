@@ -211,7 +211,7 @@ std::string load_pixels(const std::filesystem::path& path,
                 const bool g = (g_plane >> bit) & 1;
                 const bool r = (r_plane >> bit) & 1;
                 const bool i = (i_plane >> bit) & 1;
-                const int color_index = (i << 3) | (r << 2) | (g << 1) | b;
+                const auto color_index = (i << 3) | (r << 2) | (g << 1) | b;
                 // For stars, replace blacks with transparent
                 if (is_star && color_index == 0)
                 {
