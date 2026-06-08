@@ -180,6 +180,7 @@ std::string load_pixels(const std::filesystem::path& path,
       uint8_t* pp = (uint8_t*)(&pixels[0]);
       for (int c = 0; c < header.count; c++, index++)
       {
+        const bool is_star = index >= static_cast<int>(Sprite::SPRITE_STARS_1) && index <= static_cast<int>(Sprite::SPRITE_STARS_6);
         int x_start = (index % stride) * sprite_w;
         int y_start = (index / stride) * sprite_h;
         int x = x_start;
@@ -210,7 +211,16 @@ std::string load_pixels(const std::filesystem::path& path,
                 const bool g = (g_plane >> bit) & 1;
                 const bool r = (r_plane >> bit) & 1;
                 const bool i = (i_plane >> bit) & 1;
-                ((uint32_t*)all_pixels.data())[pixel_i] = colors[((int)i << 3) | ((int)r << 2) | ((int)g << 1) | (int)b];
+                const int color_index = (i << 3) | (r << 2) | (g << 1) | b;
+                // For stars, replace blacks with transparent
+                if (is_star && color_index == 0)
+                {
+                  ((uint32_t*)all_pixels.data())[pixel_i] = 0;
+                }
+                else
+                {
+                  ((uint32_t*)all_pixels.data())[pixel_i] = colors[color_index];
+                }
               }
               x++;
               if (x == x_start + sprite_w)

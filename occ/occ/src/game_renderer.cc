@@ -81,7 +81,7 @@ void GameRenderer::render_game(unsigned game_tick) const
 {
   window_.set_render_target(game_surface_);
   // Clear game surface (background now)
-  window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), {33u, 33u, 33u});
+  window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), {0, 0, 0});
   render_background();
   render_tiles(false);
   render_objects(false);
@@ -108,11 +108,12 @@ void GameRenderer::render_background() const
       if (sprite_id != -1)
       {
         // Stars get parallax effect
-        const auto cameraPos =
-          (sprite_id >= static_cast<int>(Sprite::SPRITE_STARS_1) && sprite_id <= static_cast<int>(Sprite::SPRITE_STARS_6))
-          ? geometry::Position(0, 0)
-          : game_camera_.position;
-        sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, cameraPos);
+        // In main level, they are infinite distance away, but in space levels they
+        // are drawn with random offsets
+        const bool is_star = sprite_id >= static_cast<int>(Sprite::SPRITE_STARS_1) && sprite_id <= static_cast<int>(Sprite::SPRITE_STARS_6);
+        const double parallax_factor = is_star ? (game_->get_level().is_space() ? (tile_x * 31 ^ tile_y * 7) % 3 * 0.1 : 0) : 1.0;
+        const auto camera_pos = game_camera_.position * parallax_factor;
+        sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, camera_pos);
       }
     }
   }
