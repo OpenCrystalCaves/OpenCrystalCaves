@@ -100,20 +100,18 @@ void GameRenderer::render_background() const
   //       to it _once_, then just keep render that surface (with game_camera offset) until the
   //       level changes.
 
-  // Parallax background rendering
-  const auto cameraPos = game_->get_level().is_space() ? geometry::Position(0, 0) : game_camera_.position;
-  const auto start_tile_x = cameraPos.x() > 0 ? cameraPos.x() / 16 : 0;
-  const auto start_tile_y = cameraPos.y() > 0 ? cameraPos.y() / 16 : 0;
-  const auto end_tile_x = (cameraPos.x() + game_camera_.size.x()) / 16;
-  const auto end_tile_y = (cameraPos.y() + game_camera_.size.y()) / 16;
-
-  for (int tile_y = start_tile_y; tile_y <= end_tile_y; tile_y++)
+  for (int tile_y = 0; tile_y < game_->get_level().height; tile_y++)
   {
-    for (int tile_x = start_tile_x; tile_x <= end_tile_x; tile_x++)
+    for (int tile_x = 0; tile_x < game_->get_level().width; tile_x++)
     {
-      const auto sprite_id = game_->get_bg_sprite(tile_x, tile_y);
+      const auto sprite_id = game_->get_level().get_bg(tile_x, tile_y);
       if (sprite_id != -1)
       {
+        // Stars get parallax effect
+        const auto cameraPos =
+          (sprite_id >= static_cast<int>(Sprite::SPRITE_STARS_1) && sprite_id <= static_cast<int>(Sprite::SPRITE_STARS_6))
+          ? geometry::Position(0, 0)
+          : game_camera_.position;
         sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, cameraPos);
       }
     }
@@ -139,19 +137,13 @@ void GameRenderer::render_background() const
       volcano_tick_start = game_tick_;
     }
 
-    // Render volcano fire if active and visible
+    // Render volcano fire if active
     if (volcano_active)
     {
-      if (start_tile_x <= 29 && end_tile_x >= 29)
-      {
-        const auto sprite_id = 752 + ((game_tick_ - volcano_tick_start) / 3) % 4;
-        render_tile(sprite_id, {29 * SPRITE_W, 2 * SPRITE_H});
-      }
-      if (start_tile_x <= 30 && end_tile_x >= 30)
-      {
-        const auto sprite_id = 748 + ((game_tick_ - volcano_tick_start) / 3) % 4;
-        render_tile(sprite_id, {30 * SPRITE_W, 2 * SPRITE_H});
-      }
+      const auto sprite_id_1 = 752 + ((game_tick_ - volcano_tick_start) / 3) % 4;
+      render_tile(sprite_id_1, {29 * SPRITE_W, 2 * SPRITE_H});
+      const auto sprite_id_2 = 748 + ((game_tick_ - volcano_tick_start) / 3) % 4;
+      render_tile(sprite_id_2, {30 * SPRITE_W, 2 * SPRITE_H});
     }
 
     if (game_->get_level().show_player_controls)

@@ -38,8 +38,6 @@ class Game
   virtual int get_tile_width() const = 0;
   virtual int get_tile_height() const = 0;
 
-  virtual int get_bg_sprite(const int x, const int y) const = 0;
-
   virtual const std::vector<Object>& get_objects() const = 0;
 
   virtual unsigned get_score() const = 0;

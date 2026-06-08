@@ -32,8 +32,6 @@ class GameImpl : public Game
   int get_tile_width() const override { return level_->width; }
   int get_tile_height() const override { return level_->height; }
 
-  int get_bg_sprite(const int x, const int y) const override;
-
   const std::vector<Object>& get_objects() const override { return objects_; }
 
   unsigned get_score() const override { return score_; }

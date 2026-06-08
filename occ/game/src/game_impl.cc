@@ -85,11 +85,6 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   update_player(player_input);
 }
 
-int GameImpl::get_bg_sprite(const int x, const int y) const
-{
-  return level_->get_bg(x, y);
-}
-
 std::wstring GameImpl::get_debug_info() const
 {
   std::wostringstream oss;
