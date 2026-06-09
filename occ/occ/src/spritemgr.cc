@@ -180,7 +180,6 @@ std::string load_pixels(const std::filesystem::path& path,
       uint8_t* pp = (uint8_t*)(&pixels[0]);
       for (int c = 0; c < header.count; c++, index++)
       {
-        const bool is_star = index >= static_cast<int>(Sprite::SPRITE_STARS_1) && index <= static_cast<int>(Sprite::SPRITE_STARS_6);
         int x_start = (index % stride) * sprite_w;
         int y_start = (index / stride) * sprite_h;
         int x = x_start;
@@ -207,20 +206,12 @@ std::string load_pixels(const std::filesystem::path& path,
               }
               else
               {
-                const bool b = (b_plane >> bit) & 1;
-                const bool g = (g_plane >> bit) & 1;
-                const bool r = (r_plane >> bit) & 1;
-                const bool i = (i_plane >> bit) & 1;
-                const auto color_index = (i << 3) | (r << 2) | (g << 1) | b;
-                // For stars, replace blacks with transparent
-                if (is_star && color_index == 0)
-                {
-                  ((uint32_t*)all_pixels.data())[pixel_i] = 0;
-                }
-                else
-                {
-                  ((uint32_t*)all_pixels.data())[pixel_i] = colors[color_index];
-                }
+                const int b = (b_plane >> bit) & 1;
+                const int g = (g_plane >> bit) & 1;
+                const int r = (r_plane >> bit) & 1;
+                const int i = (i_plane >> bit) & 1;
+                const int color_index = (i << 3) | (r << 2) | (g << 1) | b;
+                ((uint32_t*)all_pixels.data())[pixel_i] = colors[color_index];
               }
               x++;
               if (x == x_start + sprite_w)
@@ -233,6 +224,46 @@ std::string load_pixels(const std::filesystem::path& path,
         }
       }
       index += filler;
+    }
+  }
+  // Post processing
+  // For stars, replace blacks with transparent
+  for (int sprite = static_cast<int>(Sprite::SPRITE_STARS_1); sprite <= static_cast<int>(Sprite::SPRITE_STARS_6); sprite++)
+  {
+    const int x_start = (sprite % stride) * sprite_w;
+    const int y_start = (sprite / stride) * sprite_h;
+    for (int y = 0; y < sprite_h; y++)
+    {
+      for (int x = 0; x < sprite_w; x++)
+      {
+        const int pixel_i = x + x_start + (y + y_start) * stride * sprite_h;
+        uint32_t* pixel = &((uint32_t*)all_pixels.data())[pixel_i];
+        if (*pixel == colors[0])
+        {
+          *pixel = 0;
+        }
+      }
+    }
+  }
+  // For horizon lamp, cut out the background by comparing it against the horizon sprite
+  {
+    const int bg_x_start = (static_cast<int>(Sprite::SPRITE_HORIZON) % stride) * sprite_w;
+    const int bg_y_start = (static_cast<int>(Sprite::SPRITE_HORIZON) / stride) * sprite_h;
+    const int lamp_x_start = (static_cast<int>(Sprite::SPRITE_HORIZON_LAMP) % stride) * sprite_w;
+    const int lamp_y_start = (static_cast<int>(Sprite::SPRITE_HORIZON_LAMP) / stride) * sprite_h;
+    for (int y = 0; y < sprite_h; y++)
+    {
+      for (int x = 0; x < sprite_w; x++)
+      {
+        const int bg_pixel_i = x + bg_x_start + (y + bg_y_start) * stride * sprite_h;
+        const int lamp_pixel_i = x + lamp_x_start + (y + lamp_y_start) * stride * sprite_h;
+        const uint32_t bg_pixel = ((uint32_t*)all_pixels.data())[bg_pixel_i];
+        uint32_t* lamp_pixel = &((uint32_t*)all_pixels.data())[lamp_pixel_i];
+        if (*lamp_pixel == bg_pixel)
+        {
+          *lamp_pixel = 0;
+        }
+      }
     }
   }
   return all_pixels;
