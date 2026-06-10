@@ -123,7 +123,10 @@ void GameRenderer::render_background() const
         }
         else if (is_horizon)
         {
-          camera_pos = geometry::Position(camera_pos.x() * 0.25, camera_pos.y());
+          // Render horizon with infinite horizontal parallax in addition
+          sprite_manager_->render_tile(
+            static_cast<int>(Sprite::SPRITE_HORIZON), {tile_x * SPRITE_W, tile_y * SPRITE_H}, geometry::Position(0, camera_pos.y()));
+          camera_pos = geometry::Position(static_cast<int>(camera_pos.x() * 0.25), camera_pos.y());
         }
         sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, camera_pos);
       }

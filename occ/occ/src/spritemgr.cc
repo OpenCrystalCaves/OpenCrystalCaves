@@ -245,23 +245,26 @@ std::string load_pixels(const std::filesystem::path& path,
       }
     }
   }
-  // For horizon lamp, cut out the background by comparing it against the horizon sprite
+  // For horizon lamps/mountains, cut out the background by comparing it against the horizon sprite
+  const auto horizon_sprites = {
+    Sprite::SPRITE_HORIZON_LAMP, Sprite::SPRITE_HORIZON_1, Sprite::SPRITE_HORIZON_2, Sprite::SPRITE_HORIZON_3, Sprite::SPRITE_HORIZON_4};
+  for (const auto& horizon_sprite : horizon_sprites)
   {
     const int bg_x_start = (static_cast<int>(Sprite::SPRITE_HORIZON) % stride) * sprite_w;
     const int bg_y_start = (static_cast<int>(Sprite::SPRITE_HORIZON) / stride) * sprite_h;
-    const int lamp_x_start = (static_cast<int>(Sprite::SPRITE_HORIZON_LAMP) % stride) * sprite_w;
-    const int lamp_y_start = (static_cast<int>(Sprite::SPRITE_HORIZON_LAMP) / stride) * sprite_h;
+    const int h_x_start = (static_cast<int>(horizon_sprite) % stride) * sprite_w;
+    const int h_y_start = (static_cast<int>(horizon_sprite) / stride) * sprite_h;
     for (int y = 0; y < sprite_h; y++)
     {
       for (int x = 0; x < sprite_w; x++)
       {
         const int bg_pixel_i = x + bg_x_start + (y + bg_y_start) * stride * sprite_h;
-        const int lamp_pixel_i = x + lamp_x_start + (y + lamp_y_start) * stride * sprite_h;
+        const int h_pixel_i = x + h_x_start + (y + h_y_start) * stride * sprite_h;
         const uint32_t bg_pixel = ((uint32_t*)all_pixels.data())[bg_pixel_i];
-        uint32_t* lamp_pixel = &((uint32_t*)all_pixels.data())[lamp_pixel_i];
-        if (*lamp_pixel == bg_pixel)
+        uint32_t* h_pixel = &((uint32_t*)all_pixels.data())[h_pixel_i];
+        if (*h_pixel == bg_pixel)
         {
-          *lamp_pixel = 0;
+          *h_pixel = 0;
         }
       }
     }
