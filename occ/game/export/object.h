@@ -9,15 +9,23 @@ struct ObjectDef
   bool bright;
 };
 
+enum class ObjectFlags : int
+{
+  NONE = 0,
+  RENDER_IN_FRONT = 1 << 0,
+  BRIGHT = 1 << 1,
+  FIXED_X = 1 << 2,
+  FIXED_Y = 1 << 3,
+};
+
 struct Object
 {
-  Object(geometry::Position position, int sprite_id, bool bright, int num_sprites, const bool reverse, const bool is_render_in_front)
+  Object(geometry::Position position, int sprite_id, int num_sprites, const bool reverse, int flags)
     : position(position),
       sprite_id(sprite_id),
-      bright(bright),
       num_sprites(num_sprites),
       reverse(reverse),
-      is_render_in_front(is_render_in_front)
+      flags(flags)
   {
   }
 
@@ -29,8 +37,7 @@ struct Object
 
   geometry::Position position;
   int sprite_id;
-  bool bright;
   int num_sprites;
   bool reverse;
-  bool is_render_in_front;
+  int flags;
 };

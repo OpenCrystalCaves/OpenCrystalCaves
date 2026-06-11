@@ -318,7 +318,7 @@ void GameRenderer::render_player() const
     }
     else if (game_->get_player().is_flashing())
     {
-      render_tile(sprite, player_render_pos, {0xff, 0xff, 0xff}, true);
+      render_tile(sprite, player_render_pos, {0xff, 0xff, 0xff}, static_cast<int>(ObjectFlags::BRIGHT));
     }
     else
     {
@@ -390,21 +390,18 @@ void GameRenderer::render_objects(const bool in_front) const
 {
   for (const auto& object : game_->get_objects())
   {
-    if (object.is_render_in_front != in_front)
+    if ((object.flags & static_cast<int>(ObjectFlags::RENDER_IN_FRONT)) != in_front)
     {
       continue;
     }
     static constexpr geometry::Size object_size = geometry::Size(16, 16);
-    if (geometry::isColliding(geometry::Rectangle(object.position, object_size), game_camera_))
-    {
-      const auto sprite_id = object.get_sprite(game_tick_);
-      render_tile(sprite_id, object.position, {0xff, 0xff, 0xff}, object.bright);
+    const auto sprite_id = object.get_sprite(game_tick_);
+    render_tile(sprite_id, object.position, {0xff, 0xff, 0xff}, object.flags);
 
-      if (debug_)
-      {
-        const geometry::Rectangle dest_rect{object.position - game_camera_.position, object_size};
-        window_.render_rectangle(dest_rect, {255, 0, 0});
-      }
+    if (debug_)
+    {
+      const geometry::Rectangle dest_rect{object.position - game_camera_.position, object_size};
+      window_.render_rectangle(dest_rect, {255, 0, 0});
     }
   }
   if (debug_)
@@ -536,7 +533,7 @@ void GameRenderer::render_statusbar() const
   }
 }
 
-void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, const Color color, const bool bright) const
+void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, const Color color, int flags) const
 {
   // Show alternate low gravity sign
   if (sprite == static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_2) && sprite_manager_->remaster)
@@ -545,19 +542,28 @@ void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, 
     sprite_manager_->render_other(sign_name, pos - geometry::Position(16, 0), game_camera_.position);
     return;
   }
+  geometry::Position camera_pos = game_camera_.position;
+  if (flags & static_cast<int>(ObjectFlags::FIXED_X))
+  {
+    camera_pos = geometry::Position(0, camera_pos.y());
+  }
+  if (flags & static_cast<int>(ObjectFlags::FIXED_Y))
+  {
+    camera_pos = geometry::Position(camera_pos.x(), 0);
+  }
   // Show projectiles as bright if remaster since they can be hard to see
   const bool flash_projectile = sprite_manager_->remaster && (game_tick_ & 1) &&
     (sprite == static_cast<int>(Sprite::SPRITE_LASER_BEAM_1) || sprite == static_cast<int>(Sprite::SPRITE_LASER_BEAM_2));
-  if (bright || flash_projectile)
+  if ((flags & static_cast<int>(ObjectFlags::BRIGHT)) || flash_projectile)
   {
-    sprite_manager_->render_tile(sprite + SPRITE_TOTAL * 2, pos, game_camera_.position, color);
+    sprite_manager_->render_tile(sprite + SPRITE_TOTAL * 2, pos, camera_pos, color);
   }
   else if (!(game_->get_level().switch_flags & SWITCH_FLAG_LIGHTS))
   {
-    sprite_manager_->render_tile(sprite + SPRITE_TOTAL, pos, game_camera_.position, color);
+    sprite_manager_->render_tile(sprite + SPRITE_TOTAL, pos, camera_pos, color);
   }
   else
   {
-    sprite_manager_->render_tile(sprite, pos, game_camera_.position, color);
+    sprite_manager_->render_tile(sprite, pos, camera_pos, color);
   }
 }

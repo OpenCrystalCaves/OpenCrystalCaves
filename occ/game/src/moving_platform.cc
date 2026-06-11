@@ -4,8 +4,8 @@
 
 MovingPlatform::MovingPlatform(geometry::Position position, const bool horizontal, const bool controlled)
   : position(position),
-    sprite_id_(static_cast<int>(horizontal ? Sprite::SPRITE_PLATFORM_H_1 : Sprite::SPRITE_PLATFORM_V_1)),
     velocity(horizontal ? Vector<int>(1, 0) * 2 : Vector<int>(0, 1) * 2),
+	sprite_id_(static_cast<int>(horizontal ? Sprite::SPRITE_PLATFORM_H_1 : Sprite::SPRITE_PLATFORM_V_1)),
     controlled_(controlled)
 {
 }

@@ -320,9 +320,8 @@ void Earth::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   ticks_++;
   if (!moving_)
     return;
-  const int earth_orbit_radius = (level.width - 4) * 16 / 2;
-  position =
-    geometry::Position((level.width - 2) * 16 / 2 + 16 + static_cast<int>(sin(ticks_ / 500.0 - M_PI_2) * earth_orbit_radius), position.y());
+  const int earth_orbit_radius = (20 - 5) * 16 / 2;
+  position = geometry::Position(19 * 16 / 2 + static_cast<int>(sin(ticks_ / 500.0 - M_PI_2) * earth_orbit_radius), position.y());
 }
 
 void Moon::update([[maybe_unused]] AbstractSoundManager& sound_manager,

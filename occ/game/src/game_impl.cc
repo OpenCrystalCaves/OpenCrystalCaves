@@ -130,7 +130,7 @@ void GameImpl::update_level()
   // Add moving platforms to objects_
   for (auto& platform : level_->moving_platforms)
   {
-    objects_.emplace_back(platform.position, platform.get_sprite(), false, 1, false, false);
+    objects_.emplace_back(platform.position, platform.get_sprite(), 1, false, 0);
   }
 
   // Add entrances
@@ -151,7 +151,7 @@ void GameImpl::update_level()
       }
     }
     entrance.update();
-    objects_.emplace_back(entrance.position, entrance.get_sprite(), false, 1, false, false);
+    objects_.emplace_back(entrance.position, entrance.get_sprite(), 1, false, 0);
   }
 
   // Add exit
@@ -171,7 +171,8 @@ void GameImpl::update_level()
     level_->exit->update();
     for (const auto& sprite_pos : level_->exit->get_sprites())
     {
-      objects_.emplace_back(sprite_pos.position, sprite_pos.sprite_id, sprite_pos.bright, 1, false, false);
+      objects_.emplace_back(
+        sprite_pos.position, sprite_pos.sprite_id, 1, false, sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0);
     }
   }
 
@@ -335,7 +336,7 @@ void GameImpl::update_missile()
     }
     else
     {
-      objects_.emplace_back(p->position, p->get_sprite(), false, 1, false, false);
+      objects_.emplace_back(p->position, p->get_sprite(), 1, false, 0);
       it++;
     }
   }
@@ -367,14 +368,14 @@ void GameImpl::update_missile()
   // Add missile to objects_ if alive
   if (missile_.alive)
   {
-    objects_.emplace_back(missile_.position, missile_.get_sprite(), false, missile_.get_num_sprites(), false, false);
+    objects_.emplace_back(missile_.position, missile_.get_sprite(), missile_.get_num_sprites(), false, 0);
   }
 }
 
 void GameImpl::update_enemies()
 {
   // Iterate by index as we may add/remove enemies while updating
-  for (int i = 0; i < level_->enemies.size(); i++)
+  for (int i = 0; i < static_cast<int>(level_->enemies.size()); i++)
   {
     auto e = level_->enemies[i].get();
     if (player_.stop_tick == 0)
@@ -415,7 +416,7 @@ void GameImpl::update_enemies()
 
 void GameImpl::update_hazards()
 {
-  for (int i = 0; i < level_->hazards.size();)
+  for (int i = 0; i < static_cast<int>(level_->hazards.size());)
   {
     auto h = level_->hazards[i].get();
     if (player_.stop_tick == 0)
@@ -432,7 +433,14 @@ void GameImpl::update_hazards()
     {
       for (const auto& sprite_pos : h->get_sprites(*level_))
       {
-        objects_.emplace_back(sprite_pos.position, sprite_pos.sprite_id, sprite_pos.bright, 1, false, h->is_render_in_front());
+        objects_.emplace_back(sprite_pos.position,
+                              sprite_pos.sprite_id,
+                              1,
+                              false,
+                              (sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0) +
+                                (h->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0) +
+                                (h->fixed_x() ? static_cast<int>(ObjectFlags::FIXED_X) : 0) +
+                                (h->fixed_y() ? static_cast<int>(ObjectFlags::FIXED_Y) : 0));
       }
       i++;
     }
@@ -466,7 +474,14 @@ void GameImpl::update_actors()
     {
       for (const auto& sprite_pos : a->get_sprites(*level_))
       {
-        objects_.emplace_back(sprite_pos.position, sprite_pos.sprite_id, sprite_pos.bright, 1, false, a->is_render_in_front());
+        objects_.emplace_back(sprite_pos.position,
+                              sprite_pos.sprite_id,
+                              1,
+                              false,
+                              (sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0) +
+                                (a->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0) +
+                                (a->fixed_x() ? static_cast<int>(ObjectFlags::FIXED_X) : 0) +
+                                (a->fixed_y() ? static_cast<int>(ObjectFlags::FIXED_Y) : 0));
       }
       it++;
     }

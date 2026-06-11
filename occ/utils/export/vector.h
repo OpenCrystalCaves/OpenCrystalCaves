@@ -2,20 +2,14 @@
 
 #include <cmath>
 
-template <typename T>
+template<typename T>
 class Vector
 {
  public:
   // Constructors
-  constexpr Vector()
-    : x_(0), y_(0)
-  {
-  }
+  constexpr Vector() : x_(0), y_(0) {}
 
-  constexpr Vector(T x, T y)
-    : x_(x), y_(y)
-  {
-  }
+  constexpr Vector(T x, T y) : x_(x), y_(y) {}
 
   Vector(const Vector&) = default;
   Vector& operator=(const Vector&) = default;
@@ -26,13 +20,13 @@ class Vector
   ~Vector() = default;
 
   // Constructors for other templated type
-  template <typename Y>
-  Vector(const Vector<Y>& other)
-    : x_(other.x_), y_(other.y_)
+  template<typename Y>
+  Vector(const Vector<Y>& other) : x_(other.x_),
+                                   y_(other.y_)
   {
   }
 
-  template <typename Y>
+  template<typename Y>
   Vector& operator=(const Vector<Y>& other)
   {
     x_ = other.x_;
@@ -40,13 +34,13 @@ class Vector
     return *this;
   }
 
-  template <typename Y>
-  Vector(Vector<Y>&& other)
-    : x_(other.x_), y_(other.y_)
+  template<typename Y>
+  Vector(Vector<Y>&& other) : x_(other.x_),
+                              y_(other.y_)
   {
   }
 
-  template <typename Y>
+  template<typename Y>
   Vector& operator=(Vector<Y>&& other)
   {
     if (this != &other)
@@ -61,45 +55,21 @@ class Vector
   constexpr T y() const { return y_; }
 
   // Operators
-  constexpr Vector operator+(const Vector& other) const
-  {
-    return Vector(x_ + other.x_, y_ + other.y_);
-  }
+  constexpr Vector operator+(const Vector& other) const { return Vector(x_ + other.x_, y_ + other.y_); }
 
-  constexpr Vector operator-(const Vector& other) const
-  {
-    return Vector(x_ - other.x_, y_ - other.y_);
-  }
+  constexpr Vector operator-(const Vector& other) const { return Vector(x_ - other.x_, y_ - other.y_); }
 
-  constexpr Vector operator+() const
-  {
-    return Vector(x_, y_);
-  }
+  constexpr Vector operator+() const { return Vector(x_, y_); }
 
-  constexpr Vector operator-() const
-  {
-    return Vector(-x_, -y_);
-  }
+  constexpr Vector operator-() const { return Vector(-x_, -y_); }
 
-  constexpr Vector operator*(const Vector& other) const
-  {
-    return Vector(x_ * other.x_, y_ * other.y_);
-  }
+  constexpr Vector operator*(const Vector& other) const { return Vector(x_ * other.x_, y_ * other.y_); }
 
-  constexpr Vector operator/(const Vector& other) const
-  {
-    return Vector(x_ / other.x_, y_ / other.y_);
-  }
+  constexpr Vector operator/(const Vector& other) const { return Vector(x_ / other.x_, y_ / other.y_); }
 
-  constexpr Vector operator*(double d) const
-  {
-    return Vector(static_cast<int>(x_ * d), static_cast<int>(y_ * d));
-  }
+  constexpr Vector operator*(double d) const { return Vector(static_cast<int>(x_ * d), static_cast<int>(y_ * d)); }
 
-  constexpr Vector operator/(double d) const
-  {
-    return Vector(static_cast<int>(x_ / d), static_cast<int>(y_ / d));
-  }
+  constexpr Vector operator/(double d) const { return Vector(static_cast<int>(x_ / d), static_cast<int>(y_ / d)); }
 
   template<typename Y>
   constexpr bool operator==(const Vector<Y>& other) const
@@ -137,15 +107,15 @@ class Vector
 
   constexpr Vector& operator*=(double d)
   {
-    x_ *= d;
-    y_ *= d;
+    x_ = static_cast<T>(x_ * d);
+    y_ = static_cast<T>(y_ * d);
     return *this;
   }
 
   constexpr Vector& operator/=(double d)
   {
-    x_ /= d;
-    y_ /= d;
+    x_ = static_cast<T>(x_ / d);
+    y_ = static_cast<T>(y_ / d);
     return *this;
   }
 
@@ -153,6 +123,6 @@ class Vector
   T x_;
   T y_;
 
-  template <typename Y>
+  template<typename Y>
   friend class Vector;
 };

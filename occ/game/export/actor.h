@@ -54,6 +54,8 @@ class Actor
   }
   virtual bool interact([[maybe_unused]] AbstractSoundManager& sound_manager, [[maybe_unused]] Level& level) { return false; };
   virtual std::vector<ObjectDef> get_sprites(const Level& level) const = 0;
+  virtual bool fixed_x() const { return false; }
+  virtual bool fixed_y() const { return false; }
   virtual std::vector<geometry::Rectangle> get_detection_rects([[maybe_unused]] const Level& level) const { return {}; }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,
@@ -553,6 +555,7 @@ class Earth : public Actor
   {
     return {{position, static_cast<int>(Sprite::SPRITE_EARTH), false}};
   }
+  virtual bool fixed_x() const override { return moving_; }
 
  private:
   bool moving_;
@@ -582,6 +585,7 @@ class Moon : public Actor
   {
     return {{position, static_cast<int>(in_front_ ? Sprite::SPRITE_MOON : Sprite::SPRITE_MOON_SMALL), false}};
   }
+  virtual bool fixed_x() const override { return earth_.fixed_x(); }
 
  private:
   bool in_front_ = false;
