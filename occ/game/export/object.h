@@ -23,13 +23,13 @@ struct Object
          int num_sprites = 1,
          bool reverse = false,
          int flags = 0,
-         Vector<double> parallax = {0.0, 0.0})
+         Vector<double> parallax = {1.0, 1.0})
     : position(position),
       sprite_id(sprite_id),
       num_sprites(num_sprites),
       reverse(reverse),
-      parallax(parallax),
-      flags(flags)
+      flags(flags),
+      parallax(parallax)
   {
   }
 

@@ -88,6 +88,58 @@ class Actor
                                                           const int max_len = 0) const;
 };
 
+class BasicTile : public Actor
+{
+  // Basic tile with some custom rendering options
+ public:
+  BasicTile(geometry::Position position, Sprite sprite, const Vector<double>& parallax)
+    : Actor(position, {16, 16}),
+      sprite_(sprite),
+      parallax_(parallax)
+  {
+  }
+
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {{position, static_cast<int>(sprite_), false}};
+  }
+  virtual Vector<double> parallax() const override { return parallax_; }
+
+ private:
+  Sprite sprite_;
+  Vector<double> parallax_;
+};
+
+static constexpr Vector<double> VOLCANO_PARALLAX = {0.75, 1.0};
+static constexpr int VOLCANO_DX = -64;
+
+class VolcanoEjecta : public Actor
+{
+  // Animated ejecta
+ public:
+  VolcanoEjecta(geometry::Position position, Sprite sprite) : Actor({position.x() + VOLCANO_DX, position.y()}, {16, 16}), sprite_(sprite) {}
+
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {{position, static_cast<int>(sprite_) + frame_ / 4, false}};
+  }
+  virtual Vector<double> parallax() const override { return VOLCANO_PARALLAX; }
+  virtual void update([[maybe_unused]] AbstractSoundManager& sound_manager,
+                      [[maybe_unused]] const geometry::Rectangle& player_rect,
+                      [[maybe_unused]] Level& level) override
+  {
+    frame_++;
+    if (frame_ >= 16)
+    {
+      frame_ = 0;
+    }
+  }
+
+ private:
+  int frame_ = 0;
+  Sprite sprite_;
+};
+
 class Projectile;
 
 class ProjectileParent

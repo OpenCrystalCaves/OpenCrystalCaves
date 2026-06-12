@@ -33,7 +33,7 @@ class GameRenderer
                    const geometry::Position& pos,
                    const Color color = {0xff, 0xff, 0xff},
                    int flags = 0,
-                   Vector<double> parallax = {1.0, 1.0}) const;
+                   const Vector<double> parallax = {1.0, 1.0}) const;
 
   Game* game_;
   SpriteManager* sprite_manager_;

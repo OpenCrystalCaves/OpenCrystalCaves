@@ -514,7 +514,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
         }
         break;
       case TileMode::VOLCANO:
-        sprite = volcano_sprite;
+        level->actors.emplace_back(
+          new BasicTile(geometry::Position{x * 16 + VOLCANO_DX, y * 16}, static_cast<Sprite>(volcano_sprite), VOLCANO_PARALLAX));
         volcano_sprite++;
         if (level->tile_ids[i + 1] != 'n')
         {
@@ -523,9 +524,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
         }
         break;
       case TileMode::EJECTA:
-        sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_L_1);
-        sprite_count = 4;
-        flags |= TILE_ANIMATED;
+        level->actors.emplace_back(new VolcanoEjecta({x * 16, y * 16}, Sprite::SPRITE_VOLCANO_EJECTA_L_1));
         mode = TileMode::NONE;
         break;
       case TileMode::EXIT:
@@ -1215,10 +1214,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             level->hazards.emplace_back(new Hammer(geometry::Position{x * 16, y * 16}));
             break;
           case 'u':
-            // TODO: volcano spawn point?
-            sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_EJECTA_R_1);
-            sprite_count = 4;
-            flags |= TILE_ANIMATED;
+            level->actors.emplace_back(new VolcanoEjecta({x * 16, y * 16}, Sprite::SPRITE_VOLCANO_EJECTA_R_1));
             mode = TileMode::EJECTA;
             break;
           case 'v':
@@ -1738,18 +1734,20 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             if (level->tile_ids[i + 1] == 'n')
             {
               // -113 nnn = bottom of volcano
-              sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_BOTTOM_1);
+              level->actors.emplace_back(
+                new BasicTile(geometry::Position{x * 16 + VOLCANO_DX, y * 16}, Sprite::SPRITE_VOLCANO_BOTTOM_1, VOLCANO_PARALLAX));
               mode = TileMode::VOLCANO;
-              volcano_sprite = sprite + 1;
+              volcano_sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_BOTTOM_1) + 1;
             }
             break;
           case -114:
             if (level->tile_ids[i + 1] == 'n')
             {
               // -114 n = top of volcano
-              sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_1);
+              level->actors.emplace_back(
+                new BasicTile(geometry::Position{x * 16 + VOLCANO_DX, y * 16}, Sprite::SPRITE_VOLCANO_TOP_1, VOLCANO_PARALLAX));
               mode = TileMode::VOLCANO;
-              volcano_sprite = sprite + 1;
+              volcano_sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_1) + 1;
             }
             break;
           case -116:

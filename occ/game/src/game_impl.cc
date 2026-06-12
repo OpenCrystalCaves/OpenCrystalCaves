@@ -130,7 +130,7 @@ void GameImpl::update_level()
   // Add moving platforms to objects_
   for (auto& platform : level_->moving_platforms)
   {
-    objects_.emplace_back(platform.position, platform.get_sprite(), 1, false, 0);
+    objects_.emplace_back(platform.position, platform.get_sprite());
   }
 
   // Add entrances
@@ -438,7 +438,8 @@ void GameImpl::update_hazards()
                               1,
                               false,
                               (sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0) +
-                                (h->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0), h->parallax());
+                                (h->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0),
+                              h->parallax());
       }
       i++;
     }
@@ -477,7 +478,8 @@ void GameImpl::update_actors()
                               1,
                               false,
                               (sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0) +
-                                (a->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0), a->parallax());
+                                (a->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0),
+                              a->parallax());
       }
       it++;
     }

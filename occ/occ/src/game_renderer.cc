@@ -533,7 +533,11 @@ void GameRenderer::render_statusbar() const
   }
 }
 
-void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, const Color color, int flags, Vector<double> parallax) const
+void GameRenderer::render_tile(const int sprite,
+                               const geometry::Position& pos,
+                               const Color color,
+                               int flags,
+                               const Vector<double> parallax) const
 {
   // Show alternate low gravity sign
   if (sprite == static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_2) && sprite_manager_->remaster)
@@ -542,7 +546,8 @@ void GameRenderer::render_tile(const int sprite, const geometry::Position& pos, 
     sprite_manager_->render_other(sign_name, pos - geometry::Position(16, 0), game_camera_.position);
     return;
   }
-  geometry::Position camera_pos = game_camera_.position * parallax;
+  geometry::Position camera_pos = {static_cast<int>(game_camera_.position.x() * parallax.x()),
+                                   static_cast<int>(game_camera_.position.y() * parallax.y())};
   // Show projectiles as bright if remaster since they can be hard to see
   const bool flash_projectile = sprite_manager_->remaster && (game_tick_ & 1) &&
     (sprite == static_cast<int>(Sprite::SPRITE_LASER_BEAM_1) || sprite == static_cast<int>(Sprite::SPRITE_LASER_BEAM_2));
