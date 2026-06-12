@@ -14,17 +14,21 @@ enum class ObjectFlags : int
   NONE = 0,
   RENDER_IN_FRONT = 1 << 0,
   BRIGHT = 1 << 1,
-  FIXED_X = 1 << 2,
-  FIXED_Y = 1 << 3,
 };
 
 struct Object
 {
-  Object(geometry::Position position, int sprite_id, int num_sprites, const bool reverse, int flags)
+  Object(geometry::Position position,
+         int sprite_id,
+         int num_sprites = 1,
+         bool reverse = false,
+         int flags = 0,
+         Vector<double> parallax = {0.0, 0.0})
     : position(position),
       sprite_id(sprite_id),
       num_sprites(num_sprites),
       reverse(reverse),
+      parallax(parallax),
       flags(flags)
   {
   }
@@ -40,4 +44,5 @@ struct Object
   int num_sprites;
   bool reverse;
   int flags;
+  Vector<double> parallax;
 };

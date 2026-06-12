@@ -315,7 +315,7 @@ bool Egg::on_hit([[maybe_unused]] const geometry::Rectangle& rect,
 
 void Earth::update([[maybe_unused]] AbstractSoundManager& sound_manager,
                    [[maybe_unused]] const geometry::Rectangle& player_rect,
-                   Level& level)
+                   [[maybe_unused]] Level& level)
 {
   ticks_++;
   if (!moving_)

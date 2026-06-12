@@ -438,9 +438,7 @@ void GameImpl::update_hazards()
                               1,
                               false,
                               (sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0) +
-                                (h->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0) +
-                                (h->fixed_x() ? static_cast<int>(ObjectFlags::FIXED_X) : 0) +
-                                (h->fixed_y() ? static_cast<int>(ObjectFlags::FIXED_Y) : 0));
+                                (h->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0), h->parallax());
       }
       i++;
     }
@@ -479,9 +477,7 @@ void GameImpl::update_actors()
                               1,
                               false,
                               (sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0) +
-                                (a->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0) +
-                                (a->fixed_x() ? static_cast<int>(ObjectFlags::FIXED_X) : 0) +
-                                (a->fixed_y() ? static_cast<int>(ObjectFlags::FIXED_Y) : 0));
+                                (a->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0), a->parallax());
       }
       it++;
     }
