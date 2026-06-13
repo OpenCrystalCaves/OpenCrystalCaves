@@ -63,7 +63,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Laser beams                  | ![](/screenshots/flash_cc.gif?raw=true) Can be hard to see                                                          | ![](/screenshots/flash_occ.gif?raw=true) Flashing and easy to see                                                       |
 | Low gravity sign             | ![](/screenshots/lowgrav_cc.png?raw=true)                                                                           | ![](/screenshots/lowgrav_occ.png?raw=true) HEAVY RECOIL or LIGHT RECOIL                                                 |
 | Meme signs                   | ![](/screenshots/meme_cc.png?raw=true) Boomer memes                                                                 | ![](/screenshots/meme_occ.png?raw=true) 21st century memes (multiple)                                                   |
-| Space and backgrounds        | ![](/screenshots/parallax_space_cc.png?raw=true) ![](/screenshots/parallax_main_cc.png?raw=true) Static backgrounds | ![](/screenshots/parallax_space_occ.png?raw=true) ![](/screenshots/parallax_main_occ.png?raw=true) Parallax backgrounds |
+| Space and backgrounds        | ![](/screenshots/parallax_space_cc.gif?raw=true) ![](/screenshots/parallax_main_cc.gif?raw=true) Static backgrounds | ![](/screenshots/parallax_space_occ.gif?raw=true) ![](/screenshots/parallax_main_occ.gif?raw=true) Parallax backgrounds |
 
 ## Compiling OCC
 
