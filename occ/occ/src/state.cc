@@ -396,7 +396,12 @@ GameState::GameState(Game& game,
             {4, {PanelType::PANEL_TYPE_QUIT_TO_MAIN_LEVEL}},
           }}},
       }),
-    warp_panel_({PanelText::PANEL_TEXT_WARP, exe_data, {}, {}, PanelType::PANEL_TYPE_WARP_TO_LEVEL})
+    warp_panel_({PanelText::PANEL_TEXT_WARP, exe_data, {}, {}, PanelType::PANEL_TYPE_WARP_TO_LEVEL}),
+    intro_panel_({
+      {PanelText::PANEL_TEXT_START_1, exe_data, {}},
+      {PanelText::PANEL_TEXT_START_2, exe_data, {}},
+      {PanelText::PANEL_TEXT_START_3, exe_data, {}},
+    })
 {
 }
 
@@ -428,6 +433,11 @@ void GameState::reset()
   else
   {
     sound_manager_.play_sound(SoundType::SOUND_START_LEVEL);
+  }
+  if (level_ == LevelId::INTRO)
+  {
+    // Show intro scrawl
+    panel_current_ = &intro_panel_;
   }
 }
 

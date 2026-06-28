@@ -226,45 +226,48 @@ std::string load_pixels(const std::filesystem::path& path,
       index += filler;
     }
   }
-  // Post processing
-  // For stars, replace blacks with transparent
-  for (int sprite = static_cast<int>(Sprite::SPRITE_STARS_1); sprite <= static_cast<int>(Sprite::SPRITE_STARS_6); sprite++)
+  // Post processing (only for main sprites, not font sprites)
+  if (count > 50)
   {
-    const int x_start = (sprite % stride) * sprite_w;
-    const int y_start = (sprite / stride) * sprite_h;
-    for (int y = 0; y < sprite_h; y++)
+    // For stars, replace blacks with transparent
+    for (int sprite = static_cast<int>(Sprite::SPRITE_STARS_1); sprite <= static_cast<int>(Sprite::SPRITE_STARS_6); sprite++)
     {
-      for (int x = 0; x < sprite_w; x++)
+      const int x_start = (sprite % stride) * sprite_w;
+      const int y_start = (sprite / stride) * sprite_h;
+      for (int y = 0; y < sprite_h; y++)
       {
-        const int pixel_i = x + x_start + (y + y_start) * stride * sprite_h;
-        uint32_t* pixel = &((uint32_t*)all_pixels.data())[pixel_i];
-        if (*pixel == colors[0])
+        for (int x = 0; x < sprite_w; x++)
         {
-          *pixel = 0;
+          const int pixel_i = x + x_start + (y + y_start) * stride * sprite_h;
+          uint32_t* pixel = &((uint32_t*)all_pixels.data())[pixel_i];
+          if (*pixel == colors[0])
+          {
+            *pixel = 0;
+          }
         }
       }
     }
-  }
-  // For horizon lamps/mountains, cut out the background by comparing it against the horizon sprite
-  const auto horizon_sprites = {
-    Sprite::SPRITE_HORIZON_LAMP, Sprite::SPRITE_HORIZON_1, Sprite::SPRITE_HORIZON_2, Sprite::SPRITE_HORIZON_3, Sprite::SPRITE_HORIZON_4};
-  for (const auto& horizon_sprite : horizon_sprites)
-  {
-    const int bg_x_start = (static_cast<int>(Sprite::SPRITE_HORIZON) % stride) * sprite_w;
-    const int bg_y_start = (static_cast<int>(Sprite::SPRITE_HORIZON) / stride) * sprite_h;
-    const int h_x_start = (static_cast<int>(horizon_sprite) % stride) * sprite_w;
-    const int h_y_start = (static_cast<int>(horizon_sprite) / stride) * sprite_h;
-    for (int y = 0; y < sprite_h; y++)
+    // For horizon lamps/mountains, cut out the background by comparing it against the horizon sprite
+    const auto horizon_sprites = {
+      Sprite::SPRITE_HORIZON_LAMP, Sprite::SPRITE_HORIZON_1, Sprite::SPRITE_HORIZON_2, Sprite::SPRITE_HORIZON_3, Sprite::SPRITE_HORIZON_4};
+    for (const auto& horizon_sprite : horizon_sprites)
     {
-      for (int x = 0; x < sprite_w; x++)
+      const int bg_x_start = (static_cast<int>(Sprite::SPRITE_HORIZON) % stride) * sprite_w;
+      const int bg_y_start = (static_cast<int>(Sprite::SPRITE_HORIZON) / stride) * sprite_h;
+      const int h_x_start = (static_cast<int>(horizon_sprite) % stride) * sprite_w;
+      const int h_y_start = (static_cast<int>(horizon_sprite) / stride) * sprite_h;
+      for (int y = 0; y < sprite_h; y++)
       {
-        const int bg_pixel_i = x + bg_x_start + (y + bg_y_start) * stride * sprite_h;
-        const int h_pixel_i = x + h_x_start + (y + h_y_start) * stride * sprite_h;
-        const uint32_t bg_pixel = ((uint32_t*)all_pixels.data())[bg_pixel_i];
-        uint32_t* h_pixel = &((uint32_t*)all_pixels.data())[h_pixel_i];
-        if (*h_pixel == bg_pixel)
+        for (int x = 0; x < sprite_w; x++)
         {
-          *h_pixel = 0;
+          const int bg_pixel_i = x + bg_x_start + (y + bg_y_start) * stride * sprite_h;
+          const int h_pixel_i = x + h_x_start + (y + h_y_start) * stride * sprite_h;
+          const uint32_t bg_pixel = ((uint32_t*)all_pixels.data())[bg_pixel_i];
+          uint32_t* h_pixel = &((uint32_t*)all_pixels.data())[h_pixel_i];
+          if (*h_pixel == bg_pixel)
+          {
+            *h_pixel = 0;
+          }
         }
       }
     }

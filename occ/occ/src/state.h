@@ -147,6 +147,7 @@ class GameState : public State
   LevelId level_ = LevelId::INTRO;
   Panel panel_;
   Panel warp_panel_;
+  Panel intro_panel_;
   Panel* panel_current_ = nullptr;
   Panel* panel_next_ = nullptr;
 };
