@@ -30,7 +30,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
 
   // Warp player back to last known good position if they are currently colliding
   // This is to allow them to jump into hidden blocks that solidify
-  if (!is_freemove(level) && level.collides_solid(position, size))
+  if (move_type == MoveType::HUMAN && level.collides_solid(position, size))
   {
     position = position_last;
   }
@@ -72,7 +72,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
 
   // Set y velocity
-  if (!is_freemove(level))
+  if (move_type == MoveType::HUMAN)
   {
     if (jumping)
     {
@@ -89,34 +89,65 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
 
   // Set x velocity
-  if (recoil_tick > 0)
+  if (move_type == MoveType::HUMAN)
   {
-    if (direction == Direction::right)
+    if (recoil_tick > 0)
     {
-      velocity = Vector<int>(-static_cast<int>(recoil_tick), velocity.y());
+      if (direction == Direction::right)
+      {
+        velocity = Vector<int>(-static_cast<int>(recoil_tick), velocity.y());
+      }
+      else
+      {
+        velocity = Vector<int>(recoil_tick, velocity.y());
+      }
+      recoil_tick--;
+    }
+    else if (walking)
+    {
+      // First step is 2 pixels / tick, then 4 pixels / tick
+      const auto walk_velocity = walk_tick == 0u ? 2 : 4;
+      if (direction == Player::Direction::right)
+      {
+        velocity = Vector<int>(walk_velocity, velocity.y());
+      }
+      else  // direction == Player::Direction::left
+      {
+        velocity = Vector<int>(-walk_velocity, velocity.y());
+      }
     }
     else
     {
-      velocity = Vector<int>(recoil_tick, velocity.y());
-    }
-    recoil_tick--;
-  }
-  else if (walking)
-  {
-    // First step is 2 pixels / tick, then 4 pixels / tick
-    const auto walk_velocity = walk_tick == 0u ? 2 : 4;
-    if (direction == Player::Direction::right)
-    {
-      velocity = Vector<int>(walk_velocity, velocity.y());
-    }
-    else  // direction == Player::Direction::left
-    {
-      velocity = Vector<int>(-walk_velocity, velocity.y());
+      velocity = Vector<int>(0, velocity.y());
     }
   }
-  else
+  else if (move_type == MoveType::SPACE_STALLING)
   {
-    velocity = Vector<int>(0, velocity.y());
+    // First few ticks: vibrate up/down
+    // Next few ticks: accelerate in the target direction
+    // Final few ticks: stay still
+    if (!walking)
+    {
+      velocity = {0, 0};
+    }
+    else if (walk_tick < 16)
+    {
+      velocity = Vector<int>(0, (walk_tick & 1) * 2 - 1);
+    }
+    else if (walk_tick < 22)
+    {
+      const int dx = direction == Direction::right ? 1 : -1;
+      velocity = Vector<int>(dx * (walk_tick - 16), 0);
+    }
+    else if (walk_tick < 30)
+    {
+      const int dx = direction == Direction::right ? 1 : -1;
+      velocity = Vector<int>(dx * -(walk_tick - 28), 0);
+    }
+    else
+    {
+      velocity = {0, 0};
+    }
   }
 
   // Add level velocity to player
@@ -136,7 +167,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   {
     const auto new_player_pos = position + geometry::Position(step_x, 0);
 
-    if (!is_freemove(level) &&
+    if (move_type == MoveType::HUMAN &&
         (level.collides_solid(new_player_pos, size) ||
          // collide with world edges
          new_player_pos.x() < 0 || new_player_pos.x() >= level.width * SPRITE_W - size.x()))
@@ -155,7 +186,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     const auto new_player_pos = position + geometry::Position(0, step_y);
 
     Actor* collides_actor = nullptr;
-    if (!is_freemove(level) &&
+    if (move_type == MoveType::HUMAN &&
         (level.collides_solid(new_player_pos, size, false, &collides_actor) ||
          // Don't let the player leave the top of the level
          new_player_pos.y() < 0 ||
@@ -233,7 +264,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
 
   // Check if player is falling
-  if (!is_freemove(level))
+  if (move_type == MoveType::HUMAN)
   {
     falling = !jumping && (is_reverse ? velocity.y() < 0 : velocity.y() > 0) && !collide_y &&
       !level.collides_solid(position + geometry::Position(0, is_reverse ? 1 : -1), size);
@@ -277,7 +308,7 @@ bool Player::is_flashing() const
 }
 
 
-bool Player::is_freemove(const Level& level) const
+bool Player::is_freemove() const
 {
-  return noclip || level.is_space();
+  return noclip || move_type == MoveType::FREE;
 }

@@ -33,6 +33,10 @@ bool GameImpl::init(AbstractSoundManager& sound_manager,
   player_ = Player();
   player_.position = level_->get_player_start_pos(previous_level);
   entering_level = level;
+  if (level == LevelId::INTRO)
+  {
+    player_.move_type = MoveType::SPACE_STALLING;
+  }
 
   score_ = player_state.score;
   num_ammo_ = player_state.ammo;
@@ -268,7 +272,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   }
 
   // Check up / down (noclip)
-  if (player_.is_freemove(*level_))
+  if (player_.is_freemove())
   {
     if (player_input.up)
     {
@@ -285,7 +289,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   }
 
   // Check jump
-  if (!player_.is_freemove(*level_))
+  if (player_.move_type == MoveType::HUMAN)
   {
     if (player_input.jump && !player_.jumping && !player_.falling)
     {

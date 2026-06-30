@@ -10,6 +10,13 @@
 enum class TouchType;
 struct Level;
 
+enum class MoveType
+{
+  FREE,
+  HUMAN,
+  SPACE_STALLING,
+};
+
 struct Player
 {
   // Note: this is the player's actual size and is used for collision detection
@@ -50,6 +57,7 @@ struct Player
   unsigned recoil_tick = 0u;
 
   bool noclip = false;
+  MoveType move_type = MoveType::HUMAN;
   bool godmode = false;
 
   void update(AbstractSoundManager& sound_manager, Level& level);
@@ -59,5 +67,5 @@ struct Player
   // Get the effective reverse gravity w.r.t. powerups
   bool is_reverse_gravity() const { return gravity_tick > 0; }
   // Move freely if noclip or in space level
-  bool is_freemove(const Level& level) const;
+  bool is_freemove() const;
 };
