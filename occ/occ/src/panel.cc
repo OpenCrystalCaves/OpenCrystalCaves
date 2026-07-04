@@ -170,6 +170,22 @@ Panel::Panel(const char* ucsd,
       strings_.push_back(L"airlock.");
       strings_.push_back(L"");
     }
+    else if (ends_with(s, "Personal Entry - continued..."))
+    {
+      strings_.push_back(L"SHIP@S LOG - STARDATE 2121.04");
+      strings_.push_back(L"-----------------------------");
+      strings_.push_back(L"");
+      strings_.push_back(converter.from_bytes(s));
+    }
+    else if (ends_with(s, "make it to"))
+    {
+      strings_.push_back(L"SHIP@S LOG - STARDATE 2121.04");
+      strings_.push_back(L"-----------------------------");
+      strings_.push_back(L"");
+      strings_.push_back(L"Personal Entry - continued...");
+      strings_.push_back(L"");
+      strings_.push_back(converter.from_bytes(s));
+    }
     else
     {
       strings_.push_back(converter.from_bytes(s));
@@ -192,7 +208,9 @@ Panel::Panel(const char* ucsd,
       // Story
       ends_with(s, "-----") || ends_with(s, "981,231,783,813,651") || ends_with(s, "OCCUPATION:  Space Trader") ||
       ends_with(s, "Yorp herding business.") || ends_with(s, "continued...") || ends_with(s, "ahead of his creditors.") ||
-      ends_with(s, "of Ghoulbone IV.") || ends_with(s, "- END OF ENTRY -"))
+      ends_with(s, "of Ghoulbone IV.") || ends_with(s, "- END OF ENTRY -") ||
+      // Intro
+      ends_with(s, "Record On: ") || ends_with(s, "twibble farm.") || ends_with(s, "anything big..."))
     {
       strings_.push_back(L"");
     }
@@ -202,6 +220,20 @@ Panel::Panel(const char* ucsd,
       strings_.push_back(L"");
       question_pos_ = geometry::Position((22 + 2) * CHAR_W, (static_cast<int>(strings_.size()) + 2) * CHAR_H);
       strings_.push_back(L"        Press Any Key ^");
+      break;
+    }
+    else if (ends_with(s, "Slime!"))
+    {
+      strings_.push_back(L"");
+      question_pos_ = geometry::Position((22 + 1) * CHAR_W, (static_cast<int>(strings_.size()) + 2) * CHAR_H);
+      strings_.push_back(L"       Press Any Key ^");
+      break;
+    }
+    else if (ends_with(s, "Record Off"))
+    {
+      strings_.push_back(L"");
+      question_pos_ = geometry::Position((22 + 1) * CHAR_W, (static_cast<int>(strings_.size()) + 2) * CHAR_H);
+      strings_.push_back(L"       Press Any Key ^");
       break;
     }
     // End immediately on some special lines

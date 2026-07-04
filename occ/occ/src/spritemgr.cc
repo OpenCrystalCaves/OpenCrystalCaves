@@ -279,7 +279,7 @@ std::string swap_pixels(const std::string& in, const std::unordered_map<uint32_t
 {
   // Palette swap pixels
   std::string out(in.length(), '\0');
-  for (int i = 0; i < in.length() / static_cast<int>(sizeof(uint32_t)); i++)
+  for (int i = 0; i < static_cast<int>(in.length()) / static_cast<int>(sizeof(uint32_t)); i++)
   {
     const uint32_t pixel_in = reinterpret_cast<const uint32_t*>(in.data())[i];
     uint32_t* pixel_out = &reinterpret_cast<uint32_t*>(out.data())[i];
