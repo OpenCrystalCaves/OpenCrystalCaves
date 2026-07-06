@@ -89,32 +89,19 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
 
   // Set x velocity
+  const int dx = direction == Direction::right ? 1 : -1;
   if (move_type == MoveType::HUMAN)
   {
     if (recoil_tick > 0)
     {
-      if (direction == Direction::right)
-      {
-        velocity = Vector<int>(-static_cast<int>(recoil_tick), velocity.y());
-      }
-      else
-      {
-        velocity = Vector<int>(recoil_tick, velocity.y());
-      }
+      velocity = Vector<int>(-dx * recoil_tick, velocity.y());
       recoil_tick--;
     }
     else if (walking)
     {
       // First step is 2 pixels / tick, then 4 pixels / tick
       const auto walk_velocity = walk_tick == 0u ? 2 : 4;
-      if (direction == Player::Direction::right)
-      {
-        velocity = Vector<int>(walk_velocity, velocity.y());
-      }
-      else  // direction == Player::Direction::left
-      {
-        velocity = Vector<int>(-walk_velocity, velocity.y());
-      }
+      velocity = Vector<int>(dx * walk_velocity, velocity.y());
     }
     else
     {
@@ -139,13 +126,61 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     }
     else if (walk_tick < stall_ticks + accel_ticks)
     {
-      const int dx = direction == Direction::right ? 1 : -1;
       velocity = Vector<int>(dx * (walk_tick - stall_ticks + 2), 0);
     }
     else if (walk_tick < stall_ticks + accel_ticks + decel_ticks)
     {
-      const int dx = direction == Direction::right ? 1 : -1;
-      velocity = Vector<int>(dx * -(walk_tick - (stall_ticks + accel_ticks + decel_ticks - 2)), 0);
+      velocity = Vector<int>(dx * -static_cast<int>(walk_tick - (stall_ticks + accel_ticks + decel_ticks - 2)), 0);
+    }
+    else
+    {
+      velocity = {0, 0};
+    }
+  }
+  else if (move_type == MoveType::SPACE_SPINNING)
+  {
+    // Spin 1 1/2 rotations, with the last 1/2 rotation smaller than the first, in a spiral-like pattern
+    constexpr int rot_x1_ticks = 8;
+    constexpr int rot_x2_ticks = 8;
+    constexpr int rot_x3_ticks = 7;
+    constexpr int rot_x4_ticks = 7;
+    constexpr int rot_x5_ticks = 6;
+    constexpr int rot_x6_ticks = 6;
+    // TODO: just X for now, do Y next
+    if (!walking)
+    {
+      velocity = {0, 0};
+    }
+    else if (walk_tick < rot_x1_ticks)
+    {
+      // accel forward
+      velocity = Vector<int>(dx * walk_tick, 0);
+    }
+    else if (walk_tick < rot_x1_ticks + rot_x2_ticks)
+    {
+      // decel forward
+      velocity = Vector<int>(dx * (rot_x1_ticks + rot_x2_ticks - walk_tick), 0);
+    }
+    else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks)
+    {
+      // accel backward
+      velocity = Vector<int>(-dx * (walk_tick - (rot_x1_ticks + rot_x2_ticks)), 0);
+    }
+    else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks)
+    {
+      // decel backward
+      velocity = Vector<int>(-dx * ((rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks) - walk_tick), 0);
+    }
+    else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks)
+    {
+      // accel forward
+      velocity = Vector<int>(dx * (walk_tick - (rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks)), 0);
+    }
+    else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks)
+    {
+      // decel forward
+      velocity =
+        Vector<int>(dx * ((rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks) - walk_tick), 0);
     }
     else
     {

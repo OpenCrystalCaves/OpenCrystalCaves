@@ -35,7 +35,8 @@ bool GameImpl::init(AbstractSoundManager& sound_manager,
   entering_level = level;
   if (level == LevelId::INTRO)
   {
-    player_.move_type = MoveType::SPACE_STALLING;
+    //player_.move_type = MoveType::SPACE_STALLING;
+    player_.move_type = MoveType::SPACE_SPINNING;
   }
 
   score_ = player_state.score;
