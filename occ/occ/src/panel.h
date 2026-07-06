@@ -98,7 +98,7 @@ class Panel
 {
  public:
   // Panel that pages through its children
-  Panel(const std::vector<Panel> children);
+  Panel(const std::vector<Panel> children, bool close_from_page_1 = false);
   // Menu-type panel with selectable children
   Panel(const std::vector<std::wstring> strings,
         const std::vector<std::pair<int, Panel>> children,
@@ -139,6 +139,7 @@ class Panel
   std::vector<std::pair<int, geometry::Position>> sprites_;
   std::vector<std::pair<Icon, geometry::Position>> icons_;
   int index_ = 0;
+  bool close_from_page_1_ = false;
   geometry::Size size_;
   geometry::Position question_pos_ = {0, 0};
   geometry::Position sparkle_pos_ = {0, 0};

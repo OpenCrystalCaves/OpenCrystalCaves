@@ -33,7 +33,9 @@ inline std::string& ltrim(std::string& s, const char* t = " \t\n\r\f\v")
 
 constexpr size_t len_limit = 33;
 
-Panel::Panel(const std::vector<Panel> children) : type_(PanelType::PANEL_TYPE_PAGES)
+Panel::Panel(const std::vector<Panel> children, bool close_from_page_1)
+  : type_(PanelType::PANEL_TYPE_PAGES),
+    close_from_page_1_(close_from_page_1)
 {
   int i = 0;
   for (auto child : children)
@@ -260,7 +262,14 @@ Panel* Panel::update(const Input& input)
       index_--;
       if (index_ < 0)
       {
-        next = parent_;
+        if (close_from_page_1_)
+        {
+          next = parent_;
+        }
+        else
+        {
+          index_ = 0;
+        }
       }
     }
     else if (pinput.down_pressed || input.down.pressed() || pinput.right_pressed || input.right.pressed() || pinput.jump_pressed ||

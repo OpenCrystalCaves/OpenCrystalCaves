@@ -126,9 +126,9 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     // First few ticks: vibrate up/down
     // Next few ticks: accelerate in the target direction
     // Final few ticks: stay still
-    constexpr auto stall_ticks = 8;
-    constexpr auto accel_ticks = 6;
-    constexpr auto decel_ticks = 4;
+    constexpr int stall_ticks = 8;
+    constexpr int accel_ticks = 6;
+    constexpr int decel_ticks = 4;
     if (!walking)
     {
       velocity = {0, 0};
@@ -145,7 +145,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     else if (walk_tick < stall_ticks + accel_ticks + decel_ticks)
     {
       const int dx = direction == Direction::right ? 1 : -1;
-      velocity = Vector<int>(dx * -(walk_tick - (stall_ticks + accel_ticks + decel_ticks - 1)), 0);
+      velocity = Vector<int>(dx * -(walk_tick - (stall_ticks + accel_ticks + decel_ticks - 2)), 0);
     }
     else
     {

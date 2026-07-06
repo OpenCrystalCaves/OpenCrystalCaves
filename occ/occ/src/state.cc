@@ -397,11 +397,13 @@ GameState::GameState(Game& game,
           }}},
       }),
     warp_panel_({PanelText::PANEL_TEXT_WARP, exe_data, {}, {}, PanelType::PANEL_TYPE_WARP_TO_LEVEL}),
-    intro_panel_({
-      {PanelText::PANEL_TEXT_START_1, exe_data, {}},
-      {PanelText::PANEL_TEXT_START_2, exe_data, {}},
-      {PanelText::PANEL_TEXT_START_3, exe_data, {}},
-    })
+    intro_panel_(
+      {
+        {PanelText::PANEL_TEXT_START_1, exe_data, {}},
+        {PanelText::PANEL_TEXT_START_2, exe_data, {}},
+        {PanelText::PANEL_TEXT_START_3, exe_data, {}},
+      },
+      false)
 {
 }
 
