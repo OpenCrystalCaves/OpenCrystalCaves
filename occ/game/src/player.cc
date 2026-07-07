@@ -2,6 +2,7 @@
 
 #include "constants.h"
 #include "level.h"
+#include "logger.h"
 #include "misc.h"
 #include "particle.h"
 
@@ -90,7 +91,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
 
   // Set x velocity
   const int dx = direction == Direction::right ? 1 : -1;
-  if (move_type == MoveType::HUMAN)
+  if (move_type == MoveType::HUMAN || move_type == MoveType::FREE)
   {
     if (recoil_tick > 0)
     {
@@ -258,46 +259,69 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   const bool is_reverse = is_reverse_gravity() ^ (level.gravity < 0);
   if (jumping)
   {
-    // Check if player hit something while jumping
-    if (collide_y)
+    if (move_type == MoveType::HUMAN)
     {
-      if (is_reverse ? velocity.y() > 0 : velocity.y() < 0)
+      // Check if player hit something while jumping
+      if (collide_y)
       {
-        // Player hit something while jumping up
-        const auto position_below = position - geometry::Position(0, is_reverse ? -step_y : step_y);
-        if (level.collides_solid(position_below, size) || level.player_on_platform(position_below, size))
+        if (is_reverse ? velocity.y() > 0 : velocity.y() < 0)
         {
-          // If player already on platform, stop jumping immediately
+          // Player hit something while jumping up
+          const auto position_below = position - geometry::Position(0, is_reverse ? -step_y : step_y);
+          if (level.collides_solid(position_below, size) || level.player_on_platform(position_below, size))
+          {
+            // If player already on platform, stop jumping immediately
+            jumping = false;
+          }
+          else
+          {
+            // Skip to "falling down" velocity
+            jump_tick = jump_velocity_fall_index;
+          }
+        }
+        else  // velocity.y() > 0
+        {
+          // Player landed
           jumping = false;
         }
-        else
-        {
-          // Skip to "falling down" velocity
-          jump_tick = jump_velocity_fall_index;
-        }
       }
-      else  // velocity.y() > 0
+      else if (jump_tick == jump_velocity.size() - 1u)
       {
-        // Player landed
+        // Player jump ended
         jumping = false;
       }
+      else if (jump_tick != 0 &&
+               level.collides_solid(position + geometry::Position(0, (is_reverse_gravity() ^ (level.gravity < 0)) ? -1 : 1), size))
+      {
+        // Player did not actually collide with the ground, but standing directly above it
+        // and this isn't the first tick in the jump, so we can consider the jump to have
+        // ended here
+        jumping = false;
+      }
+      else if (jump_tick == 0)
+      {
+        sound_manager.play_sound(SoundType::SOUND_JUMP);
+      }
     }
-    else if (jump_tick == jump_velocity.size() - 1u)
+    else
     {
-      // Player jump ended
-      jumping = false;
-    }
-    else if (jump_tick != 0 &&
-             level.collides_solid(position + geometry::Position(0, (is_reverse_gravity() ^ (level.gravity < 0)) ? -1 : 1), size))
-    {
-      // Player did not actually collide with the ground, but standing directly above it
-      // and this isn't the first tick in the jump, so we can consider the jump to have
-      // ended here
-      jumping = false;
-    }
-    else if (jump_tick == 0)
-    {
-      sound_manager.play_sound(SoundType::SOUND_JUMP);
+      if (jump_tick == 0)
+      {
+        // Space mode, cycle between move modes
+        if (move_type == MoveType::FREE)
+        {
+          move_type = MoveType::SPACE_STALLING;
+        }
+        else if (move_type == MoveType::SPACE_STALLING)
+        {
+          move_type = MoveType::SPACE_SPINNING;
+        }
+        else if (move_type == MoveType::SPACE_SPINNING)
+        {
+          move_type = MoveType::FREE;
+        }
+        LOG_INFO("Move type set to %d", static_cast<int>(move_type));
+      }
     }
   }
 

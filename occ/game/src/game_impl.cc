@@ -35,8 +35,7 @@ bool GameImpl::init(AbstractSoundManager& sound_manager,
   entering_level = level;
   if (level == LevelId::INTRO)
   {
-    //player_.move_type = MoveType::SPACE_STALLING;
-    player_.move_type = MoveType::SPACE_SPINNING;
+    player_.move_type = MoveType::SPACE_STALLING;
   }
 
   score_ = player_state.score;
@@ -302,6 +301,26 @@ void GameImpl::update_player(const PlayerInput& player_input)
     {
       // Player still jumping
       player_.jump_tick += 1u;
+    }
+  }
+  else
+  {
+    if (player_input.jump)
+    {
+      if (!player_.jumping)
+      {
+        player_.jumping = true;
+        player_.jump_tick = 0u;
+      }
+      else
+      {
+        // Player still jumping
+        player_.jump_tick += 1u;
+      }
+    }
+    else
+    {
+      player_.jumping = false;
     }
   }
 
