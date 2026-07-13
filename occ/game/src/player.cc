@@ -10,6 +10,19 @@ constexpr geometry::Size Player::size;
 static constexpr auto jump_velocity = misc::make_array<int>(-8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 9u;
 
+static constexpr int rot_x1_ticks = 8;
+static constexpr int rot_x2_ticks = 8;
+static constexpr int rot_x3_ticks = 7;
+static constexpr int rot_x4_ticks = 7;
+static constexpr int rot_x5_ticks = 6;
+static constexpr int rot_x6_ticks = 6;
+static constexpr int rot_y1_ticks = 5;
+static constexpr int rot_y2_ticks = 8;
+static constexpr int rot_y3_ticks = 8;
+static constexpr int rot_y4_ticks = 7;
+static constexpr int rot_y5_ticks = 6;
+static constexpr int rot_y6_ticks = 6;
+
 void Player::update(AbstractSoundManager& sound_manager, Level& level)
 {
   /**
@@ -140,19 +153,8 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
   else if (move_type == MoveType::SPACE_SPINNING)
   {
+    // TODO: Vibrate up/down first few ticks
     // Spin 1 1/2 rotations, with the last 1/2 rotation smaller than the first, in a spiral-like pattern
-    constexpr int rot_x1_ticks = 8;
-    constexpr int rot_x2_ticks = 8;
-    constexpr int rot_x3_ticks = 7;
-    constexpr int rot_x4_ticks = 7;
-    constexpr int rot_x5_ticks = 6;
-    constexpr int rot_x6_ticks = 6;
-    constexpr int rot_y1_ticks = 5;
-    constexpr int rot_y2_ticks = 8;
-    constexpr int rot_y3_ticks = 8;
-    constexpr int rot_y4_ticks = 7;
-    constexpr int rot_y5_ticks = 6;
-    constexpr int rot_y6_ticks = 6;
     int x = 0, y = 0;
     if (walking)
     {
@@ -195,7 +197,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
       else if (walk_tick < rot_y1_ticks + rot_y2_ticks)
       {
         // up to down
-        y = -(rot_y1_ticks + rot_y2_ticks / 2 - walk_tick);
+        y = -1 * (rot_y1_ticks + rot_y2_ticks / 2 - walk_tick);
       }
       else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks)
       {
@@ -215,7 +217,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
       else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks)
       {
         // up to down
-        y = -(rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks / 2 - walk_tick);
+        y = -1 * (rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks / 2 - walk_tick);
       }
     }
     velocity = Vector<int>(x, y);
@@ -405,4 +407,25 @@ bool Player::is_flashing() const
 bool Player::is_freemove() const
 {
   return noclip || move_type == MoveType::FREE;
+}
+
+Sprite Player::get_spaceship_sprite() const
+{
+  if (move_type == MoveType::SPACE_SPINNING) {
+    // TODO: vibrate up/down first few ticks
+    if (walk_tick < rot_y1_ticks) {
+      return Sprite::SPRITE_SPACESHIP_2;
+    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks) {
+      return Sprite::SPRITE_SPACESHIP_3;
+    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks) {
+      return Sprite::SPRITE_SPACESHIP_2;
+    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks) {
+      return Sprite::SPRITE_SPACESHIP_1;
+    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks) {
+      return Sprite::SPRITE_SPACESHIP_2;
+    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks) {
+      return Sprite::SPRITE_SPACESHIP_3;
+    }
+  }
+  return Sprite::SPRITE_SPACESHIP_1;
 }

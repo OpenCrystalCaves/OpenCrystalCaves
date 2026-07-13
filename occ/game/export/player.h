@@ -5,6 +5,7 @@
 #include "geometry.h"
 #include "level_id.h"
 #include "sound.h"
+#include "sprite.h"
 #include "vector.h"
 
 enum class TouchType;
@@ -69,4 +70,5 @@ struct Player
   bool is_reverse_gravity() const { return gravity_tick > 0; }
   // Move freely if noclip or in space level
   bool is_freemove() const;
+  Sprite get_spaceship_sprite() const;
 };

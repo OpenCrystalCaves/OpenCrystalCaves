@@ -202,12 +202,12 @@ void GameRenderer::render_player() const
 
   const int sprite = [this]()
   {
+    const auto& player = game_->get_player();
     if (game_->get_level().is_space())
     {
       // Render spaceship instead
-      return static_cast<int>(Sprite::SPRITE_SPACESHIP);
+      return static_cast<int>(player.get_spaceship_sprite());
     }
-    const auto& player = game_->get_player();
     int sprite = 0;
 
     if (player.dying_tick > 0)
