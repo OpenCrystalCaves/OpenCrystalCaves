@@ -147,46 +147,78 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     constexpr int rot_x4_ticks = 7;
     constexpr int rot_x5_ticks = 6;
     constexpr int rot_x6_ticks = 6;
-    // TODO: just X for now, do Y next
-    if (!walking)
+    constexpr int rot_y1_ticks = 5;
+    constexpr int rot_y2_ticks = 8;
+    constexpr int rot_y3_ticks = 8;
+    constexpr int rot_y4_ticks = 7;
+    constexpr int rot_y5_ticks = 6;
+    constexpr int rot_y6_ticks = 6;
+    int x = 0, y = 0;
+    if (walking)
     {
-      velocity = {0, 0};
+      if (walk_tick < rot_x1_ticks)
+      {
+        // constant speed forward
+        x = dx * 10;
+      }
+      else if (walk_tick < rot_x1_ticks + rot_x2_ticks)
+      {
+        // forward to back
+        x = dx * (rot_x1_ticks + rot_x2_ticks / 2 - walk_tick);
+      }
+      else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks)
+      {
+        // constant speed backward
+        x = -dx * 6;
+      }
+      else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks)
+      {
+        // back to forward
+        x = -dx * (rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks / 2 - walk_tick);
+      }
+      else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks)
+      {
+        // constant speed forward
+        x = dx * 4;
+      }
+      else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks)
+      {
+        // forward to backward
+        x = dx * (rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks / 2 - walk_tick);
+      }
+
+      if (walk_tick < rot_y1_ticks)
+      {
+        // constant speed up
+        y = -6;
+      }
+      else if (walk_tick < rot_y1_ticks + rot_y2_ticks)
+      {
+        // up to down
+        y = -(rot_y1_ticks + rot_y2_ticks / 2 - walk_tick);
+      }
+      else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks)
+      {
+        // constant speed down
+        y = 5;
+      }
+      else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks)
+      {
+        // down to up
+        y = rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks / 2 - walk_tick;
+      }
+      else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks)
+      {
+        // constant speed up
+        y = -4;
+      }
+      else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks)
+      {
+        // up to down
+        y = -(rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks / 2 - walk_tick);
+      }
     }
-    else if (walk_tick < rot_x1_ticks)
-    {
-      // accel forward
-      velocity = Vector<int>(dx * walk_tick, 0);
-    }
-    else if (walk_tick < rot_x1_ticks + rot_x2_ticks)
-    {
-      // decel forward
-      velocity = Vector<int>(dx * (rot_x1_ticks + rot_x2_ticks - walk_tick), 0);
-    }
-    else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks)
-    {
-      // accel backward
-      velocity = Vector<int>(-dx * (walk_tick - (rot_x1_ticks + rot_x2_ticks)), 0);
-    }
-    else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks)
-    {
-      // decel backward
-      velocity = Vector<int>(-dx * ((rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks) - walk_tick), 0);
-    }
-    else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks)
-    {
-      // accel forward
-      velocity = Vector<int>(dx * (walk_tick - (rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks)), 0);
-    }
-    else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks)
-    {
-      // decel forward
-      velocity =
-        Vector<int>(dx * ((rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks) - walk_tick), 0);
-    }
-    else
-    {
-      velocity = {0, 0};
-    }
+    velocity = Vector<int>(x, y);
   }
 
   // Add level velocity to player
