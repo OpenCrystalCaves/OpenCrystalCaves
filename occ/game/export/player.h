@@ -15,8 +15,9 @@ enum class MoveType
 {
   FREE,
   HUMAN,
-  SPACE_STALLING,
-  SPACE_SPINNING,
+  SPACE_STALL,
+  SPACE_SPIN,
+  SPACE_CRUISE,
 };
 
 struct Player

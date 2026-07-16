@@ -10,6 +10,7 @@ constexpr geometry::Size Player::size;
 static constexpr auto jump_velocity = misc::make_array<int>(-8, -8, -8, -4, -4, -2, -2, -2, -2, 2, 2, 2, 2, 4, 4);
 static constexpr auto jump_velocity_fall_index = 9u;
 
+static constexpr int stall_ticks = 8;
 static constexpr int rot_x1_ticks = 8;
 static constexpr int rot_x2_ticks = 8;
 static constexpr int rot_x3_ticks = 7;
@@ -104,7 +105,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
 
   // Set x velocity
   const int dx = direction == Direction::right ? 1 : -1;
-  if (move_type == MoveType::HUMAN || move_type == MoveType::FREE)
+  if (move_type == MoveType::HUMAN || move_type == MoveType::FREE || (move_type == MoveType::SPACE_CRUISE && walk_tick >= stall_ticks))
   {
     if (recoil_tick > 0)
     {
@@ -122,12 +123,11 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
       velocity = Vector<int>(0, velocity.y());
     }
   }
-  else if (move_type == MoveType::SPACE_STALLING)
+  else if (move_type == MoveType::SPACE_STALL)
   {
     // First few ticks: vibrate up/down
     // Next few ticks: accelerate in the target direction
     // Final few ticks: stay still
-    constexpr int stall_ticks = 8;
     constexpr int accel_ticks = 6;
     constexpr int decel_ticks = 4;
     if (!walking)
@@ -151,73 +151,93 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
       velocity = {0, 0};
     }
   }
-  else if (move_type == MoveType::SPACE_SPINNING)
+  else if (move_type == MoveType::SPACE_SPIN)
   {
-    // TODO: Vibrate up/down first few ticks
+    // First few ticks: vibrate up/down
     // Spin 1 1/2 rotations, with the last 1/2 rotation smaller than the first, in a spiral-like pattern
     int x = 0, y = 0;
     if (walking)
     {
-      if (walk_tick < rot_x1_ticks)
+      if (walk_tick < stall_ticks)
       {
-        // constant speed forward
-        x = dx * 10;
+        y = (walk_tick & 1) * 2 - 1;
       }
-      else if (walk_tick < rot_x1_ticks + rot_x2_ticks)
+      else
       {
-        // forward to back
-        x = dx * (rot_x1_ticks + rot_x2_ticks / 2 - walk_tick);
-      }
-      else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks)
-      {
-        // constant speed backward
-        x = -dx * 6;
-      }
-      else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks)
-      {
-        // back to forward
-        x = -dx * (rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks / 2 - walk_tick);
-      }
-      else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks)
-      {
-        // constant speed forward
-        x = dx * 4;
-      }
-      else if (walk_tick < rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks)
-      {
-        // forward to backward
-        x = dx * (rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks / 2 - walk_tick);
-      }
+        if (walk_tick < stall_ticks + rot_x1_ticks)
+        {
+          // constant speed forward
+          x = dx * 10;
+        }
+        else if (walk_tick < stall_ticks + rot_x1_ticks + rot_x2_ticks)
+        {
+          // forward to back
+          x = dx * (stall_ticks + rot_x1_ticks + rot_x2_ticks / 2 - walk_tick);
+        }
+        else if (walk_tick < stall_ticks + rot_x1_ticks + rot_x2_ticks + rot_x3_ticks)
+        {
+          // constant speed backward
+          x = -dx * 6;
+        }
+        else if (walk_tick < stall_ticks + rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks)
+        {
+          // back to forward
+          x = -dx * (stall_ticks + rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks / 2 - walk_tick);
+        }
+        else if (walk_tick < stall_ticks + rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks)
+        {
+          // constant speed forward
+          x = dx * 4;
+        }
+        else if (walk_tick < stall_ticks + rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks)
+        {
+          // forward to backward
+          x = dx * (stall_ticks + rot_x1_ticks + rot_x2_ticks + rot_x3_ticks + rot_x4_ticks + rot_x5_ticks + rot_x6_ticks / 2 - walk_tick);
+        }
 
-      if (walk_tick < rot_y1_ticks)
-      {
-        // constant speed up
-        y = -6;
+        if (walk_tick < stall_ticks + rot_y1_ticks)
+        {
+          // constant speed up
+          y = -6;
+        }
+        else if (walk_tick < stall_ticks + rot_y1_ticks + rot_y2_ticks)
+        {
+          // up to down
+          y = -1 * (stall_ticks + rot_y1_ticks + rot_y2_ticks / 2 - walk_tick);
+        }
+        else if (walk_tick < stall_ticks + rot_y1_ticks + rot_y2_ticks + rot_y3_ticks)
+        {
+          // constant speed down
+          y = 5;
+        }
+        else if (walk_tick < stall_ticks + rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks)
+        {
+          // down to up
+          y = stall_ticks + rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks / 2 - walk_tick;
+        }
+        else if (walk_tick < stall_ticks + rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks)
+        {
+          // constant speed up
+          y = -4;
+        }
+        else if (walk_tick < stall_ticks + rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks)
+        {
+          // up to down
+          y = -1 * (stall_ticks + rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks / 2 - walk_tick);
+        }
       }
-      else if (walk_tick < rot_y1_ticks + rot_y2_ticks)
+    }
+    velocity = Vector<int>(x, y);
+  }
+  else if (move_type == MoveType::SPACE_CRUISE)
+  {
+    // First few ticks: vibrate up/down
+    int x = 0, y = 0;
+    if (walking)
+    {
+      if (walk_tick < stall_ticks)
       {
-        // up to down
-        y = -1 * (rot_y1_ticks + rot_y2_ticks / 2 - walk_tick);
-      }
-      else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks)
-      {
-        // constant speed down
-        y = 5;
-      }
-      else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks)
-      {
-        // down to up
-        y = rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks / 2 - walk_tick;
-      }
-      else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks)
-      {
-        // constant speed up
-        y = -4;
-      }
-      else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks)
-      {
-        // up to down
-        y = -1 * (rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks / 2 - walk_tick);
+        y = (walk_tick & 1) * 2 - 1;
       }
     }
     velocity = Vector<int>(x, y);
@@ -344,13 +364,17 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
         // Space mode, cycle between move modes
         if (move_type == MoveType::FREE)
         {
-          move_type = MoveType::SPACE_STALLING;
+          move_type = MoveType::SPACE_STALL;
         }
-        else if (move_type == MoveType::SPACE_STALLING)
+        else if (move_type == MoveType::SPACE_STALL)
         {
-          move_type = MoveType::SPACE_SPINNING;
+          move_type = MoveType::SPACE_SPIN;
         }
-        else if (move_type == MoveType::SPACE_SPINNING)
+        else if (move_type == MoveType::SPACE_SPIN)
+        {
+          move_type = MoveType::SPACE_CRUISE;
+        }
+        else if (move_type == MoveType::SPACE_CRUISE)
         {
           move_type = MoveType::FREE;
         }
@@ -406,26 +430,42 @@ bool Player::is_flashing() const
 
 bool Player::is_freemove() const
 {
-  return noclip || move_type == MoveType::FREE;
+  return noclip || move_type == MoveType::FREE || (move_type == MoveType::SPACE_CRUISE && walk_tick >= stall_ticks);
 }
 
 Sprite Player::get_spaceship_sprite() const
 {
-  if (move_type == MoveType::SPACE_SPINNING) {
+  if (move_type == MoveType::SPACE_SPIN)
+  {
     // TODO: vibrate up/down first few ticks
-    if (walk_tick < rot_y1_ticks) {
+    if (walk_tick < rot_y1_ticks)
+    {
       return Sprite::SPRITE_SPACESHIP_2;
-    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks) {
-      return Sprite::SPRITE_SPACESHIP_3;
-    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks) {
-      return Sprite::SPRITE_SPACESHIP_2;
-    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks) {
-      return Sprite::SPRITE_SPACESHIP_1;
-    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks) {
-      return Sprite::SPRITE_SPACESHIP_2;
-    } else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks) {
+    }
+    else if (walk_tick < rot_y1_ticks + rot_y2_ticks)
+    {
       return Sprite::SPRITE_SPACESHIP_3;
     }
+    else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks)
+    {
+      return Sprite::SPRITE_SPACESHIP_2;
+    }
+    else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks)
+    {
+      return Sprite::SPRITE_SPACESHIP_1;
+    }
+    else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks)
+    {
+      return Sprite::SPRITE_SPACESHIP_2;
+    }
+    else if (walk_tick < rot_y1_ticks + rot_y2_ticks + rot_y3_ticks + rot_y4_ticks + rot_y5_ticks + rot_y6_ticks)
+    {
+      return Sprite::SPRITE_SPACESHIP_3;
+    }
+  }
+  else if (move_type == MoveType::SPACE_CRUISE)
+  {
+    return Sprite::SPRITE_SPACESHIP_4;
   }
   return Sprite::SPRITE_SPACESHIP_1;
 }
