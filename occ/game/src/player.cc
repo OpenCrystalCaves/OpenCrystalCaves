@@ -13,16 +13,16 @@ static constexpr auto jump_velocity_fall_index = 9u;
 static constexpr int stall_ticks = 8;
 static constexpr int rot_x1_ticks = 8;
 static constexpr int rot_x2_ticks = 8;
-static constexpr int rot_x3_ticks = 7;
+static constexpr int rot_x3_ticks = 10;
 static constexpr int rot_x4_ticks = 7;
 static constexpr int rot_x5_ticks = 6;
 static constexpr int rot_x6_ticks = 6;
 static constexpr int rot_y1_ticks = 5;
 static constexpr int rot_y2_ticks = 8;
-static constexpr int rot_y3_ticks = 8;
-static constexpr int rot_y4_ticks = 7;
-static constexpr int rot_y5_ticks = 6;
-static constexpr int rot_y6_ticks = 6;
+static constexpr int rot_y3_ticks = 10;
+static constexpr int rot_y4_ticks = 8;
+static constexpr int rot_y5_ticks = 4;
+static constexpr int rot_y6_ticks = 4;
 
 void Player::update(AbstractSoundManager& sound_manager, Level& level)
 {

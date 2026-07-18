@@ -84,6 +84,12 @@ void GameRenderer::render_game(unsigned game_tick) const
   window_.fill_rect(geometry::Rectangle(0, 0, CAMERA_SIZE), {0, 0, 0});
   render_background();
   render_tiles(false);
+  if (debug_)
+  {
+    // Player spawn
+    const geometry::Rectangle dest_rect{game_->get_level().player_spawn - game_camera_.position, {SPRITE_W, SPRITE_H}};
+    window_.render_rectangle(dest_rect, {0, 255, 0});
+  }
   render_objects(false);
   render_enemies(game_tick);
   render_player();
