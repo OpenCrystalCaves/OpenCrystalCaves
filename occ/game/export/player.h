@@ -18,6 +18,7 @@ enum class MoveType
   SPACE_STALL,
   SPACE_SPIN,
   SPACE_CRUISE,
+  SPACE_COLLIDE,
 };
 
 struct Player

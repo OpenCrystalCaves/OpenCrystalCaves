@@ -242,6 +242,18 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     }
     velocity = Vector<int>(x, y);
   }
+  else if (move_type == MoveType::SPACE_COLLIDE)
+  {
+    // Vibrate up/down, decellerate to a stop
+    static constexpr int decel_ticks = 8;
+    int x = 0, y = 0;
+    if (walking && walk_tick < decel_ticks)
+    {
+      x = dx * (decel_ticks - walk_tick);
+      y = (walk_tick & 1) * 2 - 1;
+    }
+    velocity = Vector<int>(x, y);
+  }
 
   // Add level velocity to player
   velocity += level.dv;
@@ -376,6 +388,10 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
         }
         else if (move_type == MoveType::SPACE_CRUISE)
         {
+          move_type = MoveType::SPACE_COLLIDE;
+        }
+        else if (move_type == MoveType::SPACE_COLLIDE)
+        {
           move_type = MoveType::FREE;
         }
         LOG_INFO("Move type set to %d", static_cast<int>(move_type));
@@ -463,7 +479,7 @@ Sprite Player::get_spaceship_sprite() const
       return Sprite::SPRITE_SPACESHIP_3;
     }
   }
-  else if (move_type == MoveType::SPACE_CRUISE)
+  else if (move_type == MoveType::SPACE_CRUISE || move_type == MoveType::SPACE_COLLIDE)
   {
     return Sprite::SPRITE_SPACESHIP_4;
   }
