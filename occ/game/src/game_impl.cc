@@ -272,15 +272,16 @@ void GameImpl::update_player(const PlayerInput& player_input)
   }
 
   // Check up / down (noclip)
-  if (player_.is_freemove())
+  const int y_vel = player_.free_vel();
+  if (y_vel)
   {
     if (player_input.up)
     {
-      player_.velocity = Vector<int>(player_.velocity.x(), -4);
+      player_.velocity = Vector<int>(player_.velocity.x(), -y_vel);
     }
     else if (player_input.down)
     {
-      player_.velocity = Vector<int>(player_.velocity.x(), 4);
+      player_.velocity = Vector<int>(player_.velocity.x(), y_vel);
     }
     else
     {

@@ -105,7 +105,8 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
 
   // Set x velocity
   const int dx = direction == Direction::right ? 1 : -1;
-  if (move_type == MoveType::HUMAN || move_type == MoveType::FREE || (move_type == MoveType::SPACE_CRUISE && walk_tick >= stall_ticks))
+  if (move_type == MoveType::HUMAN || move_type == MoveType::FREE || move_type == MoveType::SPACE_TAXI ||
+      move_type == MoveType::SPACE_DOCK || (move_type == MoveType::SPACE_CRUISE && walk_tick >= stall_ticks))
   {
     if (recoil_tick > 0)
     {
@@ -114,9 +115,17 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     }
     else if (walking)
     {
-      // First step is 2 pixels / tick, then 4 pixels / tick
-      const auto walk_velocity = walk_tick == 0u ? 2 : 4;
-      velocity = Vector<int>(dx * walk_velocity, velocity.y());
+      const auto x_vel = free_vel();
+      if (x_vel > 0)
+      {
+        velocity = Vector<int>(dx * x_vel, velocity.y());
+      }
+      else
+      {
+        // First step is 2 pixels / tick, then 4 pixels / tick
+        const auto walk_velocity = walk_tick == 0u ? 2 : 4;
+        velocity = Vector<int>(dx * walk_velocity, velocity.y());
+      }
     }
     else
     {
@@ -392,6 +401,14 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
         }
         else if (move_type == MoveType::SPACE_COLLIDE)
         {
+          move_type = MoveType::SPACE_TAXI;
+        }
+        else if (move_type == MoveType::SPACE_TAXI)
+        {
+          move_type = MoveType::SPACE_DOCK;
+        }
+        else if (move_type == MoveType::SPACE_DOCK)
+        {
           move_type = MoveType::FREE;
         }
         LOG_INFO("Move type set to %d", static_cast<int>(move_type));
@@ -444,9 +461,21 @@ bool Player::is_flashing() const
 }
 
 
-bool Player::is_freemove() const
+int Player::free_vel() const
 {
-  return noclip || move_type == MoveType::FREE || (move_type == MoveType::SPACE_CRUISE && walk_tick >= stall_ticks);
+  if (noclip || move_type == MoveType::FREE || (move_type == MoveType::SPACE_CRUISE && walk_tick >= stall_ticks))
+  {
+    return 4;
+  }
+  else if (move_type == MoveType::SPACE_TAXI)
+  {
+    return 2;
+  }
+  else if (move_type == MoveType::SPACE_DOCK)
+  {
+    return 1;
+  }
+  return 0;
 }
 
 Sprite Player::get_spaceship_sprite() const
@@ -479,9 +508,13 @@ Sprite Player::get_spaceship_sprite() const
       return Sprite::SPRITE_SPACESHIP_3;
     }
   }
-  else if (move_type == MoveType::SPACE_CRUISE || move_type == MoveType::SPACE_COLLIDE)
+  else if (move_type == MoveType::SPACE_CRUISE || move_type == MoveType::SPACE_COLLIDE || move_type == MoveType::SPACE_TAXI)
   {
     return Sprite::SPRITE_SPACESHIP_4;
+  }
+  else if (move_type == MoveType::SPACE_DOCK)
+  {
+    return Sprite::SPRITE_SPACESHIP_5;
   }
   return Sprite::SPRITE_SPACESHIP_1;
 }
