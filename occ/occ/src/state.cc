@@ -403,7 +403,10 @@ GameState::GameState(Game& game,
         {PanelText::PANEL_TEXT_START_2, exe_data, {}},
         {PanelText::PANEL_TEXT_START_3, exe_data, {}},
       },
-      false)
+      false),
+    intro_steering_panel_(PanelText::PANEL_TEXT_START_SEQ_1, exe_data),
+    intro_whoa_panel_(PanelText::PANEL_TEXT_START_SEQ_2, exe_data),
+    intro_dock_panel_(PanelText::PANEL_TEXT_START_SEQ_3, exe_data)
 {
 }
 
@@ -440,12 +443,103 @@ void GameState::reset()
   {
     // Show intro scrawl
     panel_current_ = &intro_panel_;
+    intro_ticks_ = 0;
   }
 }
 
 void GameState::update(const Input& input)
 {
   State::update(input);
+  auto pi = input_to_player_input(input);
+  // Intro-specific state updates
+  if (level_ == LevelId::INTRO && panel_current_ == nullptr && fade_out_start_ticks_ == 0)
+  {
+    intro_ticks_++;
+    // Use player movement mode as state machine
+    Player& player = const_cast<Player&>(game_.get_player());
+    switch (player.move_type)
+    {
+      case MoveType::SPACE_STALL:
+        pi.right = true;
+        if (intro_ticks_ > 70)
+        {
+          // Start spinning
+          player.move_type = MoveType::SPACE_SPIN;
+          player.walk_tick = 0;
+          intro_ticks_ = 0;
+        }
+        break;
+      case MoveType::SPACE_SPIN:
+        pi.right = true;
+        if (player.walk_tick > 0 && player.velocity.x() == 0 && player.velocity.y() == 0)
+        {
+          // Show "steering failing" panel and then cruise
+          player.move_type = MoveType::SPACE_CRUISE;
+          player.walk_tick = 0;
+          intro_ticks_ = 0;
+          panel_current_ = &intro_steering_panel_;
+        }
+        break;
+      case MoveType::SPACE_CRUISE:
+        pi.right = true;
+        // Collide into earth
+        if (player.position.x() >= 26 * 16)
+        {
+          // Collide
+          player.move_type = MoveType::SPACE_COLLIDE;
+          player.walk_tick = 0;
+          intro_ticks_ = 0;
+          // Move left
+        }
+        break;
+      case MoveType::SPACE_COLLIDE:
+        pi.left = true;
+        if (intro_ticks_ > 16)
+        {
+          // Show "whoa" panel and start taxiing
+          player.move_type = MoveType::SPACE_TAXI;
+          player.walk_tick = 0;
+          intro_ticks_ = 0;
+          panel_current_ = &intro_whoa_panel_;
+        }
+        break;
+      case MoveType::SPACE_TAXI:
+        // Move down and then right
+        if (player.position.y() < 12 * 16)
+        {
+          pi.down = true;
+        }
+        else
+        {
+          pi.right = true;
+        }
+        // Overlap with big planet
+        if (player.position.x() >= 30 * 16)
+        {
+          // Dock
+          player.move_type = MoveType::SPACE_DOCK;
+          player.walk_tick = 0;
+          intro_ticks_ = 0;
+        }
+        break;
+      case MoveType::SPACE_DOCK:
+        if (player.position.x() <= 31 * 16)
+        {
+          // Move right
+          pi.right = true;
+          if (player.position.x() == 31 * 16)
+          {
+            // Docked
+            // Show "whew" panel
+            intro_ticks_ = 0;
+            panel_current_ = &intro_dock_panel_;
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
 
   if (input.space.pressed())
   {
@@ -570,6 +664,11 @@ void GameState::update(const Input& input)
   }
   else
   {
+    if (level_ == LevelId::INTRO && panel_last == &intro_dock_panel_)
+    {
+      // Closing dock panel means going to the main level
+      game_.entering_level = LevelId::MAIN_LEVEL;
+    }
     if (input.num_1.pressed())
     {
       debug_info_ = !debug_info_;
@@ -586,7 +685,7 @@ void GameState::update(const Input& input)
     if (!paused_ || (paused_ && input.space.pressed()))
     {
       // Call game loop
-      game_.update(game_tick_, input_to_player_input(input));
+      game_.update(game_tick_, pi);
       game_tick_ += 1;
 
       if (game_.get_player().health_ == 0 && game_.get_player().dying_tick == 0)

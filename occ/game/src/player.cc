@@ -134,26 +134,33 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   }
   else if (move_type == MoveType::SPACE_STALL)
   {
-    // First few ticks: vibrate up/down
+    // First few ticks: stopped
+    // Next few ticks: vibrate up/down
     // Next few ticks: accelerate in the target direction
     // Final few ticks: stay still
+    constexpr int stop_ticks = 6;
     constexpr int accel_ticks = 6;
     constexpr int decel_ticks = 4;
+    const int cycle_ticks = walk_tick % 32;
     if (!walking)
     {
       velocity = {0, 0};
     }
-    else if (walk_tick < stall_ticks)
+    else if (cycle_ticks < stop_ticks)
     {
-      velocity = Vector<int>(0, (walk_tick & 1) * 2 - 1);
+      velocity = {0, 0};
     }
-    else if (walk_tick < stall_ticks + accel_ticks)
+    else if (cycle_ticks < stop_ticks + stall_ticks)
     {
-      velocity = Vector<int>(dx * (walk_tick - stall_ticks + 2), 0);
+      velocity = Vector<int>(0, (cycle_ticks & 1) * 2 - 1);
     }
-    else if (walk_tick < stall_ticks + accel_ticks + decel_ticks)
+    else if (cycle_ticks < stop_ticks + stall_ticks + accel_ticks)
     {
-      velocity = Vector<int>(dx * -static_cast<int>(walk_tick - (stall_ticks + accel_ticks + decel_ticks - 2)), 0);
+      velocity = Vector<int>(dx * (cycle_ticks - (stop_ticks + stall_ticks) + 2), 0);
+    }
+    else if (cycle_ticks < stop_ticks + stall_ticks + accel_ticks + decel_ticks)
+    {
+      velocity = Vector<int>(dx * -static_cast<int>(cycle_ticks - (stop_ticks + stall_ticks + accel_ticks + decel_ticks - 2)), 0);
     }
     else
     {
@@ -376,42 +383,6 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
       else if (jump_tick == 0)
       {
         sound_manager.play_sound(SoundType::SOUND_JUMP);
-      }
-    }
-    else
-    {
-      if (jump_tick == 0)
-      {
-        // Space mode, cycle between move modes
-        if (move_type == MoveType::FREE)
-        {
-          move_type = MoveType::SPACE_STALL;
-        }
-        else if (move_type == MoveType::SPACE_STALL)
-        {
-          move_type = MoveType::SPACE_SPIN;
-        }
-        else if (move_type == MoveType::SPACE_SPIN)
-        {
-          move_type = MoveType::SPACE_CRUISE;
-        }
-        else if (move_type == MoveType::SPACE_CRUISE)
-        {
-          move_type = MoveType::SPACE_COLLIDE;
-        }
-        else if (move_type == MoveType::SPACE_COLLIDE)
-        {
-          move_type = MoveType::SPACE_TAXI;
-        }
-        else if (move_type == MoveType::SPACE_TAXI)
-        {
-          move_type = MoveType::SPACE_DOCK;
-        }
-        else if (move_type == MoveType::SPACE_DOCK)
-        {
-          move_type = MoveType::FREE;
-        }
-        LOG_INFO("Move type set to %d", static_cast<int>(move_type));
       }
     }
   }
