@@ -212,7 +212,9 @@ Panel::Panel(const char* ucsd,
       ends_with(s, "Yorp herding business.") || ends_with(s, "continued...") || ends_with(s, "ahead of his creditors.") ||
       ends_with(s, "of Ghoulbone IV.") || ends_with(s, "- END OF ENTRY -") ||
       // Intro
-      ends_with(s, "Record On: ") || ends_with(s, "twibble farm.") || ends_with(s, "anything big..."))
+      ends_with(s, "Record On: ") || ends_with(s, "twibble farm.") || ends_with(s, "anything big...") ||
+      // Finale
+      ends_with(s, "Galactic Trading Post..."))
     {
       strings_.push_back(L"");
     }

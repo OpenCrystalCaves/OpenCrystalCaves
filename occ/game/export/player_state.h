@@ -29,4 +29,5 @@ struct PlayerState
 
   void set_time() { time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()); }
   bool has_completed_any_level() const;
+  bool has_completed_all_levels() const;
 };

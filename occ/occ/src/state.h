@@ -144,13 +144,14 @@ class GameState : public State
   bool debug_info_ = false;
   bool paused_ = false;
   unsigned game_tick_ = 0;
-  LevelId level_ = LevelId::INTRO;
+  LevelId level_ = LevelId::FINALE;
   Panel panel_;
   Panel warp_panel_;
   Panel intro_panel_;
   Panel intro_steering_panel_;
   Panel intro_whoa_panel_;
   Panel intro_dock_panel_;
+  Panel finale_panel_;
   unsigned intro_ticks_ = 0;
   Panel* panel_current_ = nullptr;
   Panel* panel_next_ = nullptr;

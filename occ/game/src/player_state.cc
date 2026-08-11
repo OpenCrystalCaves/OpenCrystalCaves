@@ -121,3 +121,20 @@ bool PlayerState::has_completed_any_level() const
   }
   return false;
 }
+
+bool PlayerState::has_completed_all_levels() const
+{
+  for (int i = 0; i < static_cast<int>(levels_completed.size()); i++)
+  {
+    // Ignore intro and main levels
+    if (i <= static_cast<int>(LevelId::MAIN_LEVEL))
+    {
+      continue;
+    }
+    if (!levels_completed[i])
+    {
+      return false;
+    }
+  }
+  return true;
+}

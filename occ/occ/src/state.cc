@@ -406,7 +406,8 @@ GameState::GameState(Game& game,
       false),
     intro_steering_panel_(PanelText::PANEL_TEXT_START_SEQ_1, exe_data),
     intro_whoa_panel_(PanelText::PANEL_TEXT_START_SEQ_2, exe_data),
-    intro_dock_panel_(PanelText::PANEL_TEXT_START_SEQ_3, exe_data)
+    intro_dock_panel_(PanelText::PANEL_TEXT_START_SEQ_3, exe_data),
+    finale_panel_(PanelText::PANEL_TEXT_END, exe_data)
 {
 }
 
@@ -426,6 +427,11 @@ void GameState::reset()
       player_state_.set_time();
       player_state_.save();
     }
+    // Check if all levels are complete, then move to finale
+    if (player_state_.has_completed_all_levels())
+    {
+      level_ = LevelId::FINALE;
+    }
   }
   paused_ = false;
   panel_current_ = nullptr;
@@ -443,6 +449,12 @@ void GameState::reset()
   {
     // Show intro scrawl
     panel_current_ = &intro_panel_;
+    intro_ticks_ = 0;
+  }
+  else if (level_ == LevelId::FINALE)
+  {
+    // Show finale scrawl
+    panel_current_ = &finale_panel_;
     intro_ticks_ = 0;
   }
 }
