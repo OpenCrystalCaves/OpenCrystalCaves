@@ -729,6 +729,22 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
         switch (tile_id)
         {
           case ' ':
+            // Special case for finale - show planet at player spawn
+            if (level_id == LevelId::FINALE && x > 0 && y > 0)
+            {
+              if (level->tile_ids[i - 1] == 'Y')
+              {
+                sprite = static_cast<int>(Sprite::SPRITE_PLANET_UR);
+              }
+              else if (level->tile_ids[i - level->width] == 'Y')
+              {
+                sprite = static_cast<int>(Sprite::SPRITE_PLANET_DL);
+              }
+              else if (level->tile_ids[i - 1 - level->width] == 'Y')
+              {
+                sprite = static_cast<int>(Sprite::SPRITE_PLANET_DR);
+              }
+            }
             break;
           case '!':
             // Faucet
@@ -1256,6 +1272,11 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
           case 'Y':
             // Player spawn
             level->player_spawn = geometry::Position(x * 16, y * 16);
+            // Special case for finale - show planet at player spawn
+            if (level_id == LevelId::FINALE)
+            {
+              sprite = static_cast<int>(Sprite::SPRITE_PLANET_UL);
+            }
             break;
           case 'z':
             if (is_horizon_row || (x == 0 && level->tile_ids[i + 1] == 'Z'))
