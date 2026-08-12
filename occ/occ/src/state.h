@@ -126,7 +126,8 @@ class GameState : public State
             Surface& game_surface,
             Window& window,
             ExeData& exe_data,
-            PlayerState& player_state);
+            PlayerState& player_state,
+            State& end_state);
 
   virtual void reset() override;
   virtual void update(const Input& input) override;
@@ -141,6 +142,7 @@ class GameState : public State
   GameRenderer game_renderer_;
   ExeData& exe_data_;
   PlayerState& player_state_;
+  State* end_state_;
   bool debug_info_ = false;
   bool paused_ = false;
   unsigned game_tick_ = 0;
@@ -153,9 +155,25 @@ class GameState : public State
   Panel intro_dock_panel_;
   Panel finale_panel_;
   Panel finale_any_key_panel_;
+  Panel finale_end_game_panel_;
   unsigned intro_ticks_ = 0;
   Panel* panel_current_ = nullptr;
   Panel* panel_next_ = nullptr;
 };
 
-// TODO: end state
+class EndState : public State
+{
+ public:
+  EndState(SoundManager& sound_manager, std::vector<Surface*>& images, Window& window, ExeData& exe_data);
+
+  virtual void update(const Input& input) override;
+  virtual void draw(Window& window) const override;
+
+ private:
+  SoundManager& sound_manager_;
+  std::vector<Surface*>& images_;
+  Panel outro_panel_;
+  Panel congrats_panel_;
+  Panel* panel_current_ = nullptr;
+  Panel* panel_next_ = nullptr;
+};

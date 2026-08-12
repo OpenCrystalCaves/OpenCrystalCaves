@@ -360,7 +360,8 @@ GameState::GameState(Game& game,
                      Surface& game_surface,
                      Window& window,
                      ExeData& exe_data,
-                     PlayerState& player_state)
+                     PlayerState& player_state,
+                     State& end_state)
   : State(FADE_IN_TICKS, FADE_OUT_TICKS, window),
     game_(game),
     game_surface_(game_surface),
@@ -369,6 +370,7 @@ GameState::GameState(Game& game,
     game_renderer_(&game, &sprite_manager, &game_surface, window),
     exe_data_(exe_data),
     player_state_(player_state),
+    end_state_(&end_state),
     panel_(
       {
         L"OpenCrystalCaves Game Menu",
@@ -408,7 +410,8 @@ GameState::GameState(Game& game,
     intro_whoa_panel_(PanelText::PANEL_TEXT_START_SEQ_2, exe_data),
     intro_dock_panel_(PanelText::PANEL_TEXT_START_SEQ_3, exe_data),
     finale_panel_(PanelText::PANEL_TEXT_END, exe_data),
-    finale_any_key_panel_(PanelText::PANEL_TEXT_PRESS_ANY_KEY, exe_data)
+    finale_any_key_panel_(PanelText::PANEL_TEXT_PRESS_ANY_KEY, exe_data),
+    finale_end_game_panel_({PanelType::PANEL_TYPE_END_GAME})
 {
 }
 
@@ -571,7 +574,13 @@ void GameState::update(const Input& input)
           pi.left = false;
           // TODO: drain score and crystals
           panel_current_ = &finale_any_key_panel_;
+          player.move_type = MoveType::SPACE_DOCK;
         }
+        break;
+      case MoveType::SPACE_DOCK:
+        // Transition to end state
+        panel_next_ = &finale_end_game_panel_;
+        finish();
         break;
       default:
         break;
@@ -828,10 +837,40 @@ State* GameState::next_state()
           return nullptr;
         case PanelType::PANEL_TYPE_QUIT_TO_TITLE:
           break;
+        case PanelType::PANEL_TYPE_END_GAME:
+          return end_state_;
         default:
           break;
       }
     }
   }
   return State::next_state();
+}
+
+EndState::EndState(SoundManager& sound_manager, std::vector<Surface*>& images, Window& window, ExeData& exe_data)
+  : State(FADE_IN_TICKS, 0, window),
+    sound_manager_(sound_manager),
+    images_(images),
+    outro_panel_(PanelText::PANEL_TEXT_END_1, exe_data),
+    congrats_panel_(
+      {
+        {PanelText::PANEL_TEXT_END_2, exe_data, {}},
+        {PanelText::PANEL_TEXT_END_3, exe_data, {}},
+      },
+      false)
+{
+}
+
+void EndState::update(const Input& input)
+{
+  State::update(input);
+  // TODO: go through panels
+}
+
+void EndState::draw(Window& window) const
+{
+  // Just draw the image for now
+  images_[0]->blit_surface(geometry::Rectangle(0, 0, images_[0]->size()),
+                           geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
+  State::draw(window);
 }

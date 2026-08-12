@@ -128,10 +128,13 @@ int main()
   SplashState splash{sound_manager, splash_images, *window};
   auto title_images = image_manager.get_images(episode, CCImage::IMAGE_TITLE);
   auto credits_images = image_manager.get_images(episode, CCImage::IMAGE_CREDITS);
+  auto end_images = image_manager.get_images(episode, CCImage::IMAGE_END);
   title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());
   TitleState title{episode, sprite_manager, sound_manager, *game_surface, title_images, *window, exe_data, player_state};
   splash.set_next(title);
-  GameState game_state(*game, sprite_manager, sound_manager, *game_surface, *window, exe_data, player_state);
+  EndState end_state = EndState(sound_manager, end_images, *window, exe_data);
+  end_state.set_next(title);
+  GameState game_state(*game, sprite_manager, sound_manager, *game_surface, *window, exe_data, player_state, end_state);
   title.set_next(game_state);
   game_state.set_next(title);
   State* state = &splash;
