@@ -37,6 +37,10 @@ bool GameImpl::init(AbstractSoundManager& sound_manager,
   {
     player_.move_type = MoveType::SPACE_STALL;
   }
+  else if (level == LevelId::FINALE)
+  {
+    player_.move_type = MoveType::SPACE_TRANSFER;
+  }
 
   score_ = player_state.score;
   num_ammo_ = player_state.ammo;
@@ -253,6 +257,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
   if ((player_input.left && player_input.right) || (!player_input.left && !player_input.right))
   {
     player_.walking = false;
+    player_.stand_tick += 1u;
   }
   else if (player_.walking &&
            ((player_input.right && player_.direction == Player::Direction::right) ||
@@ -266,6 +271,7 @@ void GameImpl::update_player(const PlayerInput& player_input)
     // Player started to walk
     player_.walking = true;
     player_.walk_tick = 0u;
+    player_.stand_tick = 0u;
 
     // Set direction
     player_.direction = player_input.right ? Player::Direction::right : Player::Direction::left;

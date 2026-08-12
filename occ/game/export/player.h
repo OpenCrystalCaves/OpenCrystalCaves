@@ -21,6 +21,7 @@ enum class MoveType
   SPACE_COLLIDE,
   SPACE_TAXI,
   SPACE_DOCK,
+  SPACE_TRANSFER,
 };
 
 struct Player
@@ -43,6 +44,7 @@ struct Player
 
   bool walking = false;
   unsigned walk_tick = 0u;
+  unsigned stand_tick = 0u;
 
   bool jumping = false;
   unsigned jump_tick = 0u;

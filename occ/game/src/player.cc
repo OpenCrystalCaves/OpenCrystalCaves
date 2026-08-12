@@ -106,7 +106,8 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   // Set x velocity
   const int dx = direction == Direction::right ? 1 : -1;
   if (move_type == MoveType::HUMAN || move_type == MoveType::FREE || move_type == MoveType::SPACE_TAXI ||
-      move_type == MoveType::SPACE_DOCK || (move_type == MoveType::SPACE_CRUISE && walk_tick >= stall_ticks))
+      move_type == MoveType::SPACE_DOCK || (move_type == MoveType::SPACE_CRUISE && walk_tick >= stall_ticks) ||
+      move_type == MoveType::SPACE_TRANSFER)
   {
     if (recoil_tick > 0)
     {
@@ -438,7 +439,7 @@ int Player::free_vel() const
   {
     return 4;
   }
-  else if (move_type == MoveType::SPACE_TAXI)
+  else if (move_type == MoveType::SPACE_TAXI || move_type == MoveType::SPACE_TRANSFER)
   {
     return 2;
   }
@@ -486,6 +487,10 @@ Sprite Player::get_spaceship_sprite() const
   else if (move_type == MoveType::SPACE_DOCK)
   {
     return Sprite::SPRITE_SPACESHIP_5;
+  }
+  else if (move_type == MoveType::SPACE_TRANSFER)
+  {
+    return static_cast<Sprite>(static_cast<int>(Sprite::SPRITE_SPACESHIP_1) + std::min(stand_tick, 4u));
   }
   return Sprite::SPRITE_SPACESHIP_1;
 }
