@@ -152,6 +152,7 @@ class GameState : public State
   Panel intro_whoa_panel_;
   Panel intro_dock_panel_;
   Panel finale_panel_;
+  Panel finale_any_key_panel_;
   unsigned intro_ticks_ = 0;
   Panel* panel_current_ = nullptr;
   Panel* panel_next_ = nullptr;

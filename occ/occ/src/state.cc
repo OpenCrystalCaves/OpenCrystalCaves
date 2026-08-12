@@ -407,7 +407,8 @@ GameState::GameState(Game& game,
     intro_steering_panel_(PanelText::PANEL_TEXT_START_SEQ_1, exe_data),
     intro_whoa_panel_(PanelText::PANEL_TEXT_START_SEQ_2, exe_data),
     intro_dock_panel_(PanelText::PANEL_TEXT_START_SEQ_3, exe_data),
-    finale_panel_(PanelText::PANEL_TEXT_END, exe_data)
+    finale_panel_(PanelText::PANEL_TEXT_END, exe_data),
+    finale_any_key_panel_(PanelText::PANEL_TEXT_PRESS_ANY_KEY, exe_data)
 {
 }
 
@@ -546,6 +547,30 @@ void GameState::update(const Input& input)
             intro_ticks_ = 0;
             panel_current_ = &intro_dock_panel_;
           }
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  else if (level_ == LevelId::FINALE && panel_current_ == nullptr && fade_out_start_ticks_ == 0)
+  {
+    Player& player = const_cast<Player&>(game_.get_player());
+    switch (player.move_type)
+    {
+      case MoveType::SPACE_TRANSFER:
+        // Move down and left to the trading post
+        if (player.position.y() <= 13 * 16)
+        {
+          pi.down = true;
+        }
+        pi.left = true;
+        // Stop when reaching the trading post
+        if (player.position.x() <= 9 * 16)
+        {
+          pi.left = false;
+          // TODO: drain score and crystals
+          panel_current_ = &finale_any_key_panel_;
         }
         break;
       default:
