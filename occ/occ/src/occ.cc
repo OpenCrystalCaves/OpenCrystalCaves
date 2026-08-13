@@ -132,7 +132,7 @@ int main()
   title_images.insert(title_images.end(), credits_images.begin(), credits_images.end());
   TitleState title{episode, sprite_manager, sound_manager, *game_surface, title_images, *window, exe_data, player_state};
   splash.set_next(title);
-  EndState end_state = EndState(sound_manager, end_images, *window, exe_data);
+  EndState end_state = EndState(sprite_manager, sound_manager, *game_surface, end_images, *window, exe_data);
   end_state.set_next(title);
   GameState game_state(*game, sprite_manager, sound_manager, *game_surface, *window, exe_data, player_state, end_state);
   title.set_next(game_state);

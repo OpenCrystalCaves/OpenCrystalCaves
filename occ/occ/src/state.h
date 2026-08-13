@@ -164,12 +164,19 @@ class GameState : public State
 class EndState : public State
 {
  public:
-  EndState(SoundManager& sound_manager, std::vector<Surface*>& images, Window& window, ExeData& exe_data);
+  EndState(SpriteManager& sprite_manager,
+           SoundManager& sound_manager,
+           Surface& game_surface,
+           std::vector<Surface*>& images,
+           Window& window,
+           ExeData& exe_data);
 
   virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;
 
  private:
+  Surface& game_surface_;
+  SpriteManager& sprite_manager_;
   SoundManager& sound_manager_;
   std::vector<Surface*>& images_;
   Panel outro_panel_;

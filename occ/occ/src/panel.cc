@@ -214,7 +214,10 @@ Panel::Panel(const char* ucsd,
       // Intro
       ends_with(s, "Record On: ") || ends_with(s, "twibble farm.") || ends_with(s, "anything big...") ||
       // Finale
-      ends_with(s, "Galactic Trading Post..."))
+      ends_with(s, "Galactic Trading Post...") || ends_with(s, "Three months later...") || ends_with(s, "entire food supply!") ||
+      ends_with(s, "planet full of them...!") || ends_with(s, "not yet complete.") || ends_with(s, "caves to explore.") ||
+      ends_with(s, "Millenium Kiwi?") || ends_with(s, "await him?") || ends_with(s, "get-rich scheme?") ||
+      ends_with(s, "largest burger franchise?") || ends_with(s, "Order today and find out!"))
     {
       strings_.push_back(L"");
     }

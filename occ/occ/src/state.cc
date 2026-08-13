@@ -847,9 +847,16 @@ State* GameState::next_state()
   return State::next_state();
 }
 
-EndState::EndState(SoundManager& sound_manager, std::vector<Surface*>& images, Window& window, ExeData& exe_data)
+EndState::EndState(SpriteManager& sprite_manager,
+                   SoundManager& sound_manager,
+                   Surface& game_surface,
+                   std::vector<Surface*>& images,
+                   Window& window,
+                   ExeData& exe_data)
   : State(FADE_IN_TICKS, 0, window),
+    sprite_manager_(sprite_manager),
     sound_manager_(sound_manager),
+    game_surface_(game_surface),
     images_(images),
     outro_panel_(PanelText::PANEL_TEXT_END_1, exe_data),
     congrats_panel_(
@@ -859,12 +866,41 @@ EndState::EndState(SoundManager& sound_manager, std::vector<Surface*>& images, W
       },
       false)
 {
+  panel_current_ = &outro_panel_;
 }
 
 void EndState::update(const Input& input)
 {
   State::update(input);
-  // TODO: go through panels
+  const auto panel_last = panel_current_;
+  const int index_last = panel_current_ ? panel_current_->index() : -1;
+
+  if (panel_current_)
+  {
+    panel_current_ = panel_current_->update(input);
+  }
+  else
+  {
+    const auto pinput = input_to_player_input(input);
+    if (pinput.down_pressed || input.down.pressed() || pinput.right_pressed || input.right.pressed() || pinput.jump_pressed ||
+        pinput.shoot_pressed || input.enter.pressed())
+    {
+      // Show congrats panel
+      panel_current_ = &congrats_panel_;
+    }
+  }
+
+  if (!panel_current_ && panel_last == &congrats_panel_)
+  {
+    finish();
+  }
+
+  if (panel_current_ &&
+      (panel_last != panel_current_ ||
+       (panel_current_->get_type() == PanelType::PANEL_TYPE_PAGES && panel_current_->index() != index_last)))
+  {
+    sound_manager_.play_sound(SoundType::SOUND_PANEL);
+  }
 }
 
 void EndState::draw(Window& window) const
@@ -872,5 +908,19 @@ void EndState::draw(Window& window) const
   // Just draw the image for now
   images_[0]->blit_surface(geometry::Rectangle(0, 0, images_[0]->size()),
                            geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
+
+  if (panel_current_)
+  {
+    // Blit to game surface to set scaling properly
+    window.set_render_target(&game_surface_);
+    // Clear window surface
+    window.fill_rect(geometry::Rectangle(0, 0, WINDOW_SIZE), {33u, 33u, 33u, 0u});
+
+    panel_current_->draw(sprite_manager_, window);
+    window.set_render_target(nullptr);
+    // Render game surface to window surface, centered and scaled
+    game_surface_.blit_surface(geometry::Rectangle(0, 0, CAMERA_SIZE),
+                               geometry::Rectangle((WINDOW_SIZE - CAMERA_SIZE_SCALED) / 2, CAMERA_SIZE_SCALED));
+  }
   State::draw(window);
 }
