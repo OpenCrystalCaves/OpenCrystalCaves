@@ -18,18 +18,39 @@ Current state of OCC:
 
 ![Main Level](/screenshots/screenshot3.png?raw=true "Main Level")
 
-Currently the engine can:
-
-- Load sprite, item and level data.
-- Play through a few levels.
-- Some enemies, hazards and items.
+Currently episode 1 is playable.
 
 Features that are missing:
 
-- Loading and saving games.
-- Some items.
-- Some enemies.
-- (and much more).
+- Loading and saving games
+- High scores
+- Episodes 2 & 3
+- Remapping keys
+- Joystick/gamepad/mouse input
+- Somewhat inaccurate sound
+- Alternate UI during intro/finale
+- Crystal/score countdown at trading post
+- Walk animation when exiting level
+- SFX when panels open
+- SFX when entering levels
+- SFX for faucet
+- Message when encountering switches first time
+- Message when picking up powerups first time
+- Message when collecting all crystals first time
+- Message when attempting to exit without all crystals first time
+- Player hurt sound
+- Enemy hurt flash effect
+
+Known bugs:
+
+- Can quit to main level during finale, thereby getting stuck
+- Can shoot and control ship during intro/finale sequences
+- Can hear hammers even when offscreen
+- BG not dark when lights out
+- BG parallax in some levels
+- Enemies can see player even when offscreen
+- Can't land in 1-tile-high alcoves when falling at max speed
+- Can't fall in reverse gravity level
 
 ## Differences with Crystal Caves
 
