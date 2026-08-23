@@ -411,7 +411,7 @@ GameState::GameState(Game& game,
     intro_dock_panel_(PanelText::PANEL_TEXT_START_SEQ_3, exe_data),
     finale_panel_(PanelText::PANEL_TEXT_END, exe_data),
     finale_any_key_panel_(PanelText::PANEL_TEXT_PRESS_ANY_KEY, exe_data),
-    finale_end_game_panel_({PanelType::PANEL_TYPE_END_GAME})
+    finale_end_game_panel_(PanelType::PANEL_TYPE_END_GAME)
 {
 }
 
@@ -435,6 +435,11 @@ void GameState::reset()
     if (player_state_.has_completed_all_levels())
     {
       level_ = LevelId::FINALE;
+    }
+    else if (level_ == LevelId::INTRO && player_state_.has_completed_any_level())
+    {
+      // Skip intro, go to main level
+      level_ = LevelId::MAIN_LEVEL;
     }
   }
   paused_ = false;
