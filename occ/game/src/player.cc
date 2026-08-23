@@ -89,15 +89,16 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   // Set y velocity
   if (move_type == MoveType::HUMAN)
   {
+    const bool reverse_gravity = is_reverse_gravity() ^ (level.gravity < 0);
     if (jumping)
     {
       velocity = Vector<int>(velocity.x(), jump_velocity[jump_tick]);
     }
     else
     {
-      velocity = Vector<int>(velocity.x(), level.gravity);
+      velocity = Vector<int>(velocity.x(), std::abs(level.gravity));
     }
-    if (is_reverse_gravity() ^ (level.gravity < 0))
+    if (reverse_gravity)
     {
       velocity = Vector<int>(velocity.x(), -velocity.y());
     }
@@ -350,7 +351,7 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
         if (is_reverse ? velocity.y() > 0 : velocity.y() < 0)
         {
           // Player hit something while jumping up
-          const auto position_below = position - geometry::Position(0, is_reverse ? -step_y : step_y);
+          const auto position_below = position - geometry::Position(0, step_y);
           if (level.collides_solid(position_below, size) || level.player_on_platform(position_below, size))
           {
             // If player already on platform, stop jumping immediately
