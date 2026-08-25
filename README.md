@@ -34,10 +34,12 @@ Features that are missing:
 - SFX when panels open
 - SFX when entering levels
 - SFX for faucet
-- Message when encountering switches first time
-- Message when picking up powerups first time
-- Message when collecting all crystals first time
-- Message when attempting to exit without all crystals first time
+- Messages on first time:
+  - switches
+  - powerups
+  - collecting all crystals
+  - attempting to exit without all crystals
+  - hitting air machine
 - Player hurt sound
 - Enemy hurt flash effect
 
@@ -51,6 +53,8 @@ Known bugs:
 - Enemies can see player even when offscreen
 - Can't land in 1-tile-high alcoves when falling at max speed
 - Can't fall in reverse gravity level
+- No death effect for ostrich enemy
+- Signs are not rendered until their leftmost tile is in view
 
 ## Differences with Crystal Caves
 
