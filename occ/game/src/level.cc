@@ -90,56 +90,6 @@ bool Level::collides_solid_top(const geometry::Position& position, const geometr
   return false;
 }
 
-/**
- * Checks if given position and size collides with any actor.
- *
- * Returns the first colliding actor, or null if none found.
- * TODO: combine this with collides enemy/hazard
- */
-Actor* Level::collides_actor(const geometry::Position& position, const geometry::Size& size) const
-{
-  const auto rect = geometry::Rectangle(position, size);
-  for (auto&& actor : actors)
-  {
-    if (geometry::isColliding(rect, geometry::Rectangle(actor->position, actor->size)))
-    {
-      return actor.get();
-    }
-  }
-  return nullptr;
-}
-
-Hazard* Level::collides_hazard(const geometry::Position& position, const geometry::Size& size) const
-{
-  const auto rect = geometry::Rectangle(position, size);
-  for (auto&& hazard : hazards)
-  {
-    if (geometry::isColliding(rect, geometry::Rectangle(hazard->position, hazard->size)))
-    {
-      return hazard.get();
-    }
-  }
-  return nullptr;
-}
-
-/**
- * Checks if given position and size collides with any enemy.
- *
- * Returns the first colliding enemy, or null if none found.
- */
-Enemy* Level::collides_enemy(const geometry::Position& position, const geometry::Size& size) const
-{
-  const auto rect = geometry::Rectangle(position, size);
-  for (auto&& enemy : enemies)
-  {
-    if (geometry::isColliding(rect, geometry::Rectangle(enemy->position, enemy->size)))
-    {
-      return enemy.get();
-    }
-  }
-  return nullptr;
-}
-
 bool Level::player_on_platform(const geometry::Position& position, const geometry::Size& size) const
 {
   // Need to check both static platforms (e.g. foreground items with SOLID_TOP)
