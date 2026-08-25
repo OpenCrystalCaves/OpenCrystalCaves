@@ -694,7 +694,7 @@ bool Robot::on_hit(const geometry::Rectangle& rect,
 void Robot::remove_child(Level& level)
 {
   // Respawn laser immediately if zapping
-  if (zapping_)
+  if (zapping_ && is_alive())
   {
     geometry::Position child_pos = position + geometry::Position(left_ ? -16 : 16, 0);
     child_ = new LaserBeam(child_pos, left_, *this, false);

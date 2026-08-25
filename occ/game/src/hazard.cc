@@ -90,6 +90,10 @@ std::vector<ObjectDef> Projectile::get_sprites([[maybe_unused]] const Level& lev
 
 void LaserBeam::update(AbstractSoundManager& sound_manager, const geometry::Rectangle& player_rect, Level& level)
 {
+  if (!alive_)
+  {
+    return;
+  }
   if (moving_)
   {
     Projectile::update(sound_manager, player_rect, level);
