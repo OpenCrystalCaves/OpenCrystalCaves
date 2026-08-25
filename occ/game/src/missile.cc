@@ -42,16 +42,26 @@ bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectan
   {
     const auto s = is_power ? 8 : (frame < speed.size() ? speed[frame] : speed.back());
     const int dx = right ? 1 : -1;
-    // Adjust position due to collision size being smaller than sprite size
-    const auto collision_position = position + geometry::Position(0, 3);
-    const auto crect = geometry::Rectangle{collision_position, size};
     for (int i = 0; i < s; i++)
     {
       position += geometry::Position(dx, 0);
+      // Adjust position due to collision size being smaller than sprite size
+      const auto collision_position = position + geometry::Position(0, 3);
+      const auto crect = geometry::Rectangle{collision_position, size};
 
       // Check colliding solid actors (closed doors)
-      auto actor = level.collides_actor(collision_position, size);
-      if (actor && actor->on_hit(crect, sound_manager, player_rect, level, is_power))
+      const auto rect = geometry::Rectangle(collision_position, size);
+      Actor* actorp = nullptr;
+      for (auto&& actor : level.actors)
+      {
+        if (geometry::isColliding(rect, geometry::Rectangle(actor->position, actor->size)) &&
+            actor->on_hit(crect, sound_manager, player_rect, level, is_power))
+        {
+          actorp = actor.get();
+          break;
+        }
+      }
+      if (actorp)
       {
         alive = false;
         set_cooldown();
@@ -60,13 +70,22 @@ bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectan
         break;
       }
 
-      auto enemy = level.collides_enemy(collision_position, size);
-      if (enemy && enemy->on_hit(crect, sound_manager, player_rect, level, is_power))
+      Enemy* enemyp = nullptr;
+      for (auto&& enemy : level.enemies)
+      {
+        if (geometry::isColliding(rect, geometry::Rectangle(enemy->position, enemy->size)) &&
+            enemy->on_hit(crect, sound_manager, player_rect, level, is_power))
+        {
+          enemyp = enemy.get();
+          break;
+        }
+      }
+      if (enemyp)
       {
         alive = false;
         // If enemy killed, spawn explosion
-        auto explosion_sprites = enemy->get_explosion_sprites();
-        if (explosion_sprites && !enemy->is_alive())
+        auto explosion_sprites = enemyp->get_explosion_sprites();
+        if (explosion_sprites && !enemyp->is_alive())
         {
           level.particles.emplace_back(new Explosion(position, *explosion_sprites, right ? 2 : -2));
           killed_enemy = true;
@@ -74,13 +93,22 @@ bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectan
         break;
       }
 
-      auto hazard = level.collides_hazard(collision_position, size);
-      if (hazard && hazard->on_hit(crect, sound_manager, player_rect, level, is_power))
+      Hazard* hazardp = nullptr;
+      for (auto&& hazard : level.hazards)
+      {
+        if (geometry::isColliding(rect, geometry::Rectangle(hazard->position, hazard->size)) &&
+            hazard->on_hit(crect, sound_manager, player_rect, level, is_power))
+        {
+          hazardp = hazard.get();
+          break;
+        }
+      }
+      if (hazardp)
       {
         alive = false;
         // If hazard killed, spawn explosion
-        auto explosion_sprites = hazard->get_explosion_sprites();
-        if (explosion_sprites && !hazard->is_alive())
+        auto explosion_sprites = hazardp->get_explosion_sprites();
+        if (explosion_sprites && !hazardp->is_alive())
         {
           level.particles.emplace_back(new Explosion(position, *explosion_sprites, right ? 2 : -2));
           killed_enemy = true;
