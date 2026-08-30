@@ -34,7 +34,7 @@ jobs:
           - release
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         submodules: true
     - name: Install packages (Linux)
@@ -105,14 +105,14 @@ jobs:
         ls "${{ github.workspace }}/${{ matrix.build_type }}/"
         ls ${{ github.workspace }}/${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
     - name: Upload a Build Artifact
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
       with:
         files: ${{ matrix.build_type }}/OpenCrystalCaves-*-*.*
         fail_on_unmatched_files: true
 
     - name: Set up butler
-      uses: jdno/setup-butler@v1
+      uses: jdno/setup-butler@v2.0.0
       if: startsWith(github.ref, 'refs/tags/') && matrix.build_type == 'release'
 
     - name: Verify butler
