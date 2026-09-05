@@ -13,6 +13,7 @@ struct EpisodeDef
 {
   std::unordered_set<LevelId> completedLevels;
   const Sprite blockColors[19];
+  const std::tuple<Sprite, geometry::Size, int> levelBGs[19];
 };
 
 static const std::array<EpisodeDef, 3> episodes{{
@@ -58,6 +59,32 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_BLOCK_PEBBLE_NW,
      Sprite::SPRITE_BLOCK_METAL_NW,
      Sprite::SPRITE_BLOCK_PEBBLE_NW,
+   },
+   {
+     // intro
+     {Sprite::SPRITE_STARS_1, {6, 1}, 0},
+     // finale
+     {Sprite::SPRITE_STARS_1, {6, 1}, 0},
+     // main
+     {Sprite::SPRITE_ROCKS_1, {2, 2}, 0},
+     // 1-8
+     {Sprite::SPRITE_HEX_ROCKS_1, {4, 2}, 1},
+     {Sprite::SPRITE_VERTICAL_WALL_1, {2, 2}, 0},
+     {Sprite::SPRITE_COBBLE_1, {2, 2}, 0},
+     {Sprite::SPRITE_RED_PANEL_1, {2, 2}, 0},
+     {Sprite::SPRITE_PEBBLE_WALL_1, {2, 2}, 0},
+     {Sprite::SPRITE_DARK_STONE_1, {3, 2}, 1},
+     {Sprite::SPRITE_DIAMOND_WALL_1, {2, 2}, 0},
+     {Sprite::SPRITE_COLUMN_AND_KNOB_1, {2, 2}, 0},
+     // 9-16
+     {Sprite::SPRITE_GREEN_SCAFFOLD_1, {3, 2}, 1},
+     {Sprite::SPRITE_WOOD_WALL_1, {4, 2}, 1},
+     {Sprite::SPRITE_GREY_STONE_1, {2, 2}, 0},
+     {Sprite::SPRITE_RED_RECT_1, {4, 2}, 1},
+     {Sprite::SPRITE_BRICK_1, {2, 2}, 0},
+     {Sprite::SPRITE_RED_SCAFFOLD_1, {4, 2}, 1},
+     {Sprite::SPRITE_METAL_BARS_1, {2, 2}, 0},
+     {Sprite::SPRITE_BLUE_DIAMOND_1, {2, 2}, 0},
    }},
   {{},
    {
@@ -84,8 +111,34 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_BLOCK_CYAN_NW,
      Sprite::SPRITE_BLOCK_CYAN_NW,
      Sprite::SPRITE_BLOCK_CYAN_NW,
+   },
+   {
+     // intro
+     {Sprite::SPRITE_STARS_1, {6, 1}, 0},
+     // finale
+     {Sprite::SPRITE_STARS_1, {6, 1}, 0},
+     // main
+     {Sprite::SPRITE_ROCKS_1, {2, 2}, 0},
+     // 1-8
+     {Sprite::SPRITE_DIAMOND_WALL_1, {2, 2}, 0},
+     {Sprite::SPRITE_BLUE_TILE_1, {2, 2}, 0},
+     {Sprite::SPRITE_RED_RECT_1, {4, 2}, 1},
+     {Sprite::SPRITE_DARK_STONE_1, {3, 2}, 1},
+     {Sprite::SPRITE_PEBBLE_WALL_1, {2, 2}, 0},
+     {Sprite::SPRITE_WOOD_WALL_1, {4, 2}, 1},
+     {Sprite::SPRITE_PEBBLE_WALL_1, {2, 2}, 0},
+     {Sprite::SPRITE_COLUMN_AND_KNOB_1, {2, 2}, 0},
+     // 9-16
+     {Sprite::SPRITE_GREY_STONE_1, {2, 2}, 0},
+     {Sprite::SPRITE_METAL_BARS_1, {2, 2}, 0},
+     {Sprite::SPRITE_VERTICAL_WALL_1, {2, 2}, 0},
+     {Sprite::SPRITE_GREEN_SCAFFOLD_1, {3, 2}, 1},
+     {Sprite::SPRITE_WOOD_WALL_1, {4, 2}, 1},
+     {Sprite::SPRITE_BLUE_DIAMOND_1, {2, 2}, 0},
+     {Sprite::SPRITE_RED_PANEL_1, {2, 2}, 0},
+     {Sprite::SPRITE_BRICK_1, {2, 2}, 0},
    }},
-  {{}, {}},
+  {{}, {}, {}},
 }};
 
 namespace LevelLoader
@@ -124,32 +177,6 @@ constexpr int levelRows[] = {
 // Fill in the first row with block tiles
 const std::string extraRow = "5gggggggggggggggggggggggggggggggggggggg5";
 const std::string emptyRow(40, ' ');
-const std::tuple<Sprite, geometry::Size, int> levelBGs[] = {
-  // intro
-  {Sprite::SPRITE_STARS_1, {6, 1}, 0},
-  // finale
-  {Sprite::SPRITE_STARS_1, {6, 1}, 0},
-  // main
-  {Sprite::SPRITE_ROCKS_1, {2, 2}, 0},
-  // 1-8
-  {Sprite::SPRITE_HEX_ROCKS_1, {4, 2}, 1},
-  {Sprite::SPRITE_VERTICAL_WALL_1, {2, 2}, 0},
-  {Sprite::SPRITE_COBBLE_1, {2, 2}, 0},
-  {Sprite::SPRITE_RED_PANEL_1, {2, 2}, 0},
-  {Sprite::SPRITE_PEBBLE_WALL_1, {2, 2}, 0},
-  {Sprite::SPRITE_DARK_STONE_1, {3, 2}, 1},
-  {Sprite::SPRITE_DIAMOND_WALL_1, {2, 2}, 0},
-  {Sprite::SPRITE_COLUMN_AND_KNOB_1, {2, 2}, 0},
-  // 9-16
-  {Sprite::SPRITE_GREEN_SCAFFOLD_1, {3, 2}, 1},
-  {Sprite::SPRITE_WOOD_WALL_1, {4, 2}, 1},
-  {Sprite::SPRITE_GREY_STONE_1, {2, 2}, 0},
-  {Sprite::SPRITE_RED_RECT_1, {4, 2}, 1},
-  {Sprite::SPRITE_BRICK_1, {2, 2}, 0},
-  {Sprite::SPRITE_RED_SCAFFOLD_1, {4, 2}, 1},
-  {Sprite::SPRITE_METAL_BARS_1, {2, 2}, 0},
-  {Sprite::SPRITE_BLUE_DIAMOND_1, {2, 2}, 0},
-};
 const Sprite bump_platforms[] = {
   // Intro 1-2
   Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
@@ -348,7 +375,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
     const int extraRows = 24 - levelRows[l];
     level->height += extraRows;
   }
-  const auto background = levelBGs[static_cast<int>(level_id)];
+  const auto background = episodeDef.levelBGs[static_cast<int>(level_id)];
   const auto block_sprite = episodeDef.blockColors[static_cast<int>(level_id)];
   const bool block_solid = block_sprite != Sprite::SPRITE_BLOCK_GREEN_NW;
   const int bump_sprite = static_cast<int>(bump_platforms[static_cast<int>(level_id)]);
