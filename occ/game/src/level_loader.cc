@@ -9,24 +9,84 @@
 #include "level.h"
 #include "logger.h"
 
-static const std::unordered_set<LevelId> completedLevels{
-  LevelId::LEVEL_1,
-  LevelId::LEVEL_2,
-  LevelId::LEVEL_3,
-  LevelId::LEVEL_4,
-  LevelId::LEVEL_5,
-  LevelId::LEVEL_6,
-  LevelId::LEVEL_7,
-  LevelId::LEVEL_8,
-  LevelId::LEVEL_9,
-  LevelId::LEVEL_10,
-  LevelId::LEVEL_11,
-  LevelId::LEVEL_12,
-  LevelId::LEVEL_13,
-  LevelId::LEVEL_14,
-  LevelId::LEVEL_15,
-  LevelId::LEVEL_16,
+struct EpisodeDef
+{
+  std::unordered_set<LevelId> completedLevels;
+  const Sprite blockColors[19];
 };
+
+static const std::array<EpisodeDef, 3> episodes{{
+  {{
+     LevelId::LEVEL_1,
+     LevelId::LEVEL_2,
+     LevelId::LEVEL_3,
+     LevelId::LEVEL_4,
+     LevelId::LEVEL_5,
+     LevelId::LEVEL_6,
+     LevelId::LEVEL_7,
+     LevelId::LEVEL_8,
+     LevelId::LEVEL_9,
+     LevelId::LEVEL_10,
+     LevelId::LEVEL_11,
+     LevelId::LEVEL_12,
+     LevelId::LEVEL_13,
+     LevelId::LEVEL_14,
+     LevelId::LEVEL_15,
+     LevelId::LEVEL_16,
+   },
+   {
+     // Intro 1-2
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     // Main
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     // 1-8
+     Sprite::SPRITE_BLOCK_BROWN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     Sprite::SPRITE_BLOCK_BLUE_NW,
+     // 9-16
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     Sprite::SPRITE_BLOCK_BLUE_NW,
+     Sprite::SPRITE_BLOCK_BLUE_NW,
+     Sprite::SPRITE_BLOCK_GREEN_NW,
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     Sprite::SPRITE_BLOCK_METAL_NW,
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+   }},
+  {{},
+   {
+     // Intro 1-2
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     // Main
+     Sprite::SPRITE_BLOCK_PEBBLE_NW,
+     // 1-8
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_PINK_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     // 9-16
+     Sprite::SPRITE_BLOCK_BLUE_NW,
+     Sprite::SPRITE_BLOCK_BROWN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_PINK_NW,
+     Sprite::SPRITE_BLOCK_BROWN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+     Sprite::SPRITE_BLOCK_CYAN_NW,
+   }},
+  {{}, {}},
+}};
 
 namespace LevelLoader
 {
@@ -89,32 +149,6 @@ const std::tuple<Sprite, geometry::Size, int> levelBGs[] = {
   {Sprite::SPRITE_RED_SCAFFOLD_1, {4, 2}, 1},
   {Sprite::SPRITE_METAL_BARS_1, {2, 2}, 0},
   {Sprite::SPRITE_BLUE_DIAMOND_1, {2, 2}, 0},
-};
-// Different levels use different block colours
-const Sprite blockColors[] = {
-  // Intro 1-2
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  // Main
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  // 1-8
-  Sprite::SPRITE_BLOCK_BROWN_NW,
-  Sprite::SPRITE_BLOCK_CYAN_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_CYAN_NW,
-  Sprite::SPRITE_BLOCK_CYAN_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_BLUE_NW,
-  // 9-16
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_BLUE_NW,
-  Sprite::SPRITE_BLOCK_BLUE_NW,
-  Sprite::SPRITE_BLOCK_GREEN_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
-  Sprite::SPRITE_BLOCK_METAL_NW,
-  Sprite::SPRITE_BLOCK_PEBBLE_NW,
 };
 const Sprite bump_platforms[] = {
   // Intro 1-2
@@ -214,6 +248,7 @@ enum class TileMode
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, const PlayerState& state)
 {
   LOG_INFO("Loading level %d", static_cast<int>(level_id));
+  const EpisodeDef& episodeDef = episodes[exe_data.episode - 1];
   // Find the location in exe data of the level
   const char* ptr = exe_data.data.c_str() + levelLoc;
   int l;
@@ -314,7 +349,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
     level->height += extraRows;
   }
   const auto background = levelBGs[static_cast<int>(level_id)];
-  const auto block_sprite = blockColors[static_cast<int>(level_id)];
+  const auto block_sprite = episodeDef.blockColors[static_cast<int>(level_id)];
   const bool block_solid = block_sprite != Sprite::SPRITE_BLOCK_GREEN_NW;
   const int bump_sprite = static_cast<int>(bump_platforms[static_cast<int>(level_id)]);
   Earth* earth = nullptr;
@@ -1252,9 +1287,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             mode = TileMode::AIR_PIPE;
             break;
           case 'x':
-            // TODO: remember completion state
             // Show levels under construction with cones
-            if (!completedLevels.contains(static_cast<LevelId>(entrance_level)))
+            if (!episodeDef.completedLevels.contains(static_cast<LevelId>(entrance_level)))
             {
               sprite = static_cast<int>(Sprite::SPRITE_CONES);
               flags |= TILE_RENDER_IN_FRONT;

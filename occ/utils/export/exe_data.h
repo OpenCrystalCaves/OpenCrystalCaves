@@ -9,4 +9,5 @@ class ExeData
   ExeData(const int episode);
 
   std::string data;
+  int episode;
 };
