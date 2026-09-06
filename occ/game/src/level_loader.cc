@@ -14,6 +14,7 @@ struct EpisodeDef
   std::unordered_set<LevelId> completedLevels;
   const Sprite blockColors[19];
   const std::tuple<Sprite, geometry::Size, int> levelBGs[19];
+  const Sprite bump_platforms[19];
 };
 
 static const std::array<EpisodeDef, 3> episodes{{
@@ -85,6 +86,31 @@ static const std::array<EpisodeDef, 3> episodes{{
      {Sprite::SPRITE_RED_SCAFFOLD_1, {4, 2}, 1},
      {Sprite::SPRITE_METAL_BARS_1, {2, 2}, 0},
      {Sprite::SPRITE_BLUE_DIAMOND_1, {2, 2}, 0},
+   },
+   {
+     // Intro 1-2
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     // Main
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     // 1-8
+     Sprite::SPRITE_BUMP_PLATFORM_RED_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_RED_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_GREEN_L,
+     // 9-16
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_GREEN_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
    }},
   {{},
    {
@@ -137,6 +163,31 @@ static const std::array<EpisodeDef, 3> episodes{{
      {Sprite::SPRITE_BLUE_DIAMOND_1, {2, 2}, 0},
      {Sprite::SPRITE_RED_PANEL_1, {2, 2}, 0},
      {Sprite::SPRITE_BRICK_1, {2, 2}, 0},
+   },
+   {
+     // Intro 1-2
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     // Main
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     // 1-8
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_RED_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     // 9-16
+     Sprite::SPRITE_BUMP_PLATFORM_GREEN_L,
+     Sprite::SPRITE_BUMP_PLATFORM_GREEN_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_GREEN_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+     Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
    }},
   {{}, {}, {}},
 }};
@@ -177,31 +228,6 @@ constexpr int levelRows[] = {
 // Fill in the first row with block tiles
 const std::string extraRow = "5gggggggggggggggggggggggggggggggggggggg5";
 const std::string emptyRow(40, ' ');
-const Sprite bump_platforms[] = {
-  // Intro 1-2
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  // Main
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  // 1-8
-  Sprite::SPRITE_BUMP_PLATFORM_RED_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_RED_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_GREEN_L,
-  // 9-16
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_GREEN_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-  Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
-};
 const Sprite platforms[] = {
   // Intro 1-2
   Sprite::SPRITE_PLATFORM_BLUE,
@@ -378,7 +404,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   const auto background = episodeDef.levelBGs[static_cast<int>(level_id)];
   const auto block_sprite = episodeDef.blockColors[static_cast<int>(level_id)];
   const bool block_solid = block_sprite != Sprite::SPRITE_BLOCK_GREEN_NW;
-  const int bump_sprite = static_cast<int>(bump_platforms[static_cast<int>(level_id)]);
+  const int bump_sprite = static_cast<int>(episodeDef.bump_platforms[static_cast<int>(level_id)]);
   Earth* earth = nullptr;
 
   bool is_stars_row = false;
