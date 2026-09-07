@@ -21,4 +21,5 @@ enum class LevelId : int
   LEVEL_14 = 16,
   LEVEL_15 = 17,
   LEVEL_16 = 18,
+  NUM_LEVELS = 19,
 };

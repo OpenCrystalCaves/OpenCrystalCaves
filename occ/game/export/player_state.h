@@ -5,6 +5,8 @@
 #include <ctime>
 #include <string>
 
+#include "level_id.h"
+
 // Player state, to be saved
 struct PlayerState
 {
@@ -13,7 +15,7 @@ struct PlayerState
   int episode;  // Player state limited to one episode
   int score;
   int ammo;
-  std::array<bool, 19> levels_completed;
+  std::array<bool, static_cast<int>(LevelId::NUM_LEVELS)> levels_completed;
   bool used_lever;
   bool used_switch;
   bool got_reverse_gravity;

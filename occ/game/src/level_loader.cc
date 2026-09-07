@@ -9,12 +9,18 @@
 #include "level.h"
 #include "logger.h"
 
+namespace LevelLoader
+{
+
+// https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Map_Format
+
 struct EpisodeDef
 {
   std::unordered_set<LevelId> completedLevels;
-  const Sprite blockColors[19];
-  const std::tuple<Sprite, geometry::Size, int> levelBGs[19];
-  const Sprite bump_platforms[19];
+  const Sprite blockColors[static_cast<int>(LevelId::NUM_LEVELS)];
+  const std::tuple<Sprite, geometry::Size, int> levelBGs[static_cast<int>(LevelId::NUM_LEVELS)];
+  const Sprite bump_platforms[static_cast<int>(LevelId::NUM_LEVELS)];
+  const int levelRows[static_cast<int>(LevelId::NUM_LEVELS)];
 };
 
 static const std::array<EpisodeDef, 3> episodes{{
@@ -111,6 +117,32 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
      Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
      Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+   },
+   {
+     // intro
+     5,
+     // finale
+     6,
+     // main
+     25,
+     // 1-8
+     24,
+     24,
+     24,
+     24,
+     24,
+     24,
+     23,
+     23,
+     // 9-16
+     24,
+     24,
+     24,
+     24,
+     24,
+     23,
+     24,
+     24,
    }},
   {{},
    {
@@ -188,42 +220,37 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
      Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
      Sprite::SPRITE_BUMP_PLATFORM_BLUE_L,
+   },
+   {
+     // intro
+     5,
+     // finale
+     6,
+     // main
+     25,
+     // 1-8
+     24,
+     24,
+     24,
+     24,
+     23,
+     24,
+     23,
+     23,
+     // 9-16
+     24,
+     24,
+     24,
+     24,
+     24,
+     23,
+     24,
+     23,
    }},
   {{}, {}, {}},
 }};
 
-namespace LevelLoader
-{
-
-// https://moddingwiki.shikadi.net/wiki/Crystal_Caves_Map_Format
-
 constexpr int levelLoc = 0x8CE0;
-constexpr int levelRows[] = {
-  // intro
-  5,
-  // finale
-  6,
-  // main
-  25,
-  // 1-8
-  24,
-  24,
-  24,
-  24,
-  24,
-  24,
-  23,
-  23,
-  // 9-16
-  24,
-  24,
-  24,
-  24,
-  24,
-  23,
-  24,
-  24,
-};
 // Some levels have a missing first row (those with levelRows 23)
 // Fill in the first row with block tiles
 const std::string extraRow = "5gggggggggggggggggggggggggggggggggggggg5";
@@ -312,7 +339,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       break;
     }
     // Skip this level's rows
-    for (int row = 0; row < levelRows[l]; row++)
+    for (int row = 0; row < episodeDef.levelRows[l]; row++)
     {
       const size_t len = *ptr;
       ptr++;
@@ -331,7 +358,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
 
   // Read the tile ids of the level
   level->width = 0;
-  if (levelRows[l] == 23)
+  if (episodeDef.levelRows[l] == 23)
   {
     // Some levels have a missing first row
     LOG_DEBUG("%s", extraRow.c_str());
@@ -345,7 +372,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   {
     // Space levels have a garbage first row, and we want to add extra rows
     // above and below
-    const int extraRows = 24 - levelRows[l];
+    const int extraRows = 24 - episodeDef.levelRows[l];
     for (int i = 0; i < extraRows / 2 + 1; i++)
     {
       LOG_DEBUG("%s", emptyRow.c_str());
@@ -356,7 +383,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       }
     }
   }
-  for (int row = 0; row < levelRows[l]; row++)
+  for (int row = 0; row < episodeDef.levelRows[l]; row++)
   {
     const int len = *ptr;
     if (level->width == 0)
@@ -380,7 +407,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   // Insert extra rows below for space levels
   if (level->is_space())
   {
-    const int extraRows = 24 - levelRows[l];
+    const int extraRows = 24 - episodeDef.levelRows[l];
     for (int i = 0; i < (extraRows + 1) / 2; i++)
     {
       LOG_DEBUG("%s", emptyRow.c_str());
@@ -391,14 +418,14 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       }
     }
   }
-  level->height = levelRows[l];
-  if (levelRows[l] == 23)
+  level->height = episodeDef.levelRows[l];
+  if (episodeDef.levelRows[l] == 23)
   {
     level->height++;
   }
   else if (level->is_space())
   {
-    const int extraRows = 24 - levelRows[l];
+    const int extraRows = 24 - episodeDef.levelRows[l];
     level->height += extraRows;
   }
   const auto background = episodeDef.levelBGs[static_cast<int>(level_id)];
