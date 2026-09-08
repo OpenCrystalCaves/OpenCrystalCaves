@@ -258,7 +258,7 @@ static const std::array<EpisodeDef, 3> episodes{{
      25,
      // 1-8
      24,
-     24,
+     25,
      24,
      24,
      23,
@@ -465,24 +465,39 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
 
   bool is_stars_row = false;
   bool is_horizon_row = false;
+  bool skip_row = false;
   auto mode = TileMode::NONE;
   int volcano_sprite = -1;
   int sprite_concrete = static_cast<int>(Sprite::SPRITE_CONCRETE);
   int entrance_level = static_cast<int>(LevelId::LEVEL_1);
   Caterpillar* caterpillar = nullptr;
   bool falling_rocks = false;
+  int y = -1;
   for (int i = 0; i < static_cast<int>(level->tile_ids.size()); i++)
   {
     const int x = i % level->width;
+    const auto tile_id = level->tile_ids[i];
     if (x == 0)
     {
       is_stars_row = level->is_space();
       is_horizon_row = false;
       mode = TileMode::NONE;
       volcano_sprite = -1;
+      skip_row = !level->is_space() && tile_id == ' ';
+      if (skip_row)
+      {
+        // TODO: add enemies etc from the previous skip row
+        level->height--;
+      }
+      else
+      {
+        y++;
+      }
     }
-    const int y = i / level->width;
-    const auto tile_id = level->tile_ids[i];
+    if (skip_row)
+    {
+      continue;
+    }
     Tile tile;
     int bg = static_cast<int>(std::get<0>(background));
     if (is_stars_row)
@@ -2015,12 +2030,12 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
     // Scan level left-to-right and add rectangles
     // Add area as long as there's a non-solid block in the column
     geometry::Rectangle r{{0, 8 * 16}, {0, 15 * 16}};
-    for (int x = 0; x < 40; x++)
+    for (int fx = 0; fx < 40; fx++)
     {
       bool has_non_solid_block = false;
-      for (int y = 8; y < 24; y++)
+      for (int fy = 8; fy < 24; fy++)
       {
-        if (!level->collides_solid({x * 16, y * 16}, {16, 16}))
+        if (!level->collides_solid({fx * 16, fy * 16}, {16, 16}))
         {
           has_non_solid_block = true;
           break;
@@ -2033,7 +2048,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
         {
           level->falling_rocks_areas.push_back(r);
         }
-        r.position = {(x + 1) * 16, r.position.y()};
+        r.position = {(fx + 1) * 16, r.position.y()};
         r.size = {0, r.size.y()};
       }
       else
