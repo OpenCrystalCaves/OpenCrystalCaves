@@ -45,7 +45,6 @@ Features that are missing:
 
 Known bugs:
 
-- Can quit to main level during finale, thereby getting stuck
 - Can shoot and control ship during intro/finale sequences
 - Can hear hammers even when offscreen
 - BG not dark when lights out

@@ -413,6 +413,12 @@ GameState::GameState(Game& game,
     finale_any_key_panel_(PanelText::PANEL_TEXT_PRESS_ANY_KEY, exe_data),
     finale_end_game_panel_(PanelType::PANEL_TYPE_END_GAME)
 {
+  const auto& panel_strings = panel_.get_strings();
+  const auto quit_it = std::find(std::begin(panel_strings), std::end(panel_strings), L"     Quit Game");
+  const auto quit_idx = static_cast<int>(std::distance(std::begin(panel_strings), quit_it));
+  auto& panel_children = panel_.get_children();
+  auto quit_to_panel = panel_.get_child_by_string(L"     Quit Game");
+  quit_to_main_panel_ = quit_to_panel->get_child_by_string(L" Main Level");
 }
 
 void GameState::reset()
@@ -466,6 +472,9 @@ void GameState::reset()
     panel_current_ = &finale_panel_;
     intro_ticks_ = 0;
   }
+  // Disable quit to main level if we are in the intro, main or finale levels
+  const bool enable_quit_to_main = level_ != LevelId::INTRO && level_ != LevelId::MAIN_LEVEL && level_ != LevelId::FINALE;
+  quit_to_main_panel_->set_type(enable_quit_to_main ? PanelType::PANEL_TYPE_QUIT_TO_MAIN_LEVEL : PanelType::PANEL_TYPE_DISABLED);
 }
 
 void GameState::update(const Input& input)

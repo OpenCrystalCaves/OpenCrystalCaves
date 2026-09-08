@@ -573,3 +573,18 @@ void Panel::add_input(char c)
     }
   }
 }
+
+Panel* Panel::get_child_by_string(const std::wstring& s)
+{
+  const auto& panel_strings = get_strings();
+  const auto child_it = std::find(std::begin(panel_strings), std::end(panel_strings), s);
+  if (child_it == std::end(panel_strings))
+  {
+    return nullptr;
+  }
+  const auto child_idx = static_cast<int>(std::distance(std::begin(panel_strings), child_it));
+  auto& children = get_children();
+  auto child_panel =
+    std::find_if(std::begin(children), std::end(children), [child_idx](const auto& elem) { return elem.first == child_idx; });
+  return child_panel == std::end(children) ? nullptr : &child_panel->second;
+}

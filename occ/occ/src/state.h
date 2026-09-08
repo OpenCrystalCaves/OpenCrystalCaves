@@ -159,6 +159,7 @@ class GameState : public State
   unsigned intro_ticks_ = 0;
   Panel* panel_current_ = nullptr;
   Panel* panel_next_ = nullptr;
+  Panel* quit_to_main_panel_;
 };
 
 class EndState : public State

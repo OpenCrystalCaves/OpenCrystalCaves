@@ -128,10 +128,14 @@ class Panel
   void draw(const SpriteManager& sprite_manager, Window& window) const;
 
   PanelType get_type() const { return type_; }
+  void set_type(PanelType t) { type_ = t; }
+  const std::vector<std::wstring>& get_strings() const { return strings_; }
 
   void add_input(char c);
   const std::string& get_input() const { return input_str_; }
   int index() const { return index_; }
+  std::vector<std::pair<int, Panel>>& get_children() { return children_; }
+  Panel* get_child_by_string(const std::wstring& s);
 
  private:
   PanelType type_;
