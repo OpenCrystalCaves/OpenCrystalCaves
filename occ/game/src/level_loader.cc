@@ -21,6 +21,7 @@ struct EpisodeDef
   const std::tuple<Sprite, geometry::Size, int> levelBGs[static_cast<int>(LevelId::NUM_LEVELS)];
   const Sprite bump_platforms[static_cast<int>(LevelId::NUM_LEVELS)];
   const int levelRows[static_cast<int>(LevelId::NUM_LEVELS)];
+  const Sprite platforms[static_cast<int>(LevelId::NUM_LEVELS)];
 };
 
 static const std::array<EpisodeDef, 3> episodes{{
@@ -143,6 +144,31 @@ static const std::array<EpisodeDef, 3> episodes{{
      23,
      24,
      24,
+   },
+   {
+     // Intro 1-2
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     // Main
+     Sprite::SPRITE_PLATFORM_BLUE,
+     // 1-8
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_RED,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_RED,
+     Sprite::SPRITE_PLATFORM_GREEN,
+     // 9-16
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_GREEN,
+     Sprite::SPRITE_PLATFORM_GREEN,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_GREEN,
+     Sprite::SPRITE_PLATFORM_RED,
+     Sprite::SPRITE_PLATFORM_BLUE,
    }},
   {{},
    {
@@ -246,6 +272,31 @@ static const std::array<EpisodeDef, 3> episodes{{
      23,
      24,
      23,
+   },
+   {
+     // Intro 1-2
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     // Main
+     Sprite::SPRITE_PLATFORM_BLUE,
+     // 1-8
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     // 9-16
+     Sprite::SPRITE_PLATFORM_GREEN,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_RED,
+     Sprite::SPRITE_PLATFORM_RED,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_RED,
+     Sprite::SPRITE_PLATFORM_BLUE,
+     Sprite::SPRITE_PLATFORM_GREEN,
    }},
   {{}, {}, {}},
 }};
@@ -255,31 +306,6 @@ constexpr int levelLoc = 0x8CE0;
 // Fill in the first row with block tiles
 const std::string extraRow = "5gggggggggggggggggggggggggggggggggggggg5";
 const std::string emptyRow(40, ' ');
-const Sprite platforms[] = {
-  // Intro 1-2
-  Sprite::SPRITE_PLATFORM_BLUE,
-  Sprite::SPRITE_PLATFORM_BLUE,
-  // Main
-  Sprite::SPRITE_PLATFORM_BLUE,
-  // 1-8
-  Sprite::SPRITE_PLATFORM_BLUE,
-  Sprite::SPRITE_PLATFORM_BLUE,
-  Sprite::SPRITE_PLATFORM_BLUE,
-  Sprite::SPRITE_PLATFORM_BLUE,
-  Sprite::SPRITE_PLATFORM_RED,
-  Sprite::SPRITE_PLATFORM_BLUE,
-  Sprite::SPRITE_PLATFORM_RED,
-  Sprite::SPRITE_PLATFORM_GREEN,
-  // 9-16
-  Sprite::SPRITE_PLATFORM_BLUE,
-  Sprite::SPRITE_PLATFORM_BLUE,
-  Sprite::SPRITE_PLATFORM_GREEN,
-  Sprite::SPRITE_PLATFORM_GREEN,
-  Sprite::SPRITE_PLATFORM_BLUE,
-  Sprite::SPRITE_PLATFORM_GREEN,
-  Sprite::SPRITE_PLATFORM_RED,
-  Sprite::SPRITE_PLATFORM_BLUE,
-};
 std::vector<Sprite> STARS{
   // The sprite with the bright star (3) seems to be less common...
   Sprite::SPRITE_STARS_1, Sprite::SPRITE_STARS_1, Sprite::SPRITE_STARS_1, Sprite::SPRITE_STARS_1, Sprite::SPRITE_STARS_2,
@@ -1597,7 +1623,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}));
             break;
           case '_':
-            level->actors.emplace_back(new OneWayPlatform(geometry::Position{x * 16, y * 16}, platforms[static_cast<int>(level_id)]));
+            level->actors.emplace_back(
+              new OneWayPlatform(geometry::Position{x * 16, y * 16}, episodeDef.platforms[static_cast<int>(level_id)]));
             break;
           case '|':
             // Stalactite
