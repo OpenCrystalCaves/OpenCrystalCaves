@@ -22,6 +22,7 @@ struct EpisodeDef
   const Sprite bump_platforms[static_cast<int>(LevelId::NUM_LEVELS)];
   const int levelRows[static_cast<int>(LevelId::NUM_LEVELS)];
   const Sprite platforms[static_cast<int>(LevelId::NUM_LEVELS)];
+  const Sprite crystal_sprite;
 };
 
 static const std::array<EpisodeDef, 3> episodes{{
@@ -169,7 +170,8 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_PLATFORM_GREEN,
      Sprite::SPRITE_PLATFORM_RED,
      Sprite::SPRITE_PLATFORM_BLUE,
-   }},
+   },
+   Sprite::SPRITE_CRYSTAL_1_R},
   {{},
    {
      // Intro 1-2
@@ -297,7 +299,8 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_PLATFORM_RED,
      Sprite::SPRITE_PLATFORM_BLUE,
      Sprite::SPRITE_PLATFORM_GREEN,
-   }},
+   },
+   Sprite::SPRITE_CRYSTAL_2_R},
   {{}, {}, {}},
 }};
 
@@ -936,22 +939,25 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             break;
             // Crystals
           case '+':
-            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_Y));
+            level->actors.emplace_back(
+              new Crystal(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(static_cast<int>(episodeDef.crystal_sprite) + 1)));
             level->crystals++;
             level->has_crystals = true;
             break;
           case 'b':
-            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_G));
+            level->actors.emplace_back(
+              new Crystal(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(static_cast<int>(episodeDef.crystal_sprite) + 2)));
             level->crystals++;
             level->has_crystals = true;
             break;
           case 'R':
-            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_R));
+            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, episodeDef.crystal_sprite));
             level->crystals++;
             level->has_crystals = true;
             break;
           case 'c':
-            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CRYSTAL_1_B));
+            level->actors.emplace_back(
+              new Crystal(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(static_cast<int>(episodeDef.crystal_sprite) + 3)));
             level->crystals++;
             level->has_crystals = true;
             break;
