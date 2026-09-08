@@ -47,12 +47,12 @@ Known bugs:
 
 - Can shoot and control ship during intro/finale sequences
 - Can hear hammers even when offscreen
-- BG not dark when lights out
 - Enemies can see player even when offscreen
 - Can't land in 1-tile-high alcoves when falling at max speed
 - Can't fall in reverse gravity level
 - No death effect for ostrich enemy
 - Signs are not rendered until their leftmost tile is in view
+- Selecting new game after continuing doesn't start a new game
 
 ## Differences with Crystal Caves
 
