@@ -120,7 +120,7 @@ void GameRenderer::render_background() const
         const bool is_star = sprite_id >= static_cast<int>(Sprite::SPRITE_STARS_1) && sprite_id <= static_cast<int>(Sprite::SPRITE_STARS_6);
         const bool is_horizon =
           (sprite_id >= static_cast<int>(Sprite::SPRITE_HORIZON_1) && sprite_id <= static_cast<int>(Sprite::SPRITE_HORIZON_4)) ||
-          sprite_id >= static_cast<int>(Sprite::SPRITE_HORIZON_LAMP);
+          sprite_id == static_cast<int>(Sprite::SPRITE_HORIZON_LAMP);
         geometry::Position camera_pos = game_camera_.position;
         if (is_star)
         {

@@ -48,7 +48,6 @@ Known bugs:
 - Can shoot and control ship during intro/finale sequences
 - Can hear hammers even when offscreen
 - BG not dark when lights out
-- BG parallax in some levels
 - Enemies can see player even when offscreen
 - Can't land in 1-tile-high alcoves when falling at max speed
 - Can't fall in reverse gravity level
