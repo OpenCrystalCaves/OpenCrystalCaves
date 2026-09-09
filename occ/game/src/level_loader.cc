@@ -1725,6 +1725,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
           case -24:
             sprite = static_cast<int>(Sprite::SPRITE_PIPE_V);
             break;
+          case -25:
+            sprite = static_cast<int>(Sprite::SPRITE_MINE_PIPE);
+            flags |= TILE_RENDER_IN_FRONT;
+            break;
           case -32:
             // Stand mixer
             sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_TOP_1);

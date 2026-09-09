@@ -22,7 +22,7 @@
 #define ICON_FILENAME_FMT "caves{}.ico"
 
 
-int main()
+int main(int argc, char* argv[])
 {
   LOG_INFO("Starting!");
 
@@ -42,8 +42,12 @@ int main()
   }
   LOG_INFO("SDLWrapper initialized");
 
-  // TODO: select episode
-  const int episode = 1;
+  // TODO: select episode via menu
+  int episode = 1;
+  if (argc > 1)
+  {
+    episode = atoi(argv[1]);
+  }
 
   // Create Window
   const auto icon_file = std::format(ICON_FILENAME_FMT, episode);
