@@ -11,7 +11,7 @@ https://moddingwiki.shikadi.net/wiki/Crystal_Caves
 #include "logger.h"
 #include "sdl_wrapper.h"
 
-int main()
+int main(int argc, char* argv[])
 {
   auto sdl = SDLWrapper::create();
   if (!sdl)
@@ -25,6 +25,10 @@ int main()
     return 1;
   }
   int episode = 1;
+  if (argc > 1)
+  {
+    episode = atoi(argv[1]);
+  }
   auto window = Window::create("Crystal Caves Image Viewer", geometry::Size(10, 10), "");
   if (!window)
   {
