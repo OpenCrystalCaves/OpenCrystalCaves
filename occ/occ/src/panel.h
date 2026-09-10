@@ -1,137 +1,204 @@
 #pragma once
 
+#include <array>
+
 #include <event.h>
 
 #include "exe_data.h"
 #include "spritemgr.h"
 
-// Episode 1 panel text offsets
-// TODO: other episodes
 enum class PanelText : int
 {
-  PANEL_TEXT_QUIT = 0x1327F,
-  PANEL_TEXT_SFX_ON = 0x13322,
-  PANEL_TEXT_END = 0x133D7,
-  PANEL_TEXT_END_1 = 0x1361A,
-  PANEL_TEXT_END_2 = 0x139A0,
-  PANEL_TEXT_END_3 = 0x13B27,  // order today and find out
-  PANEL_TEXT_START_1 = 0x13F29,
-  PANEL_TEXT_START_2 = 0x14063,
-  PANEL_TEXT_START_3 = 0x1411B,
-  PANEL_TEXT_STORY_1 = 0x14736,
-  PANEL_TEXT_STORY_2 = 0x14890,
-  PANEL_TEXT_PAUSED = 0x14E07,
-  PANEL_TEXT_ORDER_1 = 0x14ED3,
-  PANEL_TEXT_ORDER_2 = 0x15228,
-  PANEL_TEXT_ORDER_3 = 0x1558D,
-  PANEL_TEXT_HIGH_SCORES = 0x15A63,
-  PANEL_TEXT_ENTER_SCORE = 0x15CB7,
-  PANEL_TEXT_INSTRUCTIONS_1 = 0x15DF2,
-  PANEL_TEXT_INSTRUCTIONS_2 = 0x15F66,
-  PANEL_TEXT_INSTRUCTIONS_3 = 0x160B7,
-  PANEL_TEXT_INSTRUCTIONS_4 = 0x16220,
-  PANEL_TEXT_INSTRUCTIONS_5 = 0x16386,
-  PANEL_TEXT_INSTRUCTIONS_6 = 0x164B6,
-  PANEL_TEXT_INSTRUCTIONS_7 = 0x165DB,
-  PANEL_TEXT_LEVEL_DONE = 0x1757C,
-  PANEL_TEXT_TIME_STOP = 0x1769F,
-  PANEL_TEXT_MORE_CRYSTALS = 0x177F4,
-  PANEL_TEXT_FILE_ERROR = 0x17917,
-  PANEL_TEXT_PRESS_ANY_KEY = 0x179E2,
-  PANEL_TEXT_JOYSTICK_ON = 0x17A62,
-  PANEL_TEXT_QUIT_TO_DOS = 0x17B33,
-  PANEL_TEXT_QUIT_TO = 0x17BCB,
-  PANEL_TEXT_RED_MUSHROOM = 0x180C8,
-  PANEL_TEXT_LEVER = 0x181AC,
-  PANEL_TEXT_SWITCH = 0x18278,
-  PANEL_TEXT_P = 0x18345,
-  PANEL_TEXT_GREEN_MUSHROOM = 0x18422,
-  PANEL_TEXT_CHEAT_MODE = 0x18553,
-  PANEL_TEXT_SAVED = 0x1863E,
-  PANEL_TEXT_SAVE_FROM_MAIN = 0x187F9,
-  PANEL_TEXT_HIT_AIR = 0x18913,
-  PANEL_TEXT_RESTORE_FROM_MAIN = 0x18AE4,
-  PANEL_TEXT_REDEFINE_KEYS = 0x18BFD,
-  PANEL_TEXT_KEY_UNAVAILABLE = 0x18DF1,
-  PANEL_TEXT_KEY_LEFT = 0x18EBD,
-  PANEL_TEXT_KEY_RIGHT = 0x18EFD,
-  PANEL_TEXT_KEY_JUMP = 0x18F19,
-  PANEL_TEXT_KEY_FIRE = 0x18F2F,
-  PANEL_TEXT_MAIN_MENU = 0x1925D,
-  PANEL_TEXT_HELP_MENU = 0x19665,
-  PANEL_TEXT_HIGH_SCORE_NAMES = 0x1A15C,
-  PANEL_TEXT_ABOUT = 0x1BA8F,
-  PANEL_TEXT_REVERSE_GRAVITY = 0x1BE26,
-  PANEL_TEXT_PERFECT = 0x1BFB1,
-  PANEL_TEXT_WARP = 0x1C090,
-  PANEL_TEXT_RESTORE = 0x1C159,
-  PANEL_TEXT_SAVE = 0x1C21C,
-  PANEL_TEXT_START_SEQ_1 = 0x1C606,
-  PANEL_TEXT_START_SEQ_2 = 0x1C6C8,
-  PANEL_TEXT_START_SEQ_3 = 0x1C76A,
+  PANEL_TEXT_QUIT = 0,
+  PANEL_TEXT_SFX_ON,
+  PANEL_TEXT_END,
+  PANEL_TEXT_END_1,
+  PANEL_TEXT_END_2,
+  PANEL_TEXT_END_3,  // order today and find out
+  PANEL_TEXT_START_1,
+  PANEL_TEXT_START_2,
+  PANEL_TEXT_START_3,
+  PANEL_TEXT_STORY_1,
+  PANEL_TEXT_STORY_2,
+  PANEL_TEXT_PAUSED,
+  PANEL_TEXT_ORDER_1,
+  PANEL_TEXT_ORDER_2,
+  PANEL_TEXT_ORDER_3,
+  PANEL_TEXT_HIGH_SCORES,
+  PANEL_TEXT_ENTER_SCORE,
+  PANEL_TEXT_INSTRUCTIONS_1,
+  PANEL_TEXT_INSTRUCTIONS_2,
+  PANEL_TEXT_INSTRUCTIONS_3,
+  PANEL_TEXT_INSTRUCTIONS_4,
+  PANEL_TEXT_INSTRUCTIONS_5,
+  PANEL_TEXT_INSTRUCTIONS_6,
+  PANEL_TEXT_INSTRUCTIONS_7,
+  PANEL_TEXT_LEVEL_DONE,
+  PANEL_TEXT_TIME_STOP,
+  PANEL_TEXT_MORE_CRYSTALS,
+  PANEL_TEXT_FILE_ERROR,
+  PANEL_TEXT_PRESS_ANY_KEY,
+  PANEL_TEXT_JOYSTICK_ON,
+  PANEL_TEXT_QUIT_TO_DOS,
+  PANEL_TEXT_QUIT_TO,
+  PANEL_TEXT_RED_MUSHROOM,
+  PANEL_TEXT_LEVER,
+  PANEL_TEXT_SWITCH,
+  PANEL_TEXT_P,
+  PANEL_TEXT_GREEN_MUSHROOM,
+  PANEL_TEXT_CHEAT_MODE,
+  PANEL_TEXT_SAVED,
+  PANEL_TEXT_SAVE_FROM_MAIN,
+  PANEL_TEXT_HIT_AIR,
+  PANEL_TEXT_RESTORE_FROM_MAIN,
+  PANEL_TEXT_REDEFINE_KEYS,
+  PANEL_TEXT_KEY_UNAVAILABLE,
+  PANEL_TEXT_KEY_LEFT,
+  PANEL_TEXT_KEY_RIGHT,
+  PANEL_TEXT_KEY_JUMP,
+  PANEL_TEXT_KEY_FIRE,
+  PANEL_TEXT_MAIN_MENU,
+  PANEL_TEXT_HELP_MENU,
+  PANEL_TEXT_HIGH_SCORE_NAMES,
+  PANEL_TEXT_ABOUT,
+  PANEL_TEXT_REVERSE_GRAVITY,
+  PANEL_TEXT_PERFECT,
+  PANEL_TEXT_WARP,
+  PANEL_TEXT_RESTORE,
+  PANEL_TEXT_SAVE,
+  PANEL_TEXT_START_SEQ_1,
+  PANEL_TEXT_START_SEQ_2,
+  PANEL_TEXT_START_SEQ_3,
+  NUM_TEXTS,
 };
-enum class PanelText2 : int
-{
-  PANEL_TEXT_QUIT = 0x13200,
-  PANEL_TEXT_SFX_ON = 0x132A3,
-  PANEL_TEXT_END = 0x13358,
-  PANEL_TEXT_END_1 = 0x13552,
-  PANEL_TEXT_END_2 = 0x13678,
-  PANEL_TEXT_END_3 = 0x13B52,
-  PANEL_TEXT_START_1 = 0x13EAD,
-  PANEL_TEXT_START_2 = 0x1404B,
-  PANEL_TEXT_STORY_1 = 0x14527,
-  PANEL_TEXT_STORY_2 = 0x14686,
-  PANEL_TEXT_PAUSED = 0x14BBF,
-  PANEL_TEXT_ORDER_1 = 0x14C8B,
-  PANEL_TEXT_ORDER_2 = 0x14FE0,
-  PANEL_TEXT_ORDER_3 = 0x15345,
-  PANEL_TEXT_HIGH_SCORES = 0x1581B,
-  PANEL_TEXT_ENTER_SCORE = 0x15A6F,
-  PANEL_TEXT_INSTRUCTIONS_1 = 0x15BAA,
-  PANEL_TEXT_INSTRUCTIONS_2 = 0x15D1E,
-  PANEL_TEXT_INSTRUCTIONS_3 = 0x15E6F,
-  PANEL_TEXT_INSTRUCTIONS_4 = 0x15FD8,
-  PANEL_TEXT_INSTRUCTIONS_5 = 0x1613E,
-  PANEL_TEXT_INSTRUCTIONS_6 = 0x1626E,
-  PANEL_TEXT_INSTRUCTIONS_7 = 0x16393,
-  PANEL_TEXT_LEVEL_DONE = 0x17334,
-  PANEL_TEXT_TIME_STOP = 0x17457,
-  PANEL_TEXT_MORE_CRYSTALS = 0x175AC,
-  PANEL_TEXT_FILE_ERROR = 0x176CF,
-  PANEL_TEXT_PRESS_ANY_KEY = 0x1779A,
-  PANEL_TEXT_JOYSTICK_ON = 0x1781A,
-  PANEL_TEXT_QUIT_TO_DOS = 0x178EB,
-  PANEL_TEXT_QUIT_TO = 0x17983,
-  PANEL_TEXT_RED_MUSHROOM = 0x17E80,
-  PANEL_TEXT_LEVER = 0x17F64,
-  PANEL_TEXT_SWITCH = 0x18030,
-  PANEL_TEXT_P = 0x180FD,
-  PANEL_TEXT_GREEN_MUSHROOM = 0x181DA,
-  PANEL_TEXT_CHEAT_MODE = 0x1830B,
-  PANEL_TEXT_SAVED = 0x183F6,
-  PANEL_TEXT_SAVE_FROM_MAIN = 0x185B1,
-  PANEL_TEXT_HIT_AIR = 0x186CB,
-  PANEL_TEXT_RESTORE_FROM_MAIN = 0x1889C,
-  PANEL_TEXT_REDEFINE_KEYS = 0x189B5,
-  PANEL_TEXT_KEY_UNAVAILABLE = 0x18BA9,
-  PANEL_TEXT_KEY_LEFT = 0x18C75,
-  PANEL_TEXT_KEY_RIGHT = 0x18CB5,
-  PANEL_TEXT_KEY_JUMP = 0x18CD1,
-  PANEL_TEXT_KEY_FIRE = 0x18CE7,
-  PANEL_TEXT_MAIN_MENU = 0x19015,
-  PANEL_TEXT_HELP_MENU = 0x1941D,
-  PANEL_TEXT_HIGH_SCORE_NAMES = 0x19F14,
-  PANEL_TEXT_ABOUT = 0x1B82D,
-  PANEL_TEXT_REVERSE_GRAVITY = 0x1BBC4,
-  PANEL_TEXT_PERFECT = 0x1BD4F,
-  PANEL_TEXT_WARP = 0x1BE2F,
-  PANEL_TEXT_RESTORE = 0x1BEF8,
-  PANEL_TEXT_SAVE = 0x1BFBB,
-  PANEL_TEXT_START_SEQ_1 = 0x1C3A7,
-  PANEL_TEXT_START_SEQ_2 = 0x1C470,
-  PANEL_TEXT_START_SEQ_3 = 0x1C50B,
-};
+
+// Panel text locations, by episode
+// Texts are pascal strings (first byte is len)
+static const std::array<std::array<int, static_cast<size_t>(PanelText::NUM_TEXTS)>, 3> PANEL_TEXT_LOCS{{{
+                                                                                                          0x1327F,  // QUIT
+                                                                                                          0x13322,  // SFX_ON
+                                                                                                          0x133D7,  // END
+                                                                                                          0x1361A,  // END_1
+                                                                                                          0x139A0,  // END_2
+                                                                                                          0x13B27,  // END_3
+                                                                                                          0x13F29,  // START_1
+                                                                                                          0x14063,  // START_2
+                                                                                                          0x1411B,  // START_3
+                                                                                                          0x14736,  // STORY_1
+                                                                                                          0x14890,  // STORY_2
+                                                                                                          0x14E07,  // PAUSED
+                                                                                                          0x14ED3,  // ORDER_1
+                                                                                                          0x15228,  // ORDER_2
+                                                                                                          0x1558D,  // ORDER_3
+                                                                                                          0x15A63,  // HIGH_SCORES
+                                                                                                          0x15CB7,  // ENTER_SCORE
+                                                                                                          0x15DF2,  // INSTRUCTIONS_1
+                                                                                                          0x15F66,  // INSTRUCTIONS_2
+                                                                                                          0x160B7,  // INSTRUCTIONS_3
+                                                                                                          0x16220,  // INSTRUCTIONS_4
+                                                                                                          0x16386,  // INSTRUCTIONS_5
+                                                                                                          0x164B6,  // INSTRUCTIONS_6
+                                                                                                          0x165DB,  // INSTRUCTIONS_7
+                                                                                                          0x1757C,  // LEVEL_DONE
+                                                                                                          0x1769F,  // TIME_STOP
+                                                                                                          0x177F4,  // MORE_CRYSTALS
+                                                                                                          0x17917,  // FILE_ERROR
+                                                                                                          0x179E2,  // PRESS_ANY_KEY
+                                                                                                          0x17A62,  // JOYSTICK_ON
+                                                                                                          0x17B33,  // QUIT_TO_DOS
+                                                                                                          0x17BCB,  // QUIT_TO
+                                                                                                          0x180C8,  // RED_MUSHROOM
+                                                                                                          0x181AC,  // LEVER
+                                                                                                          0x18278,  // SWITCH
+                                                                                                          0x18345,  // P
+                                                                                                          0x18422,  // GREEN_MUSHROOM
+                                                                                                          0x18553,  // CHEAT_MODE
+                                                                                                          0x1863E,  // SAVED
+                                                                                                          0x187F9,  // SAVE_FROM_MAIN
+                                                                                                          0x18913,  // HIT_AIR
+                                                                                                          0x18AE4,  // RESTORE_FROM_MAIN
+                                                                                                          0x18BFD,  // REDEFINE_KEYS
+                                                                                                          0x18DF1,  // KEY_UNAVAILABLE
+                                                                                                          0x18EBD,  // KEY_LEFT
+                                                                                                          0x18EFD,  // KEY_RIGHT
+                                                                                                          0x18F19,  // KEY_JUMP
+                                                                                                          0x18F2F,  // KEY_FIRE
+                                                                                                          0x1925D,  // MAIN_MENU
+                                                                                                          0x19665,  // HELP_MENU
+                                                                                                          0x1A15C,  // HIGH_SCORE_NAMES
+                                                                                                          0x1BA8F,  // ABOUT
+                                                                                                          0x1BE26,  // REVERSE_GRAVITY
+                                                                                                          0x1BFB1,  // PERFECT
+                                                                                                          0x1C090,  // WARP
+                                                                                                          0x1C159,  // RESTORE
+                                                                                                          0x1C21C,  // SAVE
+                                                                                                          0x1C606,  // START_SEQ_1
+                                                                                                          0x1C6C8,  // START_SEQ_2
+                                                                                                          0x1C76A,  // START_SEQ_3
+                                                                                                        },
+                                                                                                        {
+                                                                                                          0x131FF,  // QUIT
+                                                                                                          0x132A2,  // SFX_ON
+                                                                                                          0x13357,  // END
+                                                                                                          0x13551,  // END_1
+                                                                                                          0x13677,  // END_2
+                                                                                                          0x13B51,  // END_3
+                                                                                                          0x13EAC,  // START_1
+                                                                                                          0x1404A,  // START_2
+                                                                                                          0x1404A,  // START_3 (TODO: ep2 has no start 3)
+                                                                                                          0x14526,  // STORY_1
+                                                                                                          0x14685,  // STORY_2
+                                                                                                          0x14BBE,  // PAUSED
+                                                                                                          0x14C8A,  // ORDER_1
+                                                                                                          0x14FDF,  // ORDER_2
+                                                                                                          0x15344,  // ORDER_3
+                                                                                                          0x1581A,  // HIGH_SCORES
+                                                                                                          0x15A6E,  // ENTER_SCORE
+                                                                                                          0x15BA9,  // INSTRUCTIONS_1
+                                                                                                          0x15D1D,  // INSTRUCTIONS_2
+                                                                                                          0x15E6E,  // INSTRUCTIONS_3
+                                                                                                          0x15FD7,  // INSTRUCTIONS_4
+                                                                                                          0x1613D,  // INSTRUCTIONS_5
+                                                                                                          0x1626D,  // INSTRUCTIONS_6
+                                                                                                          0x16392,  // INSTRUCTIONS_7
+                                                                                                          0x17333,  // LEVEL_DONE
+                                                                                                          0x17456,  // TIME_STOP
+                                                                                                          0x175AB,  // MORE_CRYSTALS
+                                                                                                          0x176CE,  // FILE_ERROR
+                                                                                                          0x17799,  // PRESS_ANY_KEY
+                                                                                                          0x17819,  // JOYSTICK_ON
+                                                                                                          0x178EA,  // QUIT_TO_DOS
+                                                                                                          0x17982,  // QUIT_TO
+                                                                                                          0x17E7F,  // RED_MUSHROOM
+                                                                                                          0x17F63,  // LEVER
+                                                                                                          0x1802F,  // SWITCH
+                                                                                                          0x180FC,  // P
+                                                                                                          0x181D9,  // GREEN_MUSHROOM
+                                                                                                          0x1830A,  // CHEAT_MODE
+                                                                                                          0x183F5,  // SAVED
+                                                                                                          0x185B0,  // SAVE_FROM_MAIN
+                                                                                                          0x186CA,  // HIT_AIR
+                                                                                                          0x1889B,  // RESTORE_FROM_MAIN
+                                                                                                          0x189B4,  // REDEFINE_KEYS
+                                                                                                          0x18BA8,  // KEY_UNAVAILABLE
+                                                                                                          0x18C74,  // KEY_LEFT
+                                                                                                          0x18CB4,  // KEY_RIGHT
+                                                                                                          0x18CD0,  // KEY_JUMP
+                                                                                                          0x18CE6,  // KEY_FIRE
+                                                                                                          0x19014,  // MAIN_MENU
+                                                                                                          0x1941C,  // HELP_MENU
+                                                                                                          0x19F13,  // HIGH_SCORE_NAMES
+                                                                                                          0x1B82C,  // ABOUT
+                                                                                                          0x1BBC3,  // REVERSE_GRAVITY
+                                                                                                          0x1BD4E,  // PERFECT
+                                                                                                          0x1BE2E,  // WARP
+                                                                                                          0x1BEF7,  // RESTORE
+                                                                                                          0x1BFBA,  // SAVE
+                                                                                                          0x1C3A5,  // START_SEQ_1
+                                                                                                          0x1C46F,  // START_SEQ_2
+                                                                                                          0x1C50A,  // START_SEQ_3
+                                                                                                        },
+                                                                                                        {}}};
 
 enum class PanelType
 {
@@ -170,7 +237,7 @@ class Panel
         const std::vector<std::pair<int, geometry::Position>> sprites = {},
         const std::vector<std::pair<Icon, geometry::Position>> icons = {},
         const PanelType type = PanelType::PANEL_TYPE_NORMAL)
-    : Panel(exe_data.data.c_str() + static_cast<int>(pt), sprites, icons, type)
+    : Panel(exe_data.data.c_str() + PANEL_TEXT_LOCS[exe_data.episode - 1][static_cast<int>(pt)], sprites, icons, type)
   {
   }
   // Basic panel
