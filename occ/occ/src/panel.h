@@ -74,131 +74,132 @@ enum class PanelText : int
 
 // Panel text locations, by episode
 // Texts are pascal strings (first byte is len)
-static const std::array<std::array<int, static_cast<size_t>(PanelText::NUM_TEXTS)>, 3> PANEL_TEXT_LOCS{{{
-                                                                                                          0x1327F,  // QUIT
-                                                                                                          0x13322,  // SFX_ON
-                                                                                                          0x133D7,  // END
-                                                                                                          0x1361A,  // END_1
-                                                                                                          0x139A0,  // END_2
-                                                                                                          0x13B27,  // END_3
-                                                                                                          0x13F29,  // START_1
-                                                                                                          0x14063,  // START_2
-                                                                                                          0x1411B,  // START_3
-                                                                                                          0x14736,  // STORY_1
-                                                                                                          0x14890,  // STORY_2
-                                                                                                          0x14E07,  // PAUSED
-                                                                                                          0x14ED3,  // ORDER_1
-                                                                                                          0x15228,  // ORDER_2
-                                                                                                          0x1558D,  // ORDER_3
-                                                                                                          0x15A63,  // HIGH_SCORES
-                                                                                                          0x15CB7,  // ENTER_SCORE
-                                                                                                          0x15DF2,  // INSTRUCTIONS_1
-                                                                                                          0x15F66,  // INSTRUCTIONS_2
-                                                                                                          0x160B7,  // INSTRUCTIONS_3
-                                                                                                          0x16220,  // INSTRUCTIONS_4
-                                                                                                          0x16386,  // INSTRUCTIONS_5
-                                                                                                          0x164B6,  // INSTRUCTIONS_6
-                                                                                                          0x165DB,  // INSTRUCTIONS_7
-                                                                                                          0x1757C,  // LEVEL_DONE
-                                                                                                          0x1769F,  // TIME_STOP
-                                                                                                          0x177F4,  // MORE_CRYSTALS
-                                                                                                          0x17917,  // FILE_ERROR
-                                                                                                          0x179E2,  // PRESS_ANY_KEY
-                                                                                                          0x17A62,  // JOYSTICK_ON
-                                                                                                          0x17B33,  // QUIT_TO_DOS
-                                                                                                          0x17BCB,  // QUIT_TO
-                                                                                                          0x180C8,  // RED_MUSHROOM
-                                                                                                          0x181AC,  // LEVER
-                                                                                                          0x18278,  // SWITCH
-                                                                                                          0x18345,  // P
-                                                                                                          0x18422,  // GREEN_MUSHROOM
-                                                                                                          0x18553,  // CHEAT_MODE
-                                                                                                          0x1863E,  // SAVED
-                                                                                                          0x187F9,  // SAVE_FROM_MAIN
-                                                                                                          0x18913,  // HIT_AIR
-                                                                                                          0x18AE4,  // RESTORE_FROM_MAIN
-                                                                                                          0x18BFD,  // REDEFINE_KEYS
-                                                                                                          0x18DF1,  // KEY_UNAVAILABLE
-                                                                                                          0x18EBD,  // KEY_LEFT
-                                                                                                          0x18EFD,  // KEY_RIGHT
-                                                                                                          0x18F19,  // KEY_JUMP
-                                                                                                          0x18F2F,  // KEY_FIRE
-                                                                                                          0x1925D,  // MAIN_MENU
-                                                                                                          0x19665,  // HELP_MENU
-                                                                                                          0x1A15C,  // HIGH_SCORE_NAMES
-                                                                                                          0x1BA8F,  // ABOUT
-                                                                                                          0x1BE26,  // REVERSE_GRAVITY
-                                                                                                          0x1BFB1,  // PERFECT
-                                                                                                          0x1C090,  // WARP
-                                                                                                          0x1C159,  // RESTORE
-                                                                                                          0x1C21C,  // SAVE
-                                                                                                          0x1C606,  // START_SEQ_1
-                                                                                                          0x1C6C8,  // START_SEQ_2
-                                                                                                          0x1C76A,  // START_SEQ_3
-                                                                                                        },
-                                                                                                        {
-                                                                                                          0x131FF,  // QUIT
-                                                                                                          0x132A2,  // SFX_ON
-                                                                                                          0x13357,  // END
-                                                                                                          0x13551,  // END_1
-                                                                                                          0x13677,  // END_2
-                                                                                                          0x13B51,  // END_3
-                                                                                                          0x13EAC,  // START_1
-                                                                                                          0x1404A,  // START_2
-                                                                                                          0x1404A,  // START_3 (TODO: ep2 has no start 3)
-                                                                                                          0x14526,  // STORY_1
-                                                                                                          0x14685,  // STORY_2
-                                                                                                          0x14BBE,  // PAUSED
-                                                                                                          0x14C8A,  // ORDER_1
-                                                                                                          0x14FDF,  // ORDER_2
-                                                                                                          0x15344,  // ORDER_3
-                                                                                                          0x1581A,  // HIGH_SCORES
-                                                                                                          0x15A6E,  // ENTER_SCORE
-                                                                                                          0x15BA9,  // INSTRUCTIONS_1
-                                                                                                          0x15D1D,  // INSTRUCTIONS_2
-                                                                                                          0x15E6E,  // INSTRUCTIONS_3
-                                                                                                          0x15FD7,  // INSTRUCTIONS_4
-                                                                                                          0x1613D,  // INSTRUCTIONS_5
-                                                                                                          0x1626D,  // INSTRUCTIONS_6
-                                                                                                          0x16392,  // INSTRUCTIONS_7
-                                                                                                          0x17333,  // LEVEL_DONE
-                                                                                                          0x17456,  // TIME_STOP
-                                                                                                          0x175AB,  // MORE_CRYSTALS
-                                                                                                          0x176CE,  // FILE_ERROR
-                                                                                                          0x17799,  // PRESS_ANY_KEY
-                                                                                                          0x17819,  // JOYSTICK_ON
-                                                                                                          0x178EA,  // QUIT_TO_DOS
-                                                                                                          0x17982,  // QUIT_TO
-                                                                                                          0x17E7F,  // RED_MUSHROOM
-                                                                                                          0x17F63,  // LEVER
-                                                                                                          0x1802F,  // SWITCH
-                                                                                                          0x180FC,  // P
-                                                                                                          0x181D9,  // GREEN_MUSHROOM
-                                                                                                          0x1830A,  // CHEAT_MODE
-                                                                                                          0x183F5,  // SAVED
-                                                                                                          0x185B0,  // SAVE_FROM_MAIN
-                                                                                                          0x186CA,  // HIT_AIR
-                                                                                                          0x1889B,  // RESTORE_FROM_MAIN
-                                                                                                          0x189B4,  // REDEFINE_KEYS
-                                                                                                          0x18BA8,  // KEY_UNAVAILABLE
-                                                                                                          0x18C74,  // KEY_LEFT
-                                                                                                          0x18CB4,  // KEY_RIGHT
-                                                                                                          0x18CD0,  // KEY_JUMP
-                                                                                                          0x18CE6,  // KEY_FIRE
-                                                                                                          0x19014,  // MAIN_MENU
-                                                                                                          0x1941C,  // HELP_MENU
-                                                                                                          0x19F13,  // HIGH_SCORE_NAMES
-                                                                                                          0x1B82C,  // ABOUT
-                                                                                                          0x1BBC3,  // REVERSE_GRAVITY
-                                                                                                          0x1BD4E,  // PERFECT
-                                                                                                          0x1BE2E,  // WARP
-                                                                                                          0x1BEF7,  // RESTORE
-                                                                                                          0x1BFBA,  // SAVE
-                                                                                                          0x1C3A5,  // START_SEQ_1
-                                                                                                          0x1C46F,  // START_SEQ_2
-                                                                                                          0x1C50A,  // START_SEQ_3
-                                                                                                        },
-                                                                                                        {}}};
+static const std::array<std::array<int, static_cast<size_t>(PanelText::NUM_TEXTS)>, 3> PANEL_TEXT_LOCS{
+  {{
+     0x1327F,  // QUIT
+     0x13322,  // SFX_ON
+     0x133D7,  // END
+     0x1361A,  // END_1
+     0x139A0,  // END_2
+     0x13B27,  // END_3
+     0x13F29,  // START_1
+     0x14063,  // START_2
+     0x1411B,  // START_3
+     0x14736,  // STORY_1
+     0x14890,  // STORY_2
+     0x14E07,  // PAUSED
+     0x14ED3,  // ORDER_1
+     0x15228,  // ORDER_2
+     0x1558D,  // ORDER_3
+     0x15A63,  // HIGH_SCORES
+     0x15CB7,  // ENTER_SCORE
+     0x15DF2,  // INSTRUCTIONS_1
+     0x15F66,  // INSTRUCTIONS_2
+     0x160B7,  // INSTRUCTIONS_3
+     0x16220,  // INSTRUCTIONS_4
+     0x16386,  // INSTRUCTIONS_5
+     0x164B6,  // INSTRUCTIONS_6
+     0x165DB,  // INSTRUCTIONS_7
+     0x1757C,  // LEVEL_DONE
+     0x1769F,  // TIME_STOP
+     0x177F4,  // MORE_CRYSTALS
+     0x17917,  // FILE_ERROR
+     0x179E2,  // PRESS_ANY_KEY
+     0x17A62,  // JOYSTICK_ON
+     0x17B33,  // QUIT_TO_DOS
+     0x17BCB,  // QUIT_TO
+     0x180C8,  // RED_MUSHROOM
+     0x181AC,  // LEVER
+     0x18278,  // SWITCH
+     0x18345,  // P
+     0x18422,  // GREEN_MUSHROOM
+     0x18553,  // CHEAT_MODE
+     0x1863E,  // SAVED
+     0x187F9,  // SAVE_FROM_MAIN
+     0x18913,  // HIT_AIR
+     0x18AE4,  // RESTORE_FROM_MAIN
+     0x18BFD,  // REDEFINE_KEYS
+     0x18DF1,  // KEY_UNAVAILABLE
+     0x18EBD,  // KEY_LEFT
+     0x18EFD,  // KEY_RIGHT
+     0x18F19,  // KEY_JUMP
+     0x18F2F,  // KEY_FIRE
+     0x1925D,  // MAIN_MENU
+     0x19665,  // HELP_MENU
+     0x1A15C,  // HIGH_SCORE_NAMES
+     0x1BA8F,  // ABOUT
+     0x1BE26,  // REVERSE_GRAVITY
+     0x1BFB1,  // PERFECT
+     0x1C090,  // WARP
+     0x1C159,  // RESTORE
+     0x1C21C,  // SAVE
+     0x1C606,  // START_SEQ_1
+     0x1C6C8,  // START_SEQ_2
+     0x1C76A,  // START_SEQ_3
+   },
+   {
+     0x131FF,  // QUIT
+     0x132A2,  // SFX_ON
+     0x13357,  // END
+     0x13551,  // END_1
+     0x13677,  // END_2
+     0x13B51,  // END_3
+     0x13EAC,  // START_1
+     0x1404A,  // START_2
+     0x1404A,  // START_3 (TODO: ep2 has no start 3)
+     0x14526,  // STORY_1
+     0x14685,  // STORY_2
+     0x14BBE,  // PAUSED
+     0x14C8A,  // ORDER_1
+     0x14FDF,  // ORDER_2
+     0x15344,  // ORDER_3
+     0x1581A,  // HIGH_SCORES
+     0x15A6E,  // ENTER_SCORE
+     0x15BA9,  // INSTRUCTIONS_1
+     0x15D1D,  // INSTRUCTIONS_2
+     0x15E6E,  // INSTRUCTIONS_3
+     0x15FD7,  // INSTRUCTIONS_4
+     0x1613D,  // INSTRUCTIONS_5
+     0x1626D,  // INSTRUCTIONS_6
+     0x16392,  // INSTRUCTIONS_7
+     0x17333,  // LEVEL_DONE
+     0x17456,  // TIME_STOP
+     0x175AB,  // MORE_CRYSTALS
+     0x176CE,  // FILE_ERROR
+     0x17799,  // PRESS_ANY_KEY
+     0x17819,  // JOYSTICK_ON
+     0x178EA,  // QUIT_TO_DOS
+     0x17982,  // QUIT_TO
+     0x17E7F,  // RED_MUSHROOM
+     0x17F63,  // LEVER
+     0x1802F,  // SWITCH
+     0x180FC,  // P
+     0x181D9,  // GREEN_MUSHROOM
+     0x1830A,  // CHEAT_MODE
+     0x183F5,  // SAVED
+     0x185B0,  // SAVE_FROM_MAIN
+     0x186CA,  // HIT_AIR
+     0x1889B,  // RESTORE_FROM_MAIN
+     0x189B4,  // REDEFINE_KEYS
+     0x18BA8,  // KEY_UNAVAILABLE
+     0x18C74,  // KEY_LEFT
+     0x18CB4,  // KEY_RIGHT
+     0x18CD0,  // KEY_JUMP
+     0x18CE6,  // KEY_FIRE
+     0x19014,  // MAIN_MENU
+     0x1941C,  // HELP_MENU
+     0x19F13,  // HIGH_SCORE_NAMES
+     0x1B82C,  // ABOUT
+     0x1BBC3,  // REVERSE_GRAVITY
+     0x1BD4E,  // PERFECT
+     0x1BE2E,  // WARP
+     0x1BEF7,  // RESTORE
+     0x1BFBA,  // SAVE
+     0x1C3A5,  // START_SEQ_1
+     0x1C46F,  // START_SEQ_2
+     0x1C50A,  // START_SEQ_3
+   },
+   {}}};
 
 enum class PanelType
 {
@@ -215,6 +216,9 @@ enum class PanelType
   PANEL_TYPE_WARP_TO_LEVEL,
   PANEL_TYPE_WEBSITE,
   PANEL_TYPE_END_GAME,
+  PANEL_TYPE_EPISODE_1,
+  PANEL_TYPE_EPISODE_2,
+  PANEL_TYPE_EPISODE_3,
 };
 
 class Panel

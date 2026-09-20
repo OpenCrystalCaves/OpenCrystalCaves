@@ -182,8 +182,10 @@ TitleState::TitleState(const int episode,
         L"Welcome to OpenCrystalCaves!",
         L"----------------------------",
         L"     New Game",
-        L"     Continue Game",   // TODO: dynamically disable if no save file
-        L"     Ordering Info.",  // TODO: hide if retail version detected
+        L"     Continue Game",
+        // Check if we have the registered version (randomly load a episode 2 file)
+        // If so show episode chooser instead
+        (get_data_path("CC2.APG").empty() ? L"     Ordering Info." : L"     Choose Episode"),
         L"     Instructions",
         L"     Story",
         L"     High Scores",
@@ -191,23 +193,35 @@ TitleState::TitleState(const int episode,
         L"     About Apogee",
         L"     Quit to " OS_NAME,
       },
-      {
-        {2, {PanelType::PANEL_TYPE_NEW_GAME}},
-        {3, {PlayerState::can_load(episode) ? PanelType::PANEL_TYPE_CONTINUE_GAME : PanelType::PANEL_TYPE_DISABLED}},
-        // Check if we have the registered version (randomly load a episode 2 file)
-        // If so disable the ordering instructions panel
-        {4, get_data_path("CC2.APG").empty() ? Panel(PanelText::PANEL_TEXT_ORDER_3, exe_data) : Panel(PanelType::PANEL_TYPE_DISABLED)},
-        {5, makeInstructionsPanels(exe_data)},
-        {6,
-         {{
-           {PanelText::PANEL_TEXT_STORY_1, exe_data},
-           {PanelText::PANEL_TEXT_STORY_2, exe_data},
-         }}},
-        {7, {PanelType::PANEL_TYPE_DISABLED}},
-        {8, {PanelType::PANEL_TYPE_WEBSITE}},
-        {9, {PanelText::PANEL_TEXT_ABOUT, exe_data}},
-        {10, {PanelType::PANEL_TYPE_QUIT_TO_OS}},
-      })
+      {{2, {PanelType::PANEL_TYPE_NEW_GAME}},
+       {3, {PlayerState::can_load(episode) ? PanelType::PANEL_TYPE_CONTINUE_GAME : PanelType::PANEL_TYPE_DISABLED}},
+       // Check if we have the registered version (randomly load a episode 2 file)
+       // If so show episode picker submenus
+       {4,
+        (get_data_path("CC2.APG").empty() ? Panel(PanelText::PANEL_TEXT_ORDER_3, exe_data)
+                                          : Panel(
+                                              {
+                                                L"Select Episode:",
+                                                L"",
+                                                L" 1: Troubles with Twibbles",
+                                                L" 2: Slugging It Out",
+                                                L" 3: Mylo Versus the Supernova",
+                                              },
+                                              {
+                                                {2, {PanelType::PANEL_TYPE_EPISODE_1}},
+                                                {3, {PanelType::PANEL_TYPE_EPISODE_2}},
+                                                {4, {PanelType::PANEL_TYPE_EPISODE_3}},
+                                              }))},
+       {5, makeInstructionsPanels(exe_data)},
+       {6,
+        {{
+          {PanelText::PANEL_TEXT_STORY_1, exe_data},
+          {PanelText::PANEL_TEXT_STORY_2, exe_data},
+        }}},
+       {7, {PanelType::PANEL_TYPE_DISABLED}},
+       {8, {PanelType::PANEL_TYPE_WEBSITE}},
+       {9, {PanelText::PANEL_TEXT_ABOUT, exe_data}},
+       {10, {PanelType::PANEL_TYPE_QUIT_TO_OS}}})
 {
 }
 
@@ -277,6 +291,21 @@ void TitleState::update(const Input& input)
       case PanelType::PANEL_TYPE_WEBSITE:
         misc::open_url("https://congusbongus.itch.io/opencrystalcaves");
         panel_current_ = &panel_;
+        break;
+      case PanelType::PANEL_TYPE_EPISODE_1:
+        player_state_.episode = 1;
+        panel_current_ = &panel_;
+        // TODO: reset everything to episode 1
+        break;
+      case PanelType::PANEL_TYPE_EPISODE_2:
+        player_state_.episode = 2;
+        panel_current_ = &panel_;
+        // TODO: reset everything to episode 2
+        break;
+      case PanelType::PANEL_TYPE_EPISODE_3:
+        player_state_.episode = 3;
+        panel_current_ = &panel_;
+        // TODO: reset everything to episode 3
         break;
       default:
         break;
