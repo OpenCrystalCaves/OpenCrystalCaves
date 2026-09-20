@@ -256,6 +256,13 @@ class Panel
   PanelType get_type() const { return type_; }
   void set_type(PanelType t) { type_ = t; }
   const std::vector<std::wstring>& get_strings() const { return strings_; }
+  void set_string(const int idx, const std::wstring& s)
+  {
+    if (idx >= 0 && idx < (int)strings_.size())
+    {
+      strings_[idx] = s;
+    }
+  }
 
   void add_input(char c);
   const std::string& get_input() const { return input_str_; }

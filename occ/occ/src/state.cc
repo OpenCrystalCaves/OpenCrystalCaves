@@ -179,8 +179,8 @@ TitleState::TitleState(const int episode,
     panel_(
       // TODO: add options menu here
       {
-        L"Welcome to OpenCrystalCaves!",
-        L"----------------------------",
+        L"OpenCrystalCaves: Episode " + std::to_wstring(episode),
+        L"---------------------------",
         L"     New Game",
         L"     Continue Game",
         // Check if we have the registered version (randomly load a episode 2 file)
@@ -210,7 +210,7 @@ TitleState::TitleState(const int episode,
                                               {
                                                 {2, {PanelType::PANEL_TYPE_EPISODE_1}},
                                                 {3, {PanelType::PANEL_TYPE_EPISODE_2}},
-                                                {4, {PanelType::PANEL_TYPE_EPISODE_3}},
+                                                {4, {PanelType::PANEL_TYPE_DISABLED}},  // TODO: episode 3
                                               }))},
        {5, makeInstructionsPanels(exe_data)},
        {6,
@@ -235,6 +235,7 @@ void TitleState::reset_episode(const int episode, ExeData& exe_data)
 {
   player_state_.episode = episode;
   player_state_.reset();
+  panel_.set_string(0, L"OpenCrystalCaves: Episode " + std::to_wstring(episode));
   auto& children = panel_.get_children();
   children[1].second.set_type(PlayerState::can_load(episode) ? PanelType::PANEL_TYPE_CONTINUE_GAME : PanelType::PANEL_TYPE_DISABLED);
   children[3].second = Panel(makeInstructionsPanels(exe_data));
@@ -472,11 +473,13 @@ void GameState::reset()
   State::reset();
   panel_.get_children()[0].second = Panel(makeInstructionsPanels(exe_data_));
   warp_panel_ = Panel(PanelText::PANEL_TEXT_WARP, exe_data_, {}, {}, PanelType::PANEL_TYPE_WARP_TO_LEVEL);
-  intro_panel_ = Panel({
-    {PanelText::PANEL_TEXT_START_1, exe_data_, {}},
-    {PanelText::PANEL_TEXT_START_2, exe_data_, {}},
-    {PanelText::PANEL_TEXT_START_3, exe_data_, {}},
-  }, false);
+  intro_panel_ = Panel(
+    {
+      {PanelText::PANEL_TEXT_START_1, exe_data_, {}},
+      {PanelText::PANEL_TEXT_START_2, exe_data_, {}},
+      {PanelText::PANEL_TEXT_START_3, exe_data_, {}},
+    },
+    false);
   intro_steering_panel_ = Panel(PanelText::PANEL_TEXT_START_SEQ_1, exe_data_);
   intro_whoa_panel_ = Panel(PanelText::PANEL_TEXT_START_SEQ_2, exe_data_);
   intro_dock_panel_ = Panel(PanelText::PANEL_TEXT_START_SEQ_3, exe_data_);
@@ -946,10 +949,12 @@ void EndState::reset()
 {
   State::reset();
   outro_panel_ = Panel(PanelText::PANEL_TEXT_END_1, exe_data_);
-  congrats_panel_ = Panel({
-    {PanelText::PANEL_TEXT_END_2, exe_data_, {}},
-    {PanelText::PANEL_TEXT_END_3, exe_data_, {}},
-  }, false);
+  congrats_panel_ = Panel(
+    {
+      {PanelText::PANEL_TEXT_END_2, exe_data_, {}},
+      {PanelText::PANEL_TEXT_END_3, exe_data_, {}},
+    },
+    false);
   panel_current_ = &outro_panel_;
   panel_next_ = nullptr;
 }
