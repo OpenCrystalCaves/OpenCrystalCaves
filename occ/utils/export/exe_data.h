@@ -8,6 +8,8 @@ class ExeData
  public:
   ExeData(const int episode);
 
+  void reset(const int episode);
+
   std::string data;
   int episode;
 };

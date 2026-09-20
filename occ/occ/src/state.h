@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "event.h"
 #include "game_renderer.h"
 #include "graphics.h"
@@ -94,6 +96,8 @@ class TitleState : public State
     panel_current_ = nullptr;
     State::reset();
   }
+  void set_episode_switcher(std::function<void(int)> episode_switcher) { episode_switcher_ = std::move(episode_switcher); }
+  void reset_episode(const int episode, ExeData& exe_data);
   virtual void finish() override;
   virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;
@@ -115,6 +119,7 @@ class TitleState : public State
   unsigned scroll_ticks_ = 0;
   Panel panel_;
   Panel* panel_current_ = nullptr;
+  std::function<void(int)> episode_switcher_;
 };
 
 class GameState : public State
@@ -172,6 +177,7 @@ class EndState : public State
            Window& window,
            ExeData& exe_data);
 
+  virtual void reset() override;
   virtual void update(const Input& input) override;
   virtual void draw(Window& window) const override;
 
@@ -180,6 +186,7 @@ class EndState : public State
   SpriteManager& sprite_manager_;
   SoundManager& sound_manager_;
   std::vector<Surface*>& images_;
+  ExeData& exe_data_;
   Panel outro_panel_;
   Panel congrats_panel_;
   Panel* panel_current_ = nullptr;

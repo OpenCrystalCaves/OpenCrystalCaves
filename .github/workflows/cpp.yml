@@ -45,7 +45,7 @@ jobs:
     - name: Set up Homebrew (macOS)
       id: set-up-homebrew
       if: matrix.os == 'macos-latest'
-      uses: Homebrew/actions/setup-homebrew@master
+      uses: Homebrew/actions/setup-homebrew@1f8e202ffddf94def7f42f6fa3a482e821489f9c # 2026.07.10.1
     - name: Install SDL via homebrew (macOS)
       if: matrix.os == 'macos-latest'
       run: brew install sdl2 sdl2_mixer

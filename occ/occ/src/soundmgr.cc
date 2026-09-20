@@ -95,6 +95,13 @@ SoundManager::~SoundManager()
 
 bool SoundManager::load_sounds(const int episode)
 {
+  for (const auto& chunk : chunks_)
+  {
+    Mix_FreeChunk(chunk);
+  }
+  chunks_.clear();
+  raw_chunks_.clear();
+
   std::vector<Sound> sounds;
   // Read raw audio into memory
   for (int i = 0;; i++)

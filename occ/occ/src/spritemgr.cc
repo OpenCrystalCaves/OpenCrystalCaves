@@ -436,6 +436,13 @@ bool SpriteManager::load_tilesets(Window& window, const int episode)
   return true;
 }
 
+bool SpriteManager::reset_episode(Window& window, const int episode)
+{
+  sprite_surface_.reset();
+  char_surface_.reset();
+  return load_tilesets(window, episode);
+}
+
 const Surface* SpriteManager::get_surface() const
 {
   return sprite_surface_.get();

@@ -8,8 +8,14 @@
 
 #define EXE_FILENAME_FMT "CC{}.EXE"
 
-ExeData::ExeData(const int episode) : episode(episode)
+ExeData::ExeData(const int episode) : episode(0)
 {
+  reset(episode);
+}
+
+void ExeData::reset(const int new_episode)
+{
+  episode = new_episode;
   const auto exe_file = std::format(EXE_FILENAME_FMT, episode);
   const auto exe_path = get_data_path(exe_file);
   size_t exe_len;

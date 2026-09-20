@@ -141,6 +141,24 @@ int main(int argc, char* argv[])
   GameState game_state(*game, sprite_manager, sound_manager, *game_surface, *window, exe_data, player_state, end_state);
   title.set_next(game_state);
   game_state.set_next(title);
+  title.set_episode_switcher([&](const int new_episode) {
+    exe_data.reset(new_episode);
+    player_state.episode = new_episode;
+    player_state.reset();
+    if (!sprite_manager.reset_episode(*window, new_episode))
+    {
+      LOG_CRITICAL("Could not reload tilesets for episode %d", new_episode);
+    }
+    if (!sound_manager.load_sounds(new_episode))
+    {
+      LOG_CRITICAL("Could not reload sounds for episode %d", new_episode);
+    }
+    title_images = image_manager.get_images(new_episode, CCImage::IMAGE_TITLE);
+    const auto new_credits_images = image_manager.get_images(new_episode, CCImage::IMAGE_CREDITS);
+    title_images.insert(title_images.end(), new_credits_images.begin(), new_credits_images.end());
+    end_images = image_manager.get_images(new_episode, CCImage::IMAGE_END);
+    title.reset_episode(new_episode, exe_data);
+  });
   State* state = &splash;
   state->reset();
 

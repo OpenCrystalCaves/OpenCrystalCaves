@@ -231,6 +231,21 @@ void TitleState::finish()
   State::finish();
 }
 
+void TitleState::reset_episode(const int episode, ExeData& exe_data)
+{
+  player_state_.episode = episode;
+  player_state_.reset();
+  auto& children = panel_.get_children();
+  children[1].second.set_type(PlayerState::can_load(episode) ? PanelType::PANEL_TYPE_CONTINUE_GAME : PanelType::PANEL_TYPE_DISABLED);
+  children[3].second = Panel(makeInstructionsPanels(exe_data));
+  children[4].second = Panel({
+    {PanelText::PANEL_TEXT_STORY_1, exe_data},
+    {PanelText::PANEL_TEXT_STORY_2, exe_data},
+  });
+  children[7].second = Panel(PanelText::PANEL_TEXT_ABOUT, exe_data);
+  panel_current_ = nullptr;
+}
+
 void TitleState::update(const Input& input)
 {
   State::update(input);
@@ -293,19 +308,25 @@ void TitleState::update(const Input& input)
         panel_current_ = &panel_;
         break;
       case PanelType::PANEL_TYPE_EPISODE_1:
-        player_state_.episode = 1;
+        if (episode_switcher_)
+        {
+          episode_switcher_(1);
+        }
         panel_current_ = &panel_;
-        // TODO: reset everything to episode 1
         break;
       case PanelType::PANEL_TYPE_EPISODE_2:
-        player_state_.episode = 2;
+        if (episode_switcher_)
+        {
+          episode_switcher_(2);
+        }
         panel_current_ = &panel_;
-        // TODO: reset everything to episode 2
         break;
       case PanelType::PANEL_TYPE_EPISODE_3:
-        player_state_.episode = 3;
+        if (episode_switcher_)
+        {
+          episode_switcher_(3);
+        }
         panel_current_ = &panel_;
-        // TODO: reset everything to episode 3
         break;
       default:
         break;
@@ -449,6 +470,18 @@ GameState::GameState(Game& game,
 void GameState::reset()
 {
   State::reset();
+  panel_.get_children()[0].second = Panel(makeInstructionsPanels(exe_data_));
+  warp_panel_ = Panel(PanelText::PANEL_TEXT_WARP, exe_data_, {}, {}, PanelType::PANEL_TYPE_WARP_TO_LEVEL);
+  intro_panel_ = Panel({
+    {PanelText::PANEL_TEXT_START_1, exe_data_, {}},
+    {PanelText::PANEL_TEXT_START_2, exe_data_, {}},
+    {PanelText::PANEL_TEXT_START_3, exe_data_, {}},
+  }, false);
+  intro_steering_panel_ = Panel(PanelText::PANEL_TEXT_START_SEQ_1, exe_data_);
+  intro_whoa_panel_ = Panel(PanelText::PANEL_TEXT_START_SEQ_2, exe_data_);
+  intro_dock_panel_ = Panel(PanelText::PANEL_TEXT_START_SEQ_3, exe_data_);
+  finale_panel_ = Panel(PanelText::PANEL_TEXT_END, exe_data_);
+  finale_any_key_panel_ = Panel(PanelText::PANEL_TEXT_PRESS_ANY_KEY, exe_data_);
   LevelId previous_level = level_;
   if (game_.get_level().is_complete())
   {
@@ -897,6 +930,7 @@ EndState::EndState(SpriteManager& sprite_manager,
     sound_manager_(sound_manager),
     game_surface_(game_surface),
     images_(images),
+    exe_data_(exe_data),
     outro_panel_(PanelText::PANEL_TEXT_END_1, exe_data),
     congrats_panel_(
       {
@@ -906,6 +940,18 @@ EndState::EndState(SpriteManager& sprite_manager,
       false)
 {
   panel_current_ = &outro_panel_;
+}
+
+void EndState::reset()
+{
+  State::reset();
+  outro_panel_ = Panel(PanelText::PANEL_TEXT_END_1, exe_data_);
+  congrats_panel_ = Panel({
+    {PanelText::PANEL_TEXT_END_2, exe_data_, {}},
+    {PanelText::PANEL_TEXT_END_3, exe_data_, {}},
+  }, false);
+  panel_current_ = &outro_panel_;
+  panel_next_ = nullptr;
 }
 
 void EndState::update(const Input& input)

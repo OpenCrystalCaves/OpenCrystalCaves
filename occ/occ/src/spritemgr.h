@@ -49,6 +49,7 @@ class SpriteManager
   }
 
   bool load_tilesets(Window& window, const int episode);
+  bool reset_episode(Window& window, const int episode);
   const Surface* get_surface() const;
   geometry::Rectangle get_rect_for_tile(const int sprite) const;
   void render_tile(const int sprite,
