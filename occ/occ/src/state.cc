@@ -543,6 +543,9 @@ void GameState::update(const Input& input)
   State::update(input);
   auto pi = input_to_player_input(input);
   // Intro-specific state updates
+  // Disallow player input in intro/finale unless debug
+  if ((level_ == LevelId::INTRO || level_ == LevelId::FINALE) && !game_renderer_.get_debug())
+    pi = input_to_player_input({});
   if (level_ == LevelId::INTRO && panel_current_ == nullptr && fade_out_start_ticks_ == 0)
   {
     intro_ticks_++;

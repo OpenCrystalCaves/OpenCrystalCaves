@@ -45,7 +45,6 @@ Features that are missing:
 
 Known bugs:
 
-- Can shoot and control ship during intro/finale sequences
 - Can hear hammers even when offscreen
 - Enemies can see player even when offscreen
 - Can't land in 1-tile-high alcoves when falling at max speed
