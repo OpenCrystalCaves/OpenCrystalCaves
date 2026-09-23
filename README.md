@@ -47,7 +47,6 @@ Known bugs:
 
 - Can hear hammers even when offscreen
 - Enemies can see player even when offscreen
-- Can't land in 1-tile-high alcoves when falling at max speed
 - Can't fall in reverse gravity level
 - No death effect for ostrich enemy
 - Signs are not rendered until their leftmost tile is in view

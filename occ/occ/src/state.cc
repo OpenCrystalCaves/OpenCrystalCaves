@@ -127,7 +127,7 @@ void SkipState::update(const Input& input)
   if (ticks_ > grace_ticks_)
   {
     const auto pinput = input_to_player_input(input);
-    if (pinput.jump_pressed || pinput.shoot_pressed || input.escape.pressed())
+    if (pinput.jump_pressed || pinput.shoot_pressed || input.escape.pressed() || input.enter.pressed())
     {
       finish();
     }
@@ -262,7 +262,7 @@ void TitleState::update(const Input& input)
   const int index_last = panel_current_ ? panel_current_->index() : -1;
   if (panel_current_ == nullptr)
   {
-    if (fade_out_start_ticks_ == 0 && (pinput.jump_pressed || pinput.shoot_pressed || input.escape.pressed()))
+    if (fade_out_start_ticks_ == 0 && (pinput.jump_pressed || pinput.shoot_pressed || input.escape.pressed() || input.enter.pressed()))
     {
       panel_current_ = &panel_;
     }

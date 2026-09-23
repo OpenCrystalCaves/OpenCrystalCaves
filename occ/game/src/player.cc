@@ -283,50 +283,61 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
   collide_x = false;
   collide_y = false;
   const auto destination = position + velocity;
-
-  // Move on x axis
-  const auto step_x = destination.x() > position.x() ? 1 : -1;
-  while (position.x() != destination.x())
+  constexpr auto collides =
+    [](Player& player, Level& level, AbstractSoundManager& sound_manager, geometry::Position new_player_pos, const bool falling)
   {
-    const auto new_player_pos = position + geometry::Position(step_x, 0);
-
-    if (move_type == MoveType::HUMAN &&
-        (level.collides_solid(new_player_pos, size) ||
-         // collide with world edges
-         new_player_pos.x() < 0 || new_player_pos.x() >= level.width * SPRITE_W - size.x()))
-    {
-      collide_x = true;
-      break;
-    }
-
-    position = new_player_pos;
-  }
-
-  // Move on y axis
-  const auto step_y = destination.y() > position.y() ? 1 : -1;
-  while (position.y() != destination.y())
-  {
-    const auto new_player_pos = position + geometry::Position(0, step_y);
-
     Actor* collides_actor = nullptr;
-    if (move_type == MoveType::HUMAN &&
+    if (player.move_type == MoveType::HUMAN &&
         (level.collides_solid(new_player_pos, size, false, &collides_actor) ||
+
+         // collide with world edges
+         new_player_pos.x() < 0 || new_player_pos.x() >= level.width * SPRITE_W - size.x() ||
          // Don't let the player leave the top of the level
          new_player_pos.y() < 0 ||
          // Don't let the player leave the bottom of the level (but allow standing on the bottom edge)
          new_player_pos.y() >= level.height * SPRITE_H - size.y() ||
-         // If player is falling down (step_y == 1) we need to check for collision with platforms
-         (step_y == 1 && level.player_on_platform(new_player_pos, size))))
+         // If player is falling down (step_y > 0) we need to check for collision with platforms
+         (falling && level.player_on_platform(new_player_pos, size))))
     {
       if (collides_actor)
       {
-        collides_actor->on_collide(*this, sound_manager, level);
+        collides_actor->on_collide(player, sound_manager, level);
       }
-      collide_y = true;
-      break;
+      return true;
+    }
+    return false;
+  };
+  // Move on x/y axis simultaneously until we reach the destination or both x/y collide
+  const auto step_x = destination.x() > position.x() ? 1 : -1;
+  const auto step_y = destination.y() > position.y() ? 1 : -1;
+  while (position != destination)
+  {
+    // Try moving X axis
+    if (destination.x() != position.x())
+    {
+      const auto new_player_pos = position + geometry::Position(step_x, 0);
+      collide_x = collides(*this, level, sound_manager, new_player_pos, false);
+      if (!collide_x)
+      {
+        position = new_player_pos;
+        continue;
+      }
     }
 
-    position = new_player_pos;
+    // Try moving Y axis
+    if (destination.y() != position.y())
+    {
+      const auto new_player_pos = position + geometry::Position(0, step_y);
+      collide_y = collides(*this, level, sound_manager, new_player_pos, step_y > 0);
+      if (!collide_y)
+      {
+        position = new_player_pos;
+        continue;
+      }
+    }
+
+    // Both collided or reached destination
+    break;
   }
 
   /**
