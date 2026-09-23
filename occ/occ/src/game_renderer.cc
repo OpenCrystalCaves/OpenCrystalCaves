@@ -126,6 +126,7 @@ void GameRenderer::render_background() const
         {
           const double factor = game_->get_level().is_space() ? (tile_x * 31 ^ tile_y * 7) % 6 * 0.1 : 0;
           camera_pos *= factor;
+          sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, camera_pos);
         }
         else if (is_horizon)
         {
@@ -133,8 +134,13 @@ void GameRenderer::render_background() const
           sprite_manager_->render_tile(
             static_cast<int>(Sprite::SPRITE_HORIZON), {tile_x * SPRITE_W, tile_y * SPRITE_H}, geometry::Position(0, camera_pos.y()));
           camera_pos = geometry::Position(static_cast<int>(camera_pos.x() * 0.25), camera_pos.y());
+          sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, camera_pos);
         }
-        sprite_manager_->render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H}, camera_pos);
+        else
+        {
+          // Use helper to render with lighting
+          render_tile(sprite_id, {tile_x * SPRITE_W, tile_y * SPRITE_H});
+        }
       }
     }
   }

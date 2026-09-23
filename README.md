@@ -52,8 +52,7 @@ Known bugs:
 - Signs are not rendered until their leftmost tile is in view
 - Selecting new game after continuing doesn't start a new game
 - Noclip broken
-- No lights level broken
-- Can bump bumpable platforms by jumping on top
+- Can bump bumpable platforms by jumping on top from a lower elevation
 
 ## Differences with Crystal Caves
 
