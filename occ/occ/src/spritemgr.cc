@@ -478,8 +478,13 @@ void SpriteManager::render_tile(const int sprite,
         render_sign("winners_sign", winners_sign_index_, pos, camera_position);
         return;
       case static_cast<int>(Sprite::SPRITE_KILROY_2):
+        render_sign("kilroy_sign", kilroy_sign_index_, pos - geometry::Position{SPRITE_W, 0}, camera_position);
+        break;
       case static_cast<int>(Sprite::SPRITE_WINNERS_2):
+        render_sign("winners_sign", winners_sign_index_, pos - geometry::Position{SPRITE_W, 0}, camera_position);
+        return;
       case static_cast<int>(Sprite::SPRITE_WINNERS_3):
+        render_sign("winners_sign", winners_sign_index_, pos - geometry::Position{SPRITE_W * 2, 0}, camera_position);
         return;
       default:
         break;
