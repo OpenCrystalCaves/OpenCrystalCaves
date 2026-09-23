@@ -385,14 +385,6 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
         // Player jump ended
         jumping = false;
       }
-      else if (jump_tick != 0 &&
-               level.collides_solid(position + geometry::Position(0, (is_reverse_gravity() ^ (level.gravity < 0)) ? -1 : 1), size))
-      {
-        // Player did not actually collide with the ground, but standing directly above it
-        // and this isn't the first tick in the jump, so we can consider the jump to have
-        // ended here
-        jumping = false;
-      }
       else if (jump_tick == 0)
       {
         sound_manager.play_sound(SoundType::SOUND_JUMP);
