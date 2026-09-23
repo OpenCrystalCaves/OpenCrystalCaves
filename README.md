@@ -50,6 +50,7 @@ Known bugs:
 - Selecting new game after continuing doesn't start a new game
 - Noclip broken
 - Can bump bumpable platforms by jumping on top from a lower elevation
+- Quitting from level then starting new game starts in that level
 
 ## Differences with Crystal Caves
 
@@ -92,7 +93,7 @@ OCC is built using C++20 and requires external libraries: [SDL 2.0](https://www.
 Steps to compile (Linux, macOS):
 
 ```
-git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
+git clone --recursive https://github.com/OpenCrystalCaves/OpenCrystalCaves
 cd OpenCrystalCaves
 mkdir -p debug
 cmake -Bdebug -DCMAKE_BUILD_TYPE=debug occ
@@ -108,7 +109,7 @@ Or in Windows (with [vcpkg](https://vcpkg.io)):
 # In vcpkg dir
 ./vcpkg install --triplet x64-windows sdl2 sdl2-mixer --recurse
 # In your projects dir
-git clone --recursive https://github.com/gurka/OpenCrystalCaves.git
+git clone --recursive https://github.com/OpenCrystalCaves/OpenCrystalCaves
 cd OpenCrystalCaves
 cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake occ -A x64
 ```

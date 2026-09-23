@@ -289,7 +289,6 @@ void Player::update(AbstractSoundManager& sound_manager, Level& level)
     Actor* collides_actor = nullptr;
     if (player.move_type == MoveType::HUMAN &&
         (level.collides_solid(new_player_pos, size, false, &collides_actor) ||
-
          // collide with world edges
          new_player_pos.x() < 0 || new_player_pos.x() >= level.width * SPRITE_W - size.x() ||
          // Don't let the player leave the top of the level
