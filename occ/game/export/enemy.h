@@ -724,6 +724,7 @@ class Ostrich
   {
     return create_detection_rects(left_ ? -1 : 1, 0, level);
   }
+  virtual const std::vector<Sprite>* get_explosion_sprites() const override { return &Explosion::sprites_implosion; }
   virtual void on_death(AbstractSoundManager& sound_manager, Level& level) override;
 
  private:

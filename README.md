@@ -47,8 +47,6 @@ Known bugs:
 
 - Can hear hammers even when offscreen
 - Enemies can see player even when offscreen
-- Can't fall in reverse gravity level
-- No death effect for ostrich enemy
 - Signs are not rendered until their leftmost tile is in view
 - Selecting new game after continuing doesn't start a new game
 - Noclip broken
