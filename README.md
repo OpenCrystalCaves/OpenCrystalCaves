@@ -47,9 +47,7 @@ Known bugs:
 
 - Can hear hammers even when offscreen
 - Enemies can see player even when offscreen
-- Selecting new game after continuing doesn't start a new game
 - Noclip broken
-- Quitting from level then starting new game starts in that level
 
 ## Differences with Crystal Caves
 

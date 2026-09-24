@@ -921,6 +921,8 @@ State* GameState::next_state()
           break;
       }
     }
+    // Reset game level
+    level_ = LevelId::INTRO;
   }
   return State::next_state();
 }
