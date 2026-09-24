@@ -49,7 +49,6 @@ Known bugs:
 - Enemies can see player even when offscreen
 - Selecting new game after continuing doesn't start a new game
 - Noclip broken
-- Can bump bumpable platforms by jumping on top from a lower elevation
 - Quitting from level then starting new game starts in that level
 
 ## Differences with Crystal Caves
