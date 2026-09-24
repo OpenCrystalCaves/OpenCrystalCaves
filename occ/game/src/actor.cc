@@ -196,7 +196,8 @@ std::vector<ObjectDef> Chest::get_sprites([[maybe_unused]] const Level& level) c
 
 void BumpPlatform::on_collide(const Player& player, AbstractSoundManager& sound_manager, Level& level)
 {
-  if (player.jumping)
+    // Only accept collisions from below
+  if (player.jumping && player.position.y() >= position.y() + size.y())
   {
     if (has_crystal_)
     {
