@@ -23,6 +23,7 @@ bool GameImpl::init(AbstractSoundManager& sound_manager,
                     const PlayerState& player_state,
                     const LevelId previous_level)
 {
+  objects_.clear();
   sound_manager_ = &sound_manager;
   level_ = LevelLoader::load(exe_data, level, player_state);
   if (!level_)
