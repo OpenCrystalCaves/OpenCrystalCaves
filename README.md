@@ -82,6 +82,7 @@ OCC aims to be a better, modern remake of Crystal Caves while preserving the sam
 | Low gravity sign             | ![](/screenshots/lowgrav_cc.png?raw=true)                                                                           | ![](/screenshots/lowgrav_occ.png?raw=true) HEAVY RECOIL or LIGHT RECOIL                                                 |
 | Meme signs                   | ![](/screenshots/meme_cc.png?raw=true) Boomer memes                                                                 | ![](/screenshots/meme_occ.png?raw=true) 21st century memes (multiple)                                                   |
 | Space and backgrounds        | ![](/screenshots/parallax_space_cc.gif?raw=true) ![](/screenshots/parallax_main_cc.gif?raw=true) Static backgrounds | ![](/screenshots/parallax_space_occ.gif?raw=true) ![](/screenshots/parallax_main_occ.gif?raw=true) Parallax backgrounds |
+| Choosing episodes            | Load separate .exe files                                                                                            | ![](/screenshots/episode_occ.png?raw=true) Choose episode via main menu                                                 |
 
 ## Compiling OCC
 
