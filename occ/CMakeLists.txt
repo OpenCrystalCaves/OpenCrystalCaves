@@ -194,8 +194,8 @@ set(CPACK_COMPONENTS_ALL occ)
 if(WIN32)
 	set(CPACK_GENERATOR ZIP)
 	set(CPACK_PACKAGE_INSTALL_DIRECTORY "OpenCrystalCaves")
-	# Copy DLLs
-	file(GLOB DLLS "${CMAKE_SOURCE_DIR}/../dll/*.dll")
+	# CI stages SDL runtime DLLs in the build directory.
+	file(GLOB DLLS "${CMAKE_BINARY_DIR}/dll/*.dll")
 	foreach(DLL ${DLLS})
 		install(
       FILES "${DLL}" DESTINATION ${INSTALL_PREFIX}
