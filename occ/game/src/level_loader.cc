@@ -1346,6 +1346,22 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                   break;
               }
             }
+            if (!handled && x > 0)
+            {
+              handled = true;
+              // Check previous tile
+              switch (level->tile_ids[i - 1])
+              {
+                case -107:
+                  // Yellow fence (R)
+                  sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_R);
+                  flags |= TILE_RENDER_IN_FRONT;
+                  break;
+                default:
+                  handled = false;
+                  break;
+              }
+            }
             if (!handled)
             {
               LOG_INFO(
@@ -1913,6 +1929,16 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
           case -96:
             // Red lever
             level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_R));
+            break;
+          case -107:
+            // Yellow fence (mid)
+            sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_MID);
+            flags |= TILE_RENDER_IN_FRONT;
+            break;
+          case -108:
+            // Yellow fence (L)
+            sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_L);
+            flags |= TILE_RENDER_IN_FRONT;
             break;
           case -112:
             sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
