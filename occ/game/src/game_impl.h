@@ -43,8 +43,8 @@ class GameImpl : public Game
   void update_level();
   void update_player(const PlayerInput& player_input);
   void update_missile();
-  void update_enemies();
-  void update_hazards();
+  void update_enemies(unsigned game_tick);
+  void update_hazards(unsigned game_tick);
   void update_actors();
   void touch_actor(Actor& actor);
 

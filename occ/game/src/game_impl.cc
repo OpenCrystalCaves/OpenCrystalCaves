@@ -53,8 +53,6 @@ bool GameImpl::init(AbstractSoundManager& sound_manager,
 
 void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
 {
-  (void)game_tick;  // Not needed atm
-
   // Clear objects_
   objects_.clear();
 
@@ -63,8 +61,8 @@ void GameImpl::update(unsigned game_tick, const PlayerInput& player_input)
   update_level();
   update_actors();
   update_missile();
-  update_enemies();
-  update_hazards();
+  update_enemies(game_tick);
+  update_hazards(game_tick);
 
   // Hurt player when colliding enemy/hazards
   const auto prect = geometry::Rectangle(player_.position, player_.size);
@@ -404,7 +402,7 @@ void GameImpl::update_missile()
   }
 }
 
-void GameImpl::update_enemies()
+void GameImpl::update_enemies(unsigned game_tick)
 {
   // Iterate by index as we may add/remove enemies while updating
   for (int i = 0; i < static_cast<int>(level_->enemies.size()); i++)
@@ -443,10 +441,28 @@ void GameImpl::update_enemies()
       level_->enemies.erase(level_->enemies.begin() + i);
       i--;
     }
+    else
+    {
+      // Blink if time is stopped
+      // Blink faster when the effect is about to wear off
+      if (get_player().stop_tick == 0 || (get_player().stop_tick < 2 * FPS / FRAMES_PER_TICK ? (game_tick % 4) < 3 : (game_tick % 10) < 7))
+      {
+        for (const auto& sprite_pos : e->get_sprites(*level_))
+        {
+          objects_.emplace_back(sprite_pos.position,
+                                sprite_pos.sprite_id,
+                                1,
+                                false,
+                                (sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0) +
+                                  (e->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0),
+                                e->parallax());
+        }
+      }
+    }
   }
 }
 
-void GameImpl::update_hazards()
+void GameImpl::update_hazards(unsigned game_tick)
 {
   for (int i = 0; i < static_cast<int>(level_->hazards.size());)
   {
@@ -463,15 +479,20 @@ void GameImpl::update_hazards()
     }
     else
     {
-      for (const auto& sprite_pos : h->get_sprites(*level_))
+      // Blink if time is stopped
+      // Blink faster when the effect is about to wear off
+      if (get_player().stop_tick == 0 || (get_player().stop_tick < 2 * FPS / FRAMES_PER_TICK ? (game_tick % 4) < 3 : (game_tick % 10) < 7))
       {
-        objects_.emplace_back(sprite_pos.position,
-                              sprite_pos.sprite_id,
-                              1,
-                              false,
-                              (sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0) +
-                                (h->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0),
-                              h->parallax());
+        for (const auto& sprite_pos : h->get_sprites(*level_))
+        {
+          objects_.emplace_back(sprite_pos.position,
+                                sprite_pos.sprite_id,
+                                1,
+                                false,
+                                (sprite_pos.bright ? static_cast<int>(ObjectFlags::BRIGHT) : 0) +
+                                  (h->is_render_in_front() ? static_cast<int>(ObjectFlags::RENDER_IN_FRONT) : 0),
+                                h->parallax());
+        }
       }
       i++;
     }
