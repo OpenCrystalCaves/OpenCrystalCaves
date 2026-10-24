@@ -128,6 +128,7 @@ class VolcanoEjecta : public Actor
                       [[maybe_unused]] const geometry::Rectangle& player_rect,
                       [[maybe_unused]] Level& level) override
   {
+    // TODO: volcano shouldn't be constantly erupting
     frame_++;
     if (frame_ >= 16)
     {

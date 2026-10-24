@@ -42,6 +42,7 @@ Features that are missing:
   - hitting air machine
 - Player hurt sound
 - Enemy hurt flash effect
+- Volcano ejecta is constant
 
 Known bugs:
 

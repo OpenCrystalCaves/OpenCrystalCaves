@@ -148,32 +148,6 @@ void GameRenderer::render_background() const
   // MAIN_LEVEL has some special things that needs to be rendered
   if (game_->get_level().level_id == LevelId::MAIN_LEVEL)
   {
-    // Might be cleaner to have this in a dedicated struct for MainLevel stuff
-
-    static bool volcano_active = false;
-    static unsigned volcano_tick_start = 0u;
-
-    // Update volcano
-    if (volcano_active && game_tick_ - volcano_tick_start >= 81u)
-    {
-      volcano_active = false;
-      volcano_tick_start = game_tick_;
-    }
-    else if (!volcano_active && game_tick_ - volcano_tick_start >= 220u)
-    {
-      volcano_active = true;
-      volcano_tick_start = game_tick_;
-    }
-
-    // Render volcano fire if active
-    if (volcano_active)
-    {
-      const auto sprite_id_1 = 752 + ((game_tick_ - volcano_tick_start) / 3) % 4;
-      render_tile(sprite_id_1, {29 * SPRITE_W, 2 * SPRITE_H});
-      const auto sprite_id_2 = 748 + ((game_tick_ - volcano_tick_start) / 3) % 4;
-      render_tile(sprite_id_2, {30 * SPRITE_W, 2 * SPRITE_H});
-    }
-
     if (game_->get_level().show_player_controls)
     {
       // Movement
