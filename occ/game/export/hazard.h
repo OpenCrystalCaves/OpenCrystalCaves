@@ -300,11 +300,15 @@ class CorpseSlime : public Hazard
   // ⬛🟩🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚⬛⬛
   // Hurts player if they step on it; created by dead snake/tentacle
  public:
-  CorpseSlime(geometry::Position position, Sprite sprite) : Hazard(position), sprite_(sprite) {}
+  CorpseSlime(geometry::Position position, Sprite sprite)
+    : Hazard(position + geometry::Position{2, 12}, geometry::Size{12, 4}),
+      sprite_(sprite)
+  {
+  }
 
   virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
   {
-    return {{position, static_cast<int>(sprite_), false}};
+    return {{position - geometry::Position{2, 12}, static_cast<int>(sprite_), false}};
   }
   virtual TouchType on_touch([[maybe_unused]] const Player& player,
                              [[maybe_unused]] AbstractSoundManager& sound_manager,

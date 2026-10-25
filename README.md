@@ -51,7 +51,6 @@ Known bugs:
 - Can hear hammers even when offscreen
 - Enemies can see player even when offscreen
 - Noclip broken
-- Slime hitbox too big
 
 ## Differences with Crystal Caves
 
