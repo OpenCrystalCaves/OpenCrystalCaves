@@ -20,7 +20,7 @@ enum class SoundType : int
   SOUND_LASER_FIRE,
   SOUND_UNKNOWNG,
   SOUND_STOP,
-  SOUND_UNKNOWNI,
+  SOUND_UNKNOWNI, // Sounds like apogee but higher?
   SOUND_SWITCH,
   SOUND_LEVER,
   SOUND_BLUE_MUSHROOM,

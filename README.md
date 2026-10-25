@@ -43,6 +43,7 @@ Features that are missing:
 - Player hurt sound
 - Enemy hurt flash effect
 - Volcano ejecta is constant
+- Death animations
 
 Known bugs:
 
