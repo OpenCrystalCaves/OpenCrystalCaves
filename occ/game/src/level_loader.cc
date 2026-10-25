@@ -172,7 +172,7 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_PLATFORM_BLUE,
    },
    Sprite::SPRITE_CRYSTAL_1_R},
-  {{},
+  {{LevelId::LEVEL_1},
    {
      // Intro 1-2
      Sprite::SPRITE_BLOCK_PEBBLE_NW,
@@ -1188,7 +1188,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             bool handled = false;
 
             // Check tile above for continuation tile, unless it's the first row
-            if (i - level->width >= level->width)
+            if (i >= level->width)
             {
               handled = true;
               switch (level->tile_ids[i - level->width])
@@ -1671,6 +1671,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             // Bat
             level->enemies.emplace_back(new Bat(geometry::Position{x * 16, y * 16}));
             break;
+          case -4:
+            // Nukage
+            level->hazards.emplace_back(new Nukage(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_NUKAGE_1));
+            break;
           case -5:
             sprite = static_cast<int>(Sprite::SPRITE_BARREL_BROKEN);
             flags |= TILE_SOLID_TOP;
@@ -1939,6 +1943,14 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
             // Yellow fence (L)
             sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_L);
             flags |= TILE_RENDER_IN_FRONT;
+            break;
+          case -110:
+            // Nukage with a bone
+            level->hazards.emplace_back(new Nukage(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_NUKAGE_BONE));
+            break;
+          case -111:
+            // Nukage
+            level->hazards.emplace_back(new Nukage(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_NUKAGE_2));
             break;
           case -112:
             sprite = static_cast<int>(Sprite::SPRITE_COLUMN);

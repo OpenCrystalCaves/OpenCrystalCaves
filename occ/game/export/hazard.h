@@ -739,3 +739,39 @@ class FallingSign : public Hazard
   bool landed_ = false;
   std::vector<Sprite> sprites_;
 };
+
+class Nukage : public Hazard
+{
+  // ➖➖➖➖🦚🟩🟩🦚➖➖➖➖➖➖➖➖
+  // ➖➖➖🦚🟩🟩🟩🟩🦚➖➖➖🦚🟩🟩🟩
+  // 🟩🟩🟩🟩🦚🦚🦚🦚🟩🟩🟩🟩🟩🦚🦚🦚
+  // 🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚
+  // 🦚🦚🦚🦚🟩⚫🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚
+  // 🦚🦚🦚🟩🦚🟩⚫🦚🦚🦚🦚🦚🦚🦚🦚🦚
+  // 🦚🦚🦚🟩🦚🟩⚫🦚🦚🦚🦚🦚🦚🦚🦚🦚
+  // 🦚🦚🦚🦚🟩⚫🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚
+  // 🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚
+  // 🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚
+  // 🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚
+  // 🦚🦚🦚🟩⚫🦚🦚🦚🦚🦚🟩⚫🦚🦚🦚🦚
+  // 🦚🦚🟩🟩🟩⚫🦚🦚🦚🟩🦚🟩⚫🦚🦚🦚
+  // 🦚🦚🦚🟩⚫🦚🦚🦚🦚🟩🦚🟩⚫🦚🦚🦚
+  // 🦚🦚🦚🦚🦚🦚🦚🦚🦚🟩🟩🟩⚫🦚🦚🦚
+  // 🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚🦚
+  // Kills player on touch
+ public:
+  Nukage(geometry::Position position, const Sprite sprite) : Hazard(position, geometry::Size(16, 16)), sprite_(sprite) {}
+  virtual TouchType on_touch([[maybe_unused]] const Player& player,
+                             [[maybe_unused]] AbstractSoundManager& sound_manager,
+                             [[maybe_unused]] Level& level) override
+  {
+    return TouchType::TOUCH_TYPE_DIE;
+  }
+  virtual std::vector<ObjectDef> get_sprites([[maybe_unused]] const Level& level) const override
+  {
+    return {{position, static_cast<int>(sprite_), false}};
+  }
+
+ private:
+  Sprite sprite_;
+};
