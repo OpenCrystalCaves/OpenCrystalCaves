@@ -354,10 +354,47 @@ enum class TileMode
   PLANET_SECOND_ROW,
 };
 
+struct TileResults
+{
+  std::unique_ptr<Actor> actor;
+  std::unique_ptr<Enemy> enemy;
+  std::unique_ptr<Hazard> hazard;
+  std::unique_ptr<MovingPlatform> moving_platform;
+  std::unique_ptr<Entrance> entrance;
+  std::unique_ptr<Exit> exit;
+  Tile tile;
+  bool tile_unknown = false;
+  TileMode mode;
+  bool is_crystal = false;
+  bool is_player_spawn = false;
+  bool is_reverse_gravity = false;
+  bool is_low_gravity = false;
+};
+
+TileResults decode_tile(TileMode mode,
+                        const PlayerState& state,
+                        int tile_id,
+                        const int i,
+                        const int w,
+                        const int h,
+                        LevelId level_id,
+                        const std::vector<int>& tile_ids,
+                        const EpisodeDef& episode_def,
+                        const geometry::Position position,
+                        int& volcano_sprite,
+                        int& sprite_concrete,
+                        int& entrance_level,
+                        Caterpillar*& caterpillar,
+                        Earth*& earth,
+                        bool& is_stars_row,
+                        bool& is_horizon_row,
+                        bool& falling_rocks,
+                        int& switch_flags);
+
 std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, const PlayerState& state)
 {
   LOG_INFO("Loading level %d", static_cast<int>(level_id));
-  const EpisodeDef& episodeDef = episodes[exe_data.episode - 1];
+  const EpisodeDef& episode_def = episodes[exe_data.episode - 1];
   // Find the location in exe data of the level
   const char* ptr = exe_data.data.c_str() + levelLoc;
   int l;
@@ -368,7 +405,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       break;
     }
     // Skip this level's rows
-    for (int row = 0; row < episodeDef.levelRows[l]; row++)
+    for (int row = 0; row < episode_def.levelRows[l]; row++)
     {
       const size_t len = *ptr;
       ptr++;
@@ -387,7 +424,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
 
   // Read the tile ids of the level
   level->width = 0;
-  if (episodeDef.levelRows[l] == 23)
+  if (episode_def.levelRows[l] == 23)
   {
     // Some levels have a missing first row
     LOG_DEBUG("%s", extraRow.c_str());
@@ -401,7 +438,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   {
     // Space levels have a garbage first row, and we want to add extra rows
     // above and below
-    const int extraRows = 24 - episodeDef.levelRows[l];
+    const int extraRows = 24 - episode_def.levelRows[l];
     for (int i = 0; i < extraRows / 2 + 1; i++)
     {
       LOG_DEBUG("%s", emptyRow.c_str());
@@ -412,7 +449,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       }
     }
   }
-  for (int row = 0; row < episodeDef.levelRows[l]; row++)
+  for (int row = 0; row < episode_def.levelRows[l]; row++)
   {
     const int len = *ptr;
     if (level->width == 0)
@@ -436,7 +473,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   // Insert extra rows below for space levels
   if (level->is_space())
   {
-    const int extraRows = 24 - episodeDef.levelRows[l];
+    const int extraRows = 24 - episode_def.levelRows[l];
     for (int i = 0; i < (extraRows + 1) / 2; i++)
     {
       LOG_DEBUG("%s", emptyRow.c_str());
@@ -447,20 +484,17 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       }
     }
   }
-  level->height = episodeDef.levelRows[l];
-  if (episodeDef.levelRows[l] == 23)
+  level->height = episode_def.levelRows[l];
+  if (episode_def.levelRows[l] == 23)
   {
     level->height++;
   }
   else if (level->is_space())
   {
-    const int extraRows = 24 - episodeDef.levelRows[l];
+    const int extraRows = 24 - episode_def.levelRows[l];
     level->height += extraRows;
   }
-  const auto background = episodeDef.levelBGs[static_cast<int>(level_id)];
-  const auto block_sprite = episodeDef.blockColors[static_cast<int>(level_id)];
-  const bool block_solid = block_sprite != Sprite::SPRITE_BLOCK_GREEN_NW;
-  const int bump_sprite = static_cast<int>(episodeDef.bump_platforms[static_cast<int>(level_id)]);
+  const auto background = episode_def.levelBGs[static_cast<int>(level_id)];
   Earth* earth = nullptr;
 
   bool is_stars_row = false;
@@ -498,7 +532,26 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
     {
       continue;
     }
-    Tile tile;
+    // Decode tile ids from exe data
+    auto results = decode_tile(mode,
+                               state,
+                               tile_id,
+                               i,
+                               level->width,
+                               level->height,
+                               level_id,
+                               level->tile_ids,
+                               episode_def,
+                               geometry::Position{x * 16, y * 16},
+                               volcano_sprite,
+                               sprite_concrete,
+                               entrance_level,
+                               caterpillar,
+                               earth,
+                               is_stars_row,
+                               is_horizon_row,
+                               falling_rocks,
+                               level->switch_flags);
     int bg = static_cast<int>(std::get<0>(background));
     if (is_stars_row)
     {
@@ -514,1557 +567,55 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       const auto bgsize = std::get<1>(background);
       bg = bg + (((y + 1) % bgsize.y()) * 4) + ((x - std::get<2>(background)) % bgsize.x());
     }
-    // Decode tile ids from exe data
-    int sprite = -1;
-    int sprite_count = 1;
-    int flags = 0;
-    switch (mode)
+    if (results.tile_unknown)
     {
-      case TileMode::BUMPABLE_PLATFORM:
-        switch (tile_id)
-        {
-          case 'd':
-          case -103:
-            level->actors.emplace_back(
-              new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite + 1), tile_id == -103));
-            break;
-          case 'n':
-          case -102:
-            level->actors.emplace_back(
-              new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite + 2), tile_id == -102));
-            mode = TileMode::NONE;
-            break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::SIGN:
-        switch (tile_id)
-        {
-          case '-':
-            // [- = hanging platform
-            sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_2);
-            flags |= TILE_SOLID;
-            mode = TileMode::NONE;
-            break;
-          case '1':
-            // [1 = reverse gravity sign
-            sprite = static_cast<int>(Sprite::SPRITE_REVERSE_GRAVITY_2);
-            flags |= TILE_SOLID_TOP;
-            mode = TileMode::NONE;
-            break;
-          case '2':
-            // [2 = low gravity sign
-            sprite = static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_2);
-            flags |= TILE_SOLID_TOP;
-            mode = TileMode::NONE;
-            break;
-          case '3':
-            // [3 = kilroy sign
-            sprite = static_cast<int>(Sprite::SPRITE_KILROY_2);
-            mode = TileMode::NONE;
-            break;
-          case '4':
-            // [4n = winners drugs sign
-            sprite = static_cast<int>(Sprite::SPRITE_WINNERS_2);
-            flags |= TILE_SOLID_TOP;
-            break;
-          case '5':
-            // [5 = trading post sign
-            sprite = static_cast<int>(Sprite::SPRITE_TRADING_POST_2);
-            mode = TileMode::NONE;
-            break;
-          case ':':
-            // [: = pipe top
-            sprite = static_cast<int>(Sprite::SPRITE_PIPE_TOP_R);
-            flags |= TILE_SOLID;
-            mode = TileMode::NONE;
-            break;
-          case ';':
-            // [; = pipe
-            sprite = static_cast<int>(Sprite::SPRITE_PIPE_R);
-            flags |= TILE_SOLID;
-            mode = TileMode::NONE;
-            break;
-          case 'A':
-            // [A = planet
-            sprite = static_cast<int>(Sprite::SPRITE_PLANET_UR);
-            mode = TileMode::NONE;
-            break;
-          case 'B':
-            // [B = trading planet
-            sprite = static_cast<int>(Sprite::SPRITE_TRADING_PLANET_2);
-            mode = TileMode::NONE;
-            break;
-          case 'd':
-            // [d = danger sign
-            sprite = static_cast<int>(Sprite::SPRITE_DANGER_2);
-            flags |= TILE_SOLID_TOP;
-            mode = TileMode::NONE;
-            break;
-          case 'D':
-            // [D = danger sign (falls)
-            mode = TileMode::NONE;
-            break;
-          case 'f':
-            // [f = falling rocks sign
-            sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_2);
-            flags |= TILE_SOLID_TOP;
-            mode = TileMode::NONE;
-            break;
-          case 'm':
-            // [m = mine sign
-            sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_2);
-            flags |= TILE_RENDER_IN_FRONT;
-            mode = TileMode::NONE;
-            break;
-          case 'n':
-            sprite = static_cast<int>(Sprite::SPRITE_WINNERS_3);
-            flags |= TILE_SOLID_TOP;
-            mode = TileMode::NONE;
-            break;
-          case 'r':
-            // [r = red crate
-            sprite = static_cast<int>(Sprite::SPRITE_RED_CRATE_2);
-            flags |= TILE_SOLID_TOP;
-            mode = TileMode::NONE;
-            break;
-          case '#':  // [# = 2x2 grille
-            sprite = static_cast<int>(Sprite::SPRITE_GRILLE_2);
-            mode = TileMode::NONE;
-            break;
-          case '*':  // [* = 2x2 gear
-            sprite = static_cast<int>(Sprite::SPRITE_GEAR_2);
-            mode = TileMode::NONE;
-            break;
-          case '^':  // [^ = hanging platform hoist
-            sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_HOIST_2);
-            mode = TileMode::NONE;
-            break;
-          case '|':
-            // [| = Hanging platform cable
-            sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_CABLE_2);
-            mode = TileMode::NONE;
-            break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::WOOD_STRUT:
-        switch (tile_id)
-        {
-          case 'n':
-            sprite = static_cast<int>(Sprite::SPRITE_WOOD_STRUT_2);
-            mode = TileMode::NONE;
-            break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::WOOD_PILLAR:
-        switch (tile_id)
-        {
-          case 'n':
-            sprite = static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_2);
-            mode = TileMode::NONE;
-            break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::VOLCANO:
-        level->actors.emplace_back(
-          new BasicTile(geometry::Position{x * 16 + VOLCANO_DX, y * 16}, static_cast<Sprite>(volcano_sprite), VOLCANO_PARALLAX));
-        volcano_sprite++;
-        if (level->tile_ids[i + 1] != 'n')
-        {
-          mode = TileMode::NONE;
-          volcano_sprite = -1;
-        }
-        break;
-      case TileMode::EJECTA:
-        level->actors.emplace_back(new VolcanoEjecta({x * 16, y * 16}, Sprite::SPRITE_VOLCANO_EJECTA_L_1));
-        mode = TileMode::NONE;
-        break;
-      case TileMode::EXIT:
-        sprite = static_cast<int>(Sprite::SPRITE_EXIT_TOP_RIGHT_1);
-        flags |= TILE_SOLID;
-        mode = TileMode::NONE;
-        break;
-      case TileMode::COLUMN:
-        flags |= TILE_SOLID_TOP;
-        if (tile_id == 'n')
-        {
-          sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD_R);
-          mode = TileMode::NONE;
-        }
-        else
-        {
-          sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD);
-        }
-        break;
-      case TileMode::CRATE:
-        flags |= TILE_SOLID_TOP;
-        switch (tile_id)
-        {
-          case 'b':
-            sprite = static_cast<int>(Sprite::SPRITE_CRATE_U1);
-            break;
-          case 'g':
-            sprite = static_cast<int>(Sprite::SPRITE_CRATE_U1);
-            break;
-          case 'n':
-            if (level->tile_ids[i + 1] != 'n')
-            {
-              sprite = static_cast<int>(Sprite::SPRITE_CRATE_UR);
-              mode = TileMode::NONE;
-            }
-            else
-            {
-              sprite = static_cast<int>(Sprite::SPRITE_CRATE_U2);
-            }
-            break;
-          case 'y':
-            sprite = static_cast<int>(Sprite::SPRITE_CRATE_UR);
-            mode = TileMode::NONE;
-            break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::CRATE_SECOND_ROW:
-        switch (level->tile_ids[i - level->width])
-        {
-          case 'n':
-            if (level->tile_ids[i + 1] != 'n')
-            {
-              sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
-              mode = TileMode::NONE;
-            }
-            else
-            {
-              sprite = static_cast<int>(Sprite::SPRITE_CRATE_D2);
-            }
-            break;
-          case 'y':
-            sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
-            mode = TileMode::NONE;
-            break;
-          default:
-            sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
-            break;
-        }
-        break;
-      case TileMode::HAMMER_RAIL:
-        switch (tile_id)
-        {
-          case 'n':
-            if (level->tile_ids[i + 1] != 'n')
-            {
-              mode = TileMode::NONE;
-            }
-            sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_2);
-            break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::HAMMER:
-        switch (tile_id)
-        {
-          case 'n':
-            if (level->tile_ids[i + 1] != 'n')
-            {
-              mode = TileMode::NONE;
-            }
-            sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_2);
-            break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::GLASS_BALL:
-        switch (tile_id)
-        {
-          case 'n':
-            if (level->tile_ids[i + 1] != 'n')
-            {
-              mode = TileMode::NONE;
-            }
-            sprite = static_cast<int>(level->tile_ids[i - 1] == 'n' ? Sprite::SPRITE_GLASS_BALL_4 : Sprite::SPRITE_GLASS_BALL_2);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::CATERPILLAR:
-        switch (tile_id)
-        {
-          case 'P':  // fallthrough
-          case 'n':
-          {
-            auto new_caterpillar = new Caterpillar(geometry::Position{x * 16, y * 16});
-            if (caterpillar)
-            {
-              caterpillar->set_child(*new_caterpillar);
-            }
-            caterpillar = new_caterpillar;
-            level->enemies.emplace_back(caterpillar);
-            if (level->tile_ids[i + 1] != 'n')
-            {
-              mode = TileMode::NONE;
-              caterpillar = nullptr;
-            }
-          }
-          break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::TRI_ENEMY:
-        if (level->tile_ids[i + 1] != 'n')
-        {
-          mode = TileMode::NONE;
-        }
-        break;
-      case TileMode::AIR_PIPE:
-        // Skip this tile
-        mode = TileMode::NONE;
-        break;
-      case TileMode::METAL_CRATE:
-        flags |= TILE_SOLID_TOP;
-        sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_UR);
-        mode = TileMode::NONE;
-        break;
-      case TileMode::HAZARD_CRATE:
-        flags |= TILE_SOLID_TOP;
-        sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_UR);
-        mode = TileMode::NONE;
-        break;
-      case TileMode::ROCKY_PLATFORM:
-        switch (tile_id)
-        {
-          case 'j':
-            // Rocky platform (mid)
-            sprite = static_cast<int>(Sprite::SPRITE_ROCKY_PLATFORM_MID);
-            flags |= TILE_SOLID_TOP;
-            break;
-          case 'n':
-            // Rocky platform (right)
-            sprite = static_cast<int>(Sprite::SPRITE_ROCKY_PLATFORM_R);
-            flags |= TILE_SOLID_TOP;
-            mode = TileMode::NONE;
-            break;
-          default:
-            break;
-        }
-        break;
-      case TileMode::SECTOR_SIGN:
-        sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_TOP_2);
-        flags |= TILE_SOLID_TOP | TILE_RENDER_IN_FRONT;
-        mode = TileMode::NONE;
-        break;
-      case TileMode::SECTOR_SIGN_SECOND_ROW:
-        sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_BOTTOM_2);
-        flags |= TILE_RENDER_IN_FRONT;
-        mode = TileMode::NONE;
-        break;
-      case TileMode::STAND_MIXER:
-        sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_TOP_2);
-        flags |= TILE_RENDER_IN_FRONT;
-        mode = TileMode::NONE;
-        break;
-      case TileMode::STAND_MIXER_SECOND_ROW:
-        sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_BOTTOM_2);
-        flags |= TILE_RENDER_IN_FRONT | TILE_SOLID_TOP;
-        mode = TileMode::NONE;
-        break;
-      case TileMode::PLANET_SECOND_ROW:
-        sprite = static_cast<int>(Sprite::SPRITE_PLANET_DR);
-        mode = TileMode::NONE;
-        break;
-      default:
-        switch (tile_id)
-        {
-          case ' ':
-            // Special case for finale - show planet at player spawn
-            if (level_id == LevelId::FINALE && x > 0 && y > 0)
-            {
-              if (level->tile_ids[i - 1] == 'Y')
-              {
-                sprite = static_cast<int>(Sprite::SPRITE_PLANET_UR);
-              }
-              else if (level->tile_ids[i - level->width] == 'Y')
-              {
-                sprite = static_cast<int>(Sprite::SPRITE_PLANET_DL);
-              }
-              else if (level->tile_ids[i - 1 - level->width] == 'Y')
-              {
-                sprite = static_cast<int>(Sprite::SPRITE_PLANET_DR);
-              }
-            }
-            break;
-          case '!':
-            // Faucet
-            level->hazards.emplace_back(new Faucet(geometry::Position{x * 16, y * 16}));
-            break;
-          case '"':
-            // Ceiling moss 2
-            sprite = static_cast<int>(Sprite::SPRITE_CEILING_MOSS_2);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case '#':
-            // Spider
-            level->enemies.emplace_back(new Spider(geometry::Position{x * 16, y * 16}));
-            break;
-          case '%':
-            // Pipe (V)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_V);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case '&':
-            // Robot
-            level->enemies.emplace_back(new Robot(geometry::Position{x * 16, y * 16}));
-            break;
-          case '(':
-            // Stalactite 1
-            level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALACTITE_1));
-            break;
-          case ')':
-            // Stalactite 2
-            level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALACTITE_2));
-            break;
-          case '*':
-            // Rockman
-            level->enemies.emplace_back(new Rockman(geometry::Position{x * 16, y * 16}));
-            break;
-          case '$':
-            // Air tank (top)
-            level->actors.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, true));
-            break;
-          case ':':
-            // Ceiling moss 1
-            sprite = static_cast<int>(Sprite::SPRITE_CEILING_MOSS_1);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case '=':
-            // Wall monster (left)
-            level->enemies.emplace_back(new WallMonster(geometry::Position{x * 16, y * 16}, true));
-            break;
-            // Crystals
-          case '+':
-            level->actors.emplace_back(
-              new Crystal(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(static_cast<int>(episodeDef.crystal_sprite) + 1)));
-            level->crystals++;
-            level->has_crystals = true;
-            break;
-          case 'b':
-            level->actors.emplace_back(
-              new Crystal(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(static_cast<int>(episodeDef.crystal_sprite) + 2)));
-            level->crystals++;
-            level->has_crystals = true;
-            break;
-          case 'R':
-            level->actors.emplace_back(new Crystal(geometry::Position{x * 16, y * 16}, episodeDef.crystal_sprite));
-            level->crystals++;
-            level->has_crystals = true;
-            break;
-          case 'c':
-            level->actors.emplace_back(
-              new Crystal(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(static_cast<int>(episodeDef.crystal_sprite) + 3)));
-            level->crystals++;
-            level->has_crystals = true;
-            break;
-          case '-':
-            // Pipe (H)
-            // Add one way platform as sometimes V pipe also occurs together
-            level->actors.emplace_back(new OneWayPlatform(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_GPIPE_H));
-            break;
-          case '.':
-            // Pipe (L)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_L);
-            flags |= TILE_SOLID;
-            break;
-            // Ammo
-          case 'G':
-            level->actors.emplace_back(new Ammo(geometry::Position{x * 16, y * 16}));
-            break;
-            // Blocks
-          case 'r':
-            sprite = static_cast<int>(block_sprite);  // NW
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            else
-            {
-              flags |= TILE_SOLID_TOP;
-            }
-            break;
-          case 't':
-            sprite = static_cast<int>(block_sprite) + 1;  // N
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            else
-            {
-              flags |= TILE_SOLID_TOP;
-            }
-            break;
-          case 'y':
-            sprite = static_cast<int>(block_sprite) + 2;  // NE
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            else
-            {
-              flags |= TILE_SOLID_TOP;
-            }
-            break;
-          case '2':
-            if (level->tile_ids[i + level->width] != '6')
-            {
-              sprite = static_cast<int>(block_sprite) + 5;  // S
-            }
-            else
-            {
-              sprite = static_cast<int>(block_sprite) + 9;  // MID
-            }
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            break;
-          case '4':
-            if (level->tile_ids[i - 1] != '2')
-            {
-              sprite = static_cast<int>(block_sprite) + 8;  // W
-            }
-            else
-            {
-              sprite = static_cast<int>(block_sprite) + 9;  // MID
-            }
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            break;
-          case '5':
-            sprite = static_cast<int>(block_sprite) + 9;  // MID
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            break;
-          case '6':
-            sprite = static_cast<int>(block_sprite) + 10;  // E
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            break;
-          case '8':
-            // Big chain
-            sprite = static_cast<int>(Sprite::SPRITE_BIG_CHAIN);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case '9':
-            // Mine cart
-            level->enemies.emplace_back(new MineCart(geometry::Position{x * 16, y * 16}));
-            break;
-          case '?':
-            // Tentacle
-            level->enemies.emplace_back(new Tentacle(geometry::Position{x * 16, y * 16}));
-            break;
-          case 'a':
-            // Moving left laser
-            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true, true));
-            break;
-          case 'B':
-            // Clear block
-            level->actors.emplace_back(new ClearBlock(geometry::Position{x * 16, y * 16}));
-            break;
-          case 'f':
-            sprite = static_cast<int>(block_sprite) + 4;  // SW
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            break;
-          case 'F':
-            level->hazards.emplace_back(new Flame(geometry::Position{x * 16, y * 16}));
-            break;
-          case 'g':
-            sprite = static_cast<int>(block_sprite) + 5;  // S
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            break;
-          case 'h':
-            sprite = static_cast<int>(block_sprite) + 6;  // SE
-            if (block_solid)
-            {
-              flags |= TILE_SOLID;
-            }
-            break;
-            // Bumpable platforms
-          case 'D':
-          case -104:
-            // Keep adding bumpable platforms until we get an 'n'
-            level->actors.emplace_back(
-              new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite), tile_id == -104));
-            mode = TileMode::BUMPABLE_PLATFORM;
-            break;
-          case 'd':
-          case -103:
-            level->actors.emplace_back(
-              new BumpPlatform(geometry::Position{x * 16, y * 16}, static_cast<Sprite>(bump_sprite + 1), tile_id == -103));
-            mode = TileMode::BUMPABLE_PLATFORM;
-            break;
-          case 'A':
-            // Green slime
-            level->enemies.emplace_back(new Slime(geometry::Position{x * 16, y * 16}));
-            break;
-          case 'C':
-            // Cycle through concrete sprites
-            sprite = sprite_concrete;
-            if (sprite_concrete == static_cast<int>(Sprite::SPRITE_CONCRETE))
-            {
-              sprite_concrete = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
-            }
-            else
-            {
-              sprite_concrete--;
-            }
-            flags |= TILE_SOLID;
-            break;
-          case 'H':
-            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, true, false});
-            break;
-          case 'i':
-            // Stop sign
-            level->actors.emplace_back(new StopSign(geometry::Position{x * 16, y * 16}));
-            break;
-          case 'I':
-            // Thorn
-            level->hazards.emplace_back(new Thorn(geometry::Position{x * 16, y * 16}));
-            break;
-          case 'J':
-            // Flame spout
-            sprite = static_cast<int>(Sprite::SPRITE_FLAME_SPOUT);
-            flags |= TILE_SOLID;
-            break;
-          case 'k':
-            sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_V);
-            flags |= TILE_SOLID;
-            break;
-          case 'K':
-            sprite = static_cast<int>(Sprite::SPRITE_CONCRETE);
-            flags |= TILE_SOLID;
-            break;
-          case 'l':
-            sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
-            flags |= TILE_SOLID;
-            break;
-          case 'L':
-            sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_H);
-            flags |= TILE_SOLID;
-            break;
-          case 'm':
-            // Moving earth
-            earth = new Earth(geometry::Position{x * 16, y * 16}, true);
-            level->actors.emplace_back(earth);
-            break;
-          case 'M':
-            // Ostrich
-            level->enemies.emplace_back(new Ostrich(geometry::Position{x * 16, y * 16}));
-            break;
-          case 'n':
-          {
-            bool handled = false;
-
-            // Check tile above for continuation tile, unless it's the first row
-            if (i >= level->width)
-            {
-              handled = true;
-              switch (level->tile_ids[i - level->width])
-              {
-                case '[':
-                  switch (level->tile_ids[i - level->width + 1])
-                  {
-                    case '#':
-                      // Bottom left of grille
-                      sprite = static_cast<int>(Sprite::SPRITE_GRILLE_3);
-                      break;
-                    case '*':
-                      // Bottom left of gear
-                      sprite = static_cast<int>(Sprite::SPRITE_GEAR_3);
-                      break;
-                    case 'b':  // Fallthrough
-                    case 'g':  // Fallthrough
-                    case 'y':
-                      // Bottom left of crate
-                      sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
-                      mode = TileMode::CRATE_SECOND_ROW;
-                      break;
-                    case 'A':  // Fallthrough
-                    case 'B':
-                      // Bottom left of planet
-                      sprite = static_cast<int>(Sprite::SPRITE_PLANET_DL);
-                      mode = TileMode::PLANET_SECOND_ROW;
-                      break;
-                    case 'c':
-                      // Bottom left of hazard crate
-                      sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_DL);
-                      break;
-                    case 'x':
-                      // Bottom left of metal crate
-                      sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_DL);
-                      break;
-                    default:
-                      break;
-                  }
-                  break;
-                case '#':
-                  // Bottom right of grille
-                  sprite = static_cast<int>(Sprite::SPRITE_GRILLE_4);
-                  break;
-                case '*':
-                  // Bottom right of gear
-                  sprite = static_cast<int>(Sprite::SPRITE_GEAR_4);
-                  break;
-                case '$':
-                  // Air tank (bottom)
-                  level->actors.emplace_back(new AirTank(geometry::Position{x * 16, y * 16}, false));
-                  break;
-                case 'c':
-                  // Bottom right of hazard crate
-                  sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_DR);
-                  break;
-                case 'x':
-                  // Bottom right of metal crate
-                  sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_DR);
-                  break;
-                case 'i':
-                  // Stop sign pole
-                  sprite = static_cast<int>(Sprite::SPRITE_STOP_POLE);
-                  break;
-                case 'n':
-                  // Keep looking left to see what we're continuing from
-                  for (int ci = i - level->width - 1; ci >= 0; ci--)
-                  {
-                    switch (level->tile_ids[ci])
-                    {
-                      case 'X':
-                        // Bottom-right of exit
-                        sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
-                        flags |= TILE_ANIMATED | TILE_SOLID;
-                        sprite_count = 4;
-                        break;
-                      default:
-                        break;
-                    }
-                    if (level->tile_ids[ci] != 'n')
-                    {
-                      break;
-                    }
-                  }
-                  break;
-                case 'T':
-                  // Column below head
-                  sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
-                  break;
-                case 'U':
-                  // Hammer
-                  sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
-                  mode = TileMode::HAMMER;
-                  break;
-                case 'X':
-                  // Bottom-left of exit
-                  // Ignore - we've already added an exit
-                  break;
-                case -8:
-                  // Glass ball thing
-                  sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_3);
-                  mode = TileMode::GLASS_BALL;
-                  flags |= TILE_RENDER_IN_FRONT;
-                  break;
-                case -32:
-                  // Bottom of stand mixer
-                  sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_BOTTOM_1);
-                  flags |= TILE_RENDER_IN_FRONT | TILE_SOLID_TOP;
-                  mode = TileMode::STAND_MIXER_SECOND_ROW;
-                  break;
-                case -91:
-                  // Bottom of blue door; skip as we should have added it using the top
-                  break;
-                case -92:
-                  // Bottom of green door; skip as we should have added it using the top
-                  break;
-                case -93:
-                  // Bottom of red door; skip as we should have added it using the top
-                  break;
-                case -128:
-                  // Bottom of sector sign
-                  sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_BOTTOM_1);
-                  flags |= TILE_RENDER_IN_FRONT;
-                  mode = TileMode::SECTOR_SIGN_SECOND_ROW;
-                  break;
-                default:
-                  handled = false;
-                  break;
-              }
-            }
-
-            if (!handled && i < level->width * (level->height - 1))
-            {
-              handled = true;
-              // Check below for continuation tile
-              switch (level->tile_ids[i + level->width])
-              {
-                case -120:
-                  // Hanging leaves
-                  sprite = static_cast<int>(Sprite::SPRITE_HANGING_LEAVES);
-                  flags |= TILE_RENDER_IN_FRONT;
-                  break;
-                case -121:
-                  // Vine
-                  sprite = static_cast<int>(Sprite::SPRITE_VINE);
-                  flags |= TILE_RENDER_IN_FRONT;
-                  break;
-                case -122:
-                  // Small chains
-                  sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS);
-                  flags |= TILE_RENDER_IN_FRONT;
-                  break;
-                default:
-                  handled = false;
-                  break;
-              }
-            }
-            if (!handled && x > 0)
-            {
-              handled = true;
-              // Check previous tile
-              switch (level->tile_ids[i - 1])
-              {
-                case -107:
-                  // Yellow fence (R)
-                  sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_R);
-                  flags |= TILE_RENDER_IN_FRONT;
-                  break;
-                default:
-                  handled = false;
-                  break;
-              }
-            }
-            if (!handled)
-            {
-              LOG_INFO(
-                "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
-              level->tile_unknown[i] = true;
-            }
-          }
-          break;
-          case 'N':
-            level->actors.emplace_back(new Moon(geometry::Position{x * 16, y * 16}, *earth));
-            break;
-          case 'o':
-            // Inactive rockman
-            sprite = static_cast<int>(Sprite::SPRITE_ROCKMAN_R_1);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case 'p':
-            // Rocky platform
-            sprite = static_cast<int>(Sprite::SPRITE_ROCKY_PLATFORM_L);
-            flags |= TILE_SOLID_TOP;
-            mode = TileMode::ROCKY_PLATFORM;
-            break;
-          case 'q':
-            // Left laser
-            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
-            break;
-          case 's':
-            // Moving right laser
-            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false, true));
-            break;
-          case 'S':
-            // Snake
-            level->enemies.emplace_back(new Snake(geometry::Position{x * 16, y * 16}));
-            break;
-          case 'T':
-            // Hammer rail
-            sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
-            mode = TileMode::HAMMER_RAIL;
-            break;
-          case 'U':
-            // Hammer
-            sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
-            mode = TileMode::HAMMER;
-            level->hazards.emplace_back(new Hammer(geometry::Position{x * 16, y * 16}));
-            break;
-          case 'u':
-            level->actors.emplace_back(new VolcanoEjecta({x * 16, y * 16}, Sprite::SPRITE_VOLCANO_EJECTA_R_1));
-            mode = TileMode::EJECTA;
-            break;
-          case 'v':
-            // Horizontal toggle switch
-            level->actors.emplace_back(
-              new Switch(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SWITCH_OFF, SWITCH_FLAG_MOVING_PLATFORMS));
-            break;
-          case 'V':
-            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, false});
-            break;
-          case 'w':
-            // Right laser
-            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
-            break;
-          case 'W':
-            // Air Pipe
-            // WL = left facing, WR = right facing
-            level->hazards.emplace_back(new AirPipe(geometry::Position{x * 16, y * 16}, level->tile_ids[i + 1] == 'L'));
-            mode = TileMode::AIR_PIPE;
-            break;
-          case 'x':
-            // Show levels under construction with cones
-            if (!episodeDef.completedLevels.contains(static_cast<LevelId>(entrance_level)))
-            {
-              sprite = static_cast<int>(Sprite::SPRITE_CONES);
-              flags |= TILE_RENDER_IN_FRONT;
-            }
-            level->entrances.push_back({geometry::Position{x * 16, y * 16},
-                                        entrance_level,
-                                        state.levels_completed[entrance_level] ? EntranceState::COMPLETE : EntranceState::CLOSED});
-            entrance_level++;
-            break;
-          case 'X':
-            // Xn = exit
-            level->exit = std::make_unique<Exit>(geometry::Position{x * 16, y * 16});
-            mode = TileMode::EXIT;
-            break;
-          case 'Y':
-            // Player spawn
-            level->player_spawn = geometry::Position(x * 16, y * 16);
-            // Special case for finale - show planet at player spawn
-            if (level_id == LevelId::FINALE)
-            {
-              sprite = static_cast<int>(Sprite::SPRITE_PLANET_UL);
-            }
-            break;
-          case 'z':
-            if (is_horizon_row || (x == 0 && level->tile_ids[i + 1] == 'Z'))
-            {
-              // Random horizon tile
-              bg = static_cast<int>(HORIZON[rand() % HORIZON.size()]);
-              is_horizon_row = true;
-            }
-            else
-            {
-              // Random star tile
-              bg = static_cast<int>(STARS[rand() % STARS.size()]);
-              is_stars_row = true;
-            }
-            break;
-          case 'Z':
-            break;
-          case '[':
-            switch (level->tile_ids[i + 1])
-            {
-              case '-':
-                // [- = hanging platform
-                sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_1);
-                flags |= TILE_SOLID;
-                mode = TileMode::SIGN;
-                break;
-              case '1':
-                // [1 = reverse gravity sign
-                level->gravity = -GRAVITY;
-                sprite = static_cast<int>(Sprite::SPRITE_REVERSE_GRAVITY_1);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::SIGN;
-                break;
-              case '2':
-                // [2 = low gravity sign
-                // High recoil on odd levels, low recoil on even levels (just a guess)
-                level->recoil = static_cast<int>(level->level_id) & 1 ? 7 : 2;
-                sprite = static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_1);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::SIGN;
-                break;
-              case '3':
-                // [3 = kilroy sign
-                sprite = static_cast<int>(Sprite::SPRITE_KILROY_1);
-                mode = TileMode::SIGN;
-                break;
-              case '4':
-                // [4n = winners drugs sign
-                sprite = static_cast<int>(Sprite::SPRITE_WINNERS_1);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::SIGN;
-                break;
-              case '5':
-                // [5 = trading post sign
-                sprite = static_cast<int>(Sprite::SPRITE_TRADING_POST_1);
-                mode = TileMode::SIGN;
-                break;
-              case ':':
-                // [: = pipe top
-                sprite = static_cast<int>(Sprite::SPRITE_PIPE_TOP_L);
-                flags |= TILE_SOLID;
-                mode = TileMode::SIGN;
-                break;
-              case ';':
-                // [; = pipe
-                sprite = static_cast<int>(Sprite::SPRITE_PIPE_L);
-                flags |= TILE_SOLID;
-                mode = TileMode::SIGN;
-                break;
-              case '=':
-                // [=n - triceratops
-                level->enemies.emplace_back(new Triceratops(geometry::Position{x * 16, y * 16}));
-                mode = TileMode::TRI_ENEMY;
-                break;
-              case 'b':
-                // [bnn = Yellow/green crate, 4x2
-                sprite = static_cast<int>(Sprite::SPRITE_CRATE_UL);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::CRATE;
-                break;
-              case 'A':
-                // [A = planet
-                sprite = static_cast<int>(Sprite::SPRITE_PLANET_UL);
-                mode = TileMode::SIGN;
-                break;
-              case 'B':
-                // [B = trading planet
-                sprite = static_cast<int>(Sprite::SPRITE_TRADING_PLANET_1);
-                mode = TileMode::SIGN;
-                break;
-              case 'c':
-                // [c = hazard crate, 2x2
-                sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_UL);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::HAZARD_CRATE;
-                break;
-              case 'd':
-                // [d = danger sign
-                sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::SIGN;
-                break;
-              case 'D':
-                // [D = danger sign (falls)
-                level->hazards.emplace_back(
-                  new FallingSign(geometry::Position{x * 16, y * 16}, {Sprite::SPRITE_DANGER_1, Sprite::SPRITE_DANGER_2}));
-                mode = TileMode::SIGN;
-                break;
-              case 'E':
-                // [En = eye monster
-                level->enemies.emplace_back(new EyeMonster(geometry::Position{x * 16, y * 16}));
-                mode = TileMode::TRI_ENEMY;
-                break;
-              case 'f':
-                // [f = falling rocks sign
-                falling_rocks = true;
-                sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_1);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::SIGN;
-                break;
-              case 'g':
-                // [gn = Yellow/green crate, 3x2
-                sprite = static_cast<int>(Sprite::SPRITE_CRATE_UL);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::CRATE;
-                break;
-              case 'm':
-                // [m = mine sign
-                sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_1);
-                flags |= TILE_RENDER_IN_FRONT;
-                mode = TileMode::SIGN;
-                break;
-              case 'P':
-                // [P = caterpillar
-                {
-                  auto new_caterpillar = new Caterpillar(geometry::Position{x * 16, y * 16});
-                  if (caterpillar)
-                  {
-                    caterpillar->set_child(*new_caterpillar);
-                  }
-                  caterpillar = new_caterpillar;
-                  level->enemies.emplace_back(caterpillar);
-                  mode = TileMode::CATERPILLAR;
-                }
-                break;
-              case 'r':
-                // [r = red crate
-                sprite = static_cast<int>(Sprite::SPRITE_RED_CRATE_1);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::SIGN;
-                break;
-              case 'T':
-                // [Tn = Head of column
-                sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD_L);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::COLUMN;
-                break;
-              case 'x':
-                // [x = Metal crate 2x2
-                sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_UL);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::METAL_CRATE;
-                break;
-              case 'y':
-                // [y = Yellow/green crate, 2x2
-                sprite = static_cast<int>(Sprite::SPRITE_CRATE_UL);
-                flags |= TILE_SOLID_TOP;
-                mode = TileMode::CRATE;
-                break;
-              case '#':
-                // [# = 2x2 grille
-                sprite = static_cast<int>(Sprite::SPRITE_GRILLE_1);
-                mode = TileMode::SIGN;
-                break;
-              case '*':
-                // [* = 2x2 gear
-                sprite = static_cast<int>(Sprite::SPRITE_GEAR_1);
-                mode = TileMode::SIGN;
-                break;
-              case '^':
-                // [^ = Hanging platform hoist
-                sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_HOIST_1);
-                mode = TileMode::SIGN;
-                break;
-              case '|':
-                // [| = Hanging platform cable
-                sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_CABLE_1);
-                mode = TileMode::SIGN;
-                break;
-              default:
-                level->tile_unknown[i] = true;
-                break;
-            }
-            break;
-          case ']':
-            // Power
-            level->actors.emplace_back(new Power(geometry::Position{x * 16, y * 16}));
-            break;
-          case '^':
-            // Bird
-            level->enemies.emplace_back(new Bird(geometry::Position{x * 16, y * 16}));
-            break;
-          case '/':
-            level->enemies.emplace_back(new Hopper(geometry::Position{x * 16, y * 16}));
-            break;
-          case '_':
-            level->actors.emplace_back(
-              new OneWayPlatform(geometry::Position{x * 16, y * 16}, episodeDef.platforms[static_cast<int>(level_id)]));
-            break;
-          case '|':
-            // Stalactite
-            level->hazards.emplace_back(new Stalactite(geometry::Position{x * 16, y * 16}));
-            break;
-          case '~':
-            // Bat
-            level->enemies.emplace_back(new Bat(geometry::Position{x * 16, y * 16}));
-            break;
-          case -4:
-            // Nukage
-            level->hazards.emplace_back(new Nukage(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_NUKAGE_1));
-            break;
-          case -5:
-            sprite = static_cast<int>(Sprite::SPRITE_BARREL_BROKEN);
-            flags |= TILE_SOLID_TOP;
-            break;
-          case -6:
-            sprite = static_cast<int>(Sprite::SPRITE_BARREL_CRACKED);
-            flags |= TILE_SOLID_TOP;
-            break;
-          case -7:
-            sprite = static_cast<int>(Sprite::SPRITE_BARREL);
-            flags |= TILE_SOLID_TOP;
-            break;
-          case -8:
-            // Glass ball thing
-            sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_1);
-            mode = TileMode::GLASS_BALL;
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -9:
-            // Stalagmite
-            level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALAGMITE_2));
-            break;
-          case -10:
-            // Stalagmite
-            level->hazards.emplace_back(new Speleothem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_STALAGMITE_1));
-            break;
-          case -11:
-            // Shovel
-            level->actors.emplace_back(
-              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SHOVEL, SoundType::SOUND_PICKUP_GUN, 800));
-            break;
-          case -12:
-            // Pickaxe
-            level->actors.emplace_back(
-              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_PICKAXE, SoundType::SOUND_PICKUP_GUN, 5000));
-            break;
-          case -13:
-            // Snoozer
-            level->enemies.emplace_back(new Snoozer(geometry::Position{x * 16, y * 16}));
-            break;
-          case -14:
-            // Tall Green Monster
-            level->enemies.emplace_back(new Bigfoot(geometry::Position{x * 16, y * 16}));
-            break;
-          case -16:
-            if (level->tile_ids[i + 1] == 'n')
-            {
-              // Wood struts
-              sprite = static_cast<int>(Sprite::SPRITE_WOOD_STRUT_1);
-              mode = TileMode::WOOD_STRUT;
-            }
-            break;
-          case -19:
-            sprite = static_cast<int>(Sprite::SPRITE_PIPE_DR);
-            break;
-          case -20:
-            sprite = static_cast<int>(Sprite::SPRITE_PIPE_DL);
-            break;
-          case -21:
-            sprite = static_cast<int>(Sprite::SPRITE_PIPE_UL);
-            break;
-          case -22:
-            sprite = static_cast<int>(Sprite::SPRITE_PIPE_UR);
-            break;
-          case -23:
-            sprite = static_cast<int>(Sprite::SPRITE_PIPE_H);
-            break;
-          case -24:
-            sprite = static_cast<int>(Sprite::SPRITE_PIPE_V);
-            break;
-          case -25:
-            sprite = static_cast<int>(Sprite::SPRITE_MINE_PIPE);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -32:
-            // Stand mixer
-            sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_TOP_1);
-            flags |= TILE_RENDER_IN_FRONT;
-            mode = TileMode::STAND_MIXER;
-            break;
-          case -36:
-            // Static moon
-            level->actors.emplace_back(new Moon(geometry::Position{x * 16, y * 16}, *earth));
-            break;
-          case -37:
-            // Static earth
-            earth = new Earth(geometry::Position{x * 16, y * 16}, false);
-            level->actors.emplace_back(earth);
-            break;
-          case -38:
-            // Pipe (UL)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_UL);
-            flags |= TILE_SOLID;
-            break;
-          case -39:
-            // Pipe (DR)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_DR);
-            flags |= TILE_SOLID;
-            break;
-          case -40:
-            // Switch for turning off laser
-            level->actors.emplace_back(new Switch(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_SWITCH_OFF, SWITCH_FLAG_LASERS));
-            break;
-          case -41:
-            // Stopped vertical moving platform
-            level->moving_platforms.push_back({geometry::Position{x * 16, y * 16}, false, true});
-            break;
-          case -43:
-            sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
-            sprite_count = 4;
-            flags |= TILE_ANIMATED;
-            break;
-          case -47:
-            // Pipe (U)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_U);
-            flags |= TILE_SOLID_TOP | TILE_RENDER_IN_FRONT;
-            break;
-          case -48:
-            sprite = static_cast<int>(Sprite::SPRITE_METER);
-            break;
-          case -49:
-            // Pipe (D)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_D);
-            break;
-          case -50:
-            // Grass
-            sprite = static_cast<int>(Sprite::SPRITE_GRASS);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -53:
-            sprite = static_cast<int>(Sprite::SPRITE_PILLAR_1);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -54:
-            sprite = static_cast<int>(Sprite::SPRITE_PILLAR_3);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -56:
-            // Slime barrier
-            flags |= TILE_BLOCKS_SLIME;
-            break;
-          case -57:
-            sprite = static_cast<int>(Sprite::SPRITE_SIGN_UP);
-            break;
-          case -58:
-            sprite = static_cast<int>(Sprite::SPRITE_SIGN_DOWN);
-            break;
-          case -59:
-            // Pipes (H+V)
-            level->actors.emplace_back(new OneWayPlatform(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_GPIPE_H));
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_V);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -62:
-            // Pipe (UT)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_UT);
-            flags |= TILE_SOLID;
-            break;
-          case -64:
-            // Pipe (DL)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_DL);
-            flags |= TILE_SOLID;
-            break;
-          case -65:
-            // Pipe (UR)
-            sprite = static_cast<int>(Sprite::SPRITE_GPIPE_UR);
-            flags |= TILE_SOLID;
-            break;
-          case -66:
-            sprite = static_cast<int>(Sprite::SPRITE_LEDGE_L);
-            flags |= TILE_SOLID_TOP;
-            break;
-          case -67:
-            sprite = static_cast<int>(Sprite::SPRITE_LEDGE_R);
-            flags |= TILE_SOLID_TOP;
-            break;
-          case -69:
-            sprite = static_cast<int>(Sprite::SPRITE_PURPLE_MUSHROOM);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -70:
-            sprite = static_cast<int>(Sprite::SPRITE_PILLAR_2);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -77:
-            if (level->tile_ids[i + 1] == 'n')
-            {
-              // Wood pillar
-              sprite = static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_1);
-              mode = TileMode::WOOD_PILLAR;
-            }
-            break;
-          case -78:
-            sprite = static_cast<int>(Sprite::SPRITE_WOOD_V);
-            flags |= TILE_SOLID;
-            break;
-          case -79:
-            sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
-            flags |= TILE_SOLID;
-            break;
-          case -80:
-            // Hidden block
-            level->actors.emplace_back(new HiddenBlock(geometry::Position{x * 16, y * 16}));
-            break;
-          case -84:
-            // Green mushroom
-            level->actors.emplace_back(new GreenMushroom(geometry::Position{x * 16, y * 16}));
-            break;
-          case -85:
-            // Red mushroom
-            level->actors.emplace_back(new RedMushroom(geometry::Position{x * 16, y * 16}));
-            break;
-          case -86:
-            // Blue mushroom
-            level->actors.emplace_back(
-              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_MUSHROOM_BLUE, SoundType::SOUND_BLUE_MUSHROOM, 1000));
-            break;
-          case -87:
-            // Egg
-            level->actors.emplace_back(new Egg(geometry::Position{x * 16, y * 16}));
-            break;
-          case -88:
-            // Key
-            level->actors.emplace_back(new Key(geometry::Position{x * 16, y * 16}));
-            break;
-          case -89:
-            // Chest
-            level->actors.emplace_back(new Chest(geometry::Position{x * 16, y * 16}));
-            break;
-          case -90:
-            // Light switch
-            level->actors.emplace_back(new Switch(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_LIGHT_SWITCH_OFF, SWITCH_FLAG_LIGHTS));
-            // Light switch implies level is dark
-            level->switch_flags &= ~SWITCH_FLAG_LIGHTS;
-            break;
-          case -91:
-            // Top of blue door
-            level->actors.emplace_back(new Door(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_B));
-            break;
-          case -92:
-            // Top of green door
-            level->actors.emplace_back(new Door(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_G));
-            break;
-          case -93:
-            // Top of red door
-            level->actors.emplace_back(new Door(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_R));
-            break;
-          case -94:
-            // Blue lever
-            level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_B));
-            break;
-          case -95:
-            // Green lever
-            level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_G));
-            break;
-          case -96:
-            // Red lever
-            level->actors.emplace_back(new Lever(geometry::Position{x * 16, y * 16}, LeverColor::LEVER_COLOR_R));
-            break;
-          case -107:
-            // Yellow fence (mid)
-            sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_MID);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -108:
-            // Yellow fence (L)
-            sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_L);
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -110:
-            // Nukage with a bone
-            level->hazards.emplace_back(new Nukage(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_NUKAGE_BONE));
-            break;
-          case -111:
-            // Nukage
-            level->hazards.emplace_back(new Nukage(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_NUKAGE_2));
-            break;
-          case -112:
-            sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
-            break;
-          case -113:
-            if (level->tile_ids[i + 1] == 'n')
-            {
-              // -113 nnn = bottom of volcano
-              level->actors.emplace_back(
-                new BasicTile(geometry::Position{x * 16 + VOLCANO_DX, y * 16}, Sprite::SPRITE_VOLCANO_BOTTOM_1, VOLCANO_PARALLAX));
-              mode = TileMode::VOLCANO;
-              volcano_sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_BOTTOM_1) + 1;
-            }
-            break;
-          case -114:
-            if (level->tile_ids[i + 1] == 'n')
-            {
-              // -114 n = top of volcano
-              level->actors.emplace_back(
-                new BasicTile(geometry::Position{x * 16 + VOLCANO_DX, y * 16}, Sprite::SPRITE_VOLCANO_TOP_1, VOLCANO_PARALLAX));
-              mode = TileMode::VOLCANO;
-              volcano_sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_1) + 1;
-            }
-            break;
-          case -116:
-            // Gravity
-            level->actors.emplace_back(new Gravity(geometry::Position{x * 16, y * 16}));
-            break;
-          case -117:
-            // Candle
-            level->actors.emplace_back(
-              new ScoreItem(geometry::Position{x * 16, y * 16}, Sprite::SPRITE_CANDLE, SoundType::SOUND_PICKUP_GUN, 1000));
-            break;
-          case -119:
-            // Pipe in hole (H)
-            sprite = static_cast<int>(Sprite::SPRITE_HOLE_PIPE_H);
-            break;
-          case -118:
-            // Pipe in hole (V)
-            sprite = static_cast<int>(Sprite::SPRITE_HOLE_PIPE_V);
-            break;
-          case -120:
-            if (level->tile_ids[i - level->width] == -120)
-            {
-              // Hanging flower
-              sprite = static_cast<int>(Sprite::SPRITE_HANGING_FLOWER);
-            }
-            else
-            {
-              // Hanging leaves
-              sprite = static_cast<int>(Sprite::SPRITE_HANGING_LEAVES);
-            }
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -121:
-            // Vine
-            if (i < level->width * (level->height - 1) && level->tile_ids[i + level->width] == -121)
-            {
-              // Continuing vine
-              sprite = static_cast<int>(Sprite::SPRITE_VINE);
-            }
-            else
-            {
-              // Vine loop
-              sprite = static_cast<int>(Sprite::SPRITE_VINE_LOOP);
-            }
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -122:
-            // Small chains
-            if (i < level->width * (level->height - 1) && level->tile_ids[i + level->width] == -122)
-            {
-              // Continuing chains
-              sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS);
-            }
-            else
-            {
-              // Chain end
-              sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS_END);
-            }
-            flags |= TILE_RENDER_IN_FRONT;
-            break;
-          case -124:
-            // Right laser
-            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, false));
-            break;
-          case -126:
-            // Right laser
-            level->hazards.emplace_back(new Laser(geometry::Position{x * 16, y * 16}, true));
-            break;
-          case -128:
-            // Sector alpha sign
-            sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_TOP_1);
-            flags |= TILE_SOLID_TOP | TILE_RENDER_IN_FRONT;
-            mode = TileMode::SECTOR_SIGN;
-            break;
-          default:
-            LOG_INFO(
-              "Unknown tile on level %d (%d,%d) tile_id=%d (%c)", static_cast<int>(level_id), x, y, tile_id, static_cast<char>(tile_id));
-            level->tile_unknown[i] = true;
-            break;
-        }
-        break;
+      level->tile_unknown[i] = true;
     }
-    if (sprite == -1 && flags == 0)
+    if (results.actor)
     {
-      tile = Tile::INVALID;
+      level->actors.emplace_back(std::move(results.actor));
     }
-    else
+    if (results.enemy)
     {
-      tile = Tile(sprite, sprite_count, flags);
+      level->enemies.emplace_back(std::move(results.enemy));
     }
-    level->tiles.push_back(tile);
+    if (results.hazard)
+    {
+      level->hazards.emplace_back(std::move(results.hazard));
+    }
+    if (results.moving_platform)
+    {
+      level->moving_platforms.push_back(std::move(*results.moving_platform));
+    }
+    if (results.entrance)
+    {
+      level->entrances.push_back(std::move(*results.entrance));
+    }
+    if (results.exit)
+    {
+      level->exit.swap(results.exit);
+    }
+    if (results.is_crystal)
+    {
+      level->crystals++;
+      level->has_crystals = true;
+    }
+    if (results.is_player_spawn)
+    {
+      level->player_spawn = geometry::Position{x * 16, y * 16};
+    }
+    if (results.is_reverse_gravity)
+    {
+      level->gravity = -GRAVITY;
+    }
+    if (results.is_low_gravity)
+    {
+      // High recoil on odd levels, low recoil on even levels (just a guess)
+      level->recoil = static_cast<int>(level->level_id) & 1 ? 7 : 2;
+    }
+    level->tiles.push_back(results.tile);
     level->bgs.push_back(bg);
+    mode = results.mode;
   }
   if (falling_rocks)
   {
@@ -2106,5 +657,1567 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   }
 
   return level;
+}
+
+TileResults decode_tile(TileMode mode,
+                        const PlayerState& state,
+                        int tile_id,
+                        const int i,
+                        const int w,
+                        const int h,
+                        LevelId level_id,
+                        const std::vector<int>& tile_ids,
+                        const EpisodeDef& episode_def,
+                        const geometry::Position position,
+                        int& volcano_sprite,
+                        int& sprite_concrete,
+                        int& entrance_level,
+                        Caterpillar*& caterpillar,
+                        Earth*& earth,
+                        bool& is_stars_row,
+                        bool& is_horizon_row,
+                        bool& falling_rocks,
+                        int& switch_flags)
+{
+  const int bump_sprite = static_cast<int>(episode_def.bump_platforms[static_cast<int>(level_id)]);
+  const auto block_sprite = episode_def.blockColors[static_cast<int>(level_id)];
+  const bool block_solid = block_sprite != Sprite::SPRITE_BLOCK_GREEN_NW;
+  Tile tile;
+  int sprite = -1;
+  int sprite_count = 1;
+  int flags = 0;
+  TileResults results;
+  switch (mode)
+  {
+    case TileMode::BUMPABLE_PLATFORM:
+      switch (tile_id)
+      {
+        case 'd':
+        case -103:
+          results.actor = std::make_unique<BumpPlatform>(position, static_cast<Sprite>(bump_sprite + 1), tile_id == -103);
+          break;
+        case 'n':
+        case -102:
+          results.actor = std::make_unique<BumpPlatform>(position, static_cast<Sprite>(bump_sprite + 2), tile_id == -102);
+          mode = TileMode::NONE;
+          break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::SIGN:
+      switch (tile_id)
+      {
+        case '-':
+          // [- = hanging platform
+          sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_2);
+          flags |= TILE_SOLID;
+          mode = TileMode::NONE;
+          break;
+        case '1':
+          // [1 = reverse gravity sign
+          sprite = static_cast<int>(Sprite::SPRITE_REVERSE_GRAVITY_2);
+          flags |= TILE_SOLID_TOP;
+          mode = TileMode::NONE;
+          break;
+        case '2':
+          // [2 = low gravity sign
+          sprite = static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_2);
+          flags |= TILE_SOLID_TOP;
+          mode = TileMode::NONE;
+          break;
+        case '3':
+          // [3 = kilroy sign
+          sprite = static_cast<int>(Sprite::SPRITE_KILROY_2);
+          mode = TileMode::NONE;
+          break;
+        case '4':
+          // [4n = winners drugs sign
+          sprite = static_cast<int>(Sprite::SPRITE_WINNERS_2);
+          flags |= TILE_SOLID_TOP;
+          break;
+        case '5':
+          // [5 = trading post sign
+          sprite = static_cast<int>(Sprite::SPRITE_TRADING_POST_2);
+          mode = TileMode::NONE;
+          break;
+        case ':':
+          // [: = pipe top
+          sprite = static_cast<int>(Sprite::SPRITE_PIPE_TOP_R);
+          flags |= TILE_SOLID;
+          mode = TileMode::NONE;
+          break;
+        case ';':
+          // [; = pipe
+          sprite = static_cast<int>(Sprite::SPRITE_PIPE_R);
+          flags |= TILE_SOLID;
+          mode = TileMode::NONE;
+          break;
+        case 'A':
+          // [A = planet
+          sprite = static_cast<int>(Sprite::SPRITE_PLANET_UR);
+          mode = TileMode::NONE;
+          break;
+        case 'B':
+          // [B = trading planet
+          sprite = static_cast<int>(Sprite::SPRITE_TRADING_PLANET_2);
+          mode = TileMode::NONE;
+          break;
+        case 'd':
+          // [d = danger sign
+          sprite = static_cast<int>(Sprite::SPRITE_DANGER_2);
+          flags |= TILE_SOLID_TOP;
+          mode = TileMode::NONE;
+          break;
+        case 'D':
+          // [D = danger sign (falls)
+          mode = TileMode::NONE;
+          break;
+        case 'f':
+          // [f = falling rocks sign
+          sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_2);
+          flags |= TILE_SOLID_TOP;
+          mode = TileMode::NONE;
+          break;
+        case 'm':
+          // [m = mine sign
+          sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_2);
+          flags |= TILE_RENDER_IN_FRONT;
+          mode = TileMode::NONE;
+          break;
+        case 'n':
+          sprite = static_cast<int>(Sprite::SPRITE_WINNERS_3);
+          flags |= TILE_SOLID_TOP;
+          mode = TileMode::NONE;
+          break;
+        case 'r':
+          // [r = red crate
+          sprite = static_cast<int>(Sprite::SPRITE_RED_CRATE_2);
+          flags |= TILE_SOLID_TOP;
+          mode = TileMode::NONE;
+          break;
+        case '#':  // [# = 2x2 grille
+          sprite = static_cast<int>(Sprite::SPRITE_GRILLE_2);
+          mode = TileMode::NONE;
+          break;
+        case '*':  // [* = 2x2 gear
+          sprite = static_cast<int>(Sprite::SPRITE_GEAR_2);
+          mode = TileMode::NONE;
+          break;
+        case '^':  // [^ = hanging platform hoist
+          sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_HOIST_2);
+          mode = TileMode::NONE;
+          break;
+        case '|':
+          // [| = Hanging platform cable
+          sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_CABLE_2);
+          mode = TileMode::NONE;
+          break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::WOOD_STRUT:
+      switch (tile_id)
+      {
+        case 'n':
+          sprite = static_cast<int>(Sprite::SPRITE_WOOD_STRUT_2);
+          mode = TileMode::NONE;
+          break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::WOOD_PILLAR:
+      switch (tile_id)
+      {
+        case 'n':
+          sprite = static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_2);
+          mode = TileMode::NONE;
+          break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::VOLCANO:
+      results.actor =
+        std::make_unique<BasicTile>(position + geometry::Position{VOLCANO_DX, 0}, static_cast<Sprite>(volcano_sprite), VOLCANO_PARALLAX);
+      volcano_sprite++;
+      if (tile_ids[i + 1] != 'n')
+      {
+        mode = TileMode::NONE;
+        volcano_sprite = -1;
+      }
+      break;
+    case TileMode::EJECTA:
+      results.actor = std::make_unique<VolcanoEjecta>(position, Sprite::SPRITE_VOLCANO_EJECTA_L_1);
+      mode = TileMode::NONE;
+      break;
+    case TileMode::EXIT:
+      sprite = static_cast<int>(Sprite::SPRITE_EXIT_TOP_RIGHT_1);
+      flags |= TILE_SOLID;
+      mode = TileMode::NONE;
+      break;
+    case TileMode::COLUMN:
+      flags |= TILE_SOLID_TOP;
+      if (tile_id == 'n')
+      {
+        sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD_R);
+        mode = TileMode::NONE;
+      }
+      else
+      {
+        sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD);
+      }
+      break;
+    case TileMode::CRATE:
+      flags |= TILE_SOLID_TOP;
+      switch (tile_id)
+      {
+        case 'b':
+          sprite = static_cast<int>(Sprite::SPRITE_CRATE_U1);
+          break;
+        case 'g':
+          sprite = static_cast<int>(Sprite::SPRITE_CRATE_U1);
+          break;
+        case 'n':
+          if (tile_ids[i + 1] != 'n')
+          {
+            sprite = static_cast<int>(Sprite::SPRITE_CRATE_UR);
+            mode = TileMode::NONE;
+          }
+          else
+          {
+            sprite = static_cast<int>(Sprite::SPRITE_CRATE_U2);
+          }
+          break;
+        case 'y':
+          sprite = static_cast<int>(Sprite::SPRITE_CRATE_UR);
+          mode = TileMode::NONE;
+          break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::CRATE_SECOND_ROW:
+      switch (tile_ids[i - w])
+      {
+        case 'n':
+          if (tile_ids[i + 1] != 'n')
+          {
+            sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
+            mode = TileMode::NONE;
+          }
+          else
+          {
+            sprite = static_cast<int>(Sprite::SPRITE_CRATE_D2);
+          }
+          break;
+        case 'y':
+          sprite = static_cast<int>(Sprite::SPRITE_CRATE_DR);
+          mode = TileMode::NONE;
+          break;
+        default:
+          sprite = static_cast<int>(Sprite::SPRITE_CRATE_D1);
+          break;
+      }
+      break;
+    case TileMode::HAMMER_RAIL:
+      switch (tile_id)
+      {
+        case 'n':
+          if (tile_ids[i + 1] != 'n')
+          {
+            mode = TileMode::NONE;
+          }
+          sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_2);
+          break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::HAMMER:
+      switch (tile_id)
+      {
+        case 'n':
+          if (tile_ids[i + 1] != 'n')
+          {
+            mode = TileMode::NONE;
+          }
+          sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_2);
+          break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::GLASS_BALL:
+      switch (tile_id)
+      {
+        case 'n':
+          if (tile_ids[i + 1] != 'n')
+          {
+            mode = TileMode::NONE;
+          }
+          sprite = static_cast<int>(tile_ids[i - 1] == 'n' ? Sprite::SPRITE_GLASS_BALL_4 : Sprite::SPRITE_GLASS_BALL_2);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::CATERPILLAR:
+      switch (tile_id)
+      {
+        case 'P':  // fallthrough
+        case 'n':
+        {
+          auto new_caterpillar = new Caterpillar(position);
+          if (caterpillar)
+          {
+            caterpillar->set_child(*new_caterpillar);
+          }
+          caterpillar = new_caterpillar;
+          results.enemy.reset(caterpillar);
+          if (tile_ids[i + 1] != 'n')
+          {
+            mode = TileMode::NONE;
+            caterpillar = nullptr;
+          }
+        }
+        break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::TRI_ENEMY:
+      if (tile_ids[i + 1] != 'n')
+      {
+        mode = TileMode::NONE;
+      }
+      break;
+    case TileMode::AIR_PIPE:
+      // Skip this tile
+      mode = TileMode::NONE;
+      break;
+    case TileMode::METAL_CRATE:
+      flags |= TILE_SOLID_TOP;
+      sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_UR);
+      mode = TileMode::NONE;
+      break;
+    case TileMode::HAZARD_CRATE:
+      flags |= TILE_SOLID_TOP;
+      sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_UR);
+      mode = TileMode::NONE;
+      break;
+    case TileMode::ROCKY_PLATFORM:
+      switch (tile_id)
+      {
+        case 'j':
+          // Rocky platform (mid)
+          sprite = static_cast<int>(Sprite::SPRITE_ROCKY_PLATFORM_MID);
+          flags |= TILE_SOLID_TOP;
+          break;
+        case 'n':
+          // Rocky platform (right)
+          sprite = static_cast<int>(Sprite::SPRITE_ROCKY_PLATFORM_R);
+          flags |= TILE_SOLID_TOP;
+          mode = TileMode::NONE;
+          break;
+        default:
+          break;
+      }
+      break;
+    case TileMode::SECTOR_SIGN:
+      sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_TOP_2);
+      flags |= TILE_SOLID_TOP | TILE_RENDER_IN_FRONT;
+      mode = TileMode::NONE;
+      break;
+    case TileMode::SECTOR_SIGN_SECOND_ROW:
+      sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_BOTTOM_2);
+      flags |= TILE_RENDER_IN_FRONT;
+      mode = TileMode::NONE;
+      break;
+    case TileMode::STAND_MIXER:
+      sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_TOP_2);
+      flags |= TILE_RENDER_IN_FRONT;
+      mode = TileMode::NONE;
+      break;
+    case TileMode::STAND_MIXER_SECOND_ROW:
+      sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_BOTTOM_2);
+      flags |= TILE_RENDER_IN_FRONT | TILE_SOLID_TOP;
+      mode = TileMode::NONE;
+      break;
+    case TileMode::PLANET_SECOND_ROW:
+      sprite = static_cast<int>(Sprite::SPRITE_PLANET_DR);
+      mode = TileMode::NONE;
+      break;
+    default:
+      switch (tile_id)
+      {
+        case ' ':
+          // Special case for finale - show planet at player spawn
+          if (level_id == LevelId::FINALE && position.x() > 0 && position.y() > 0)
+          {
+            if (tile_ids[i - 1] == 'Y')
+            {
+              sprite = static_cast<int>(Sprite::SPRITE_PLANET_UR);
+            }
+            else if (tile_ids[i - w] == 'Y')
+            {
+              sprite = static_cast<int>(Sprite::SPRITE_PLANET_DL);
+            }
+            else if (tile_ids[i - 1 - w] == 'Y')
+            {
+              sprite = static_cast<int>(Sprite::SPRITE_PLANET_DR);
+            }
+          }
+          break;
+        case '!':
+          // Faucet
+          results.hazard = std::make_unique<Faucet>(position);
+          break;
+        case '"':
+          // Ceiling moss 2
+          sprite = static_cast<int>(Sprite::SPRITE_CEILING_MOSS_2);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case '#':
+          // Spider
+          results.enemy = std::make_unique<Spider>(position);
+          break;
+        case '%':
+          // Pipe (V)
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_V);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case '&':
+          // Robot
+          results.enemy = std::make_unique<Robot>(position);
+          break;
+        case '(':
+          // Stalactite 1
+          results.hazard = std::make_unique<Speleothem>(position, Sprite::SPRITE_STALACTITE_1);
+          break;
+        case ')':
+          // Stalactite 2
+          results.hazard = std::make_unique<Speleothem>(position, Sprite::SPRITE_STALACTITE_2);
+          break;
+        case '*':
+          // Rockman
+          results.enemy = std::make_unique<Rockman>(position);
+          break;
+        case '$':
+          // Air tank (top)
+          results.actor = std::make_unique<AirTank>(position, true);
+          break;
+        case ':':
+          // Ceiling moss 1
+          sprite = static_cast<int>(Sprite::SPRITE_CEILING_MOSS_1);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case '=':
+          // Wall monster (left)
+          results.enemy = std::make_unique<WallMonster>(position, true);
+          break;
+          // Crystals
+        case '+':
+          results.actor = std::make_unique<Crystal>(position, static_cast<Sprite>(static_cast<int>(episode_def.crystal_sprite) + 1));
+          results.is_crystal = true;
+          break;
+        case 'b':
+          results.actor = std::make_unique<Crystal>(position, static_cast<Sprite>(static_cast<int>(episode_def.crystal_sprite) + 2));
+          results.is_crystal = true;
+          break;
+        case 'R':
+          results.actor = std::make_unique<Crystal>(position, episode_def.crystal_sprite);
+          results.is_crystal = true;
+          break;
+        case 'c':
+          results.actor = std::make_unique<Crystal>(position, static_cast<Sprite>(static_cast<int>(episode_def.crystal_sprite) + 3));
+          results.is_crystal = true;
+          break;
+        case '-':
+          // Pipe (H)
+          // Add one way platform as sometimes V pipe also occurs together
+          results.actor = std::make_unique<OneWayPlatform>(position, Sprite::SPRITE_GPIPE_H);
+          break;
+        case '.':
+          // Pipe (L)
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_L);
+          flags |= TILE_SOLID;
+          break;
+          // Ammo
+        case 'G':
+          results.actor = std::make_unique<Ammo>(position);
+          break;
+          // Blocks
+        case 'r':
+          sprite = static_cast<int>(block_sprite);  // NW
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          else
+          {
+            flags |= TILE_SOLID_TOP;
+          }
+          break;
+        case 't':
+          sprite = static_cast<int>(block_sprite) + 1;  // N
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          else
+          {
+            flags |= TILE_SOLID_TOP;
+          }
+          break;
+        case 'y':
+          sprite = static_cast<int>(block_sprite) + 2;  // NE
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          else
+          {
+            flags |= TILE_SOLID_TOP;
+          }
+          break;
+        case '2':
+          if (tile_ids[i + w] != '6')
+          {
+            sprite = static_cast<int>(block_sprite) + 5;  // S
+          }
+          else
+          {
+            sprite = static_cast<int>(block_sprite) + 9;  // MID
+          }
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          break;
+        case '4':
+          if (tile_ids[i - 1] != '2')
+          {
+            sprite = static_cast<int>(block_sprite) + 8;  // W
+          }
+          else
+          {
+            sprite = static_cast<int>(block_sprite) + 9;  // MID
+          }
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          break;
+        case '5':
+          sprite = static_cast<int>(block_sprite) + 9;  // MID
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          break;
+        case '6':
+          sprite = static_cast<int>(block_sprite) + 10;  // E
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          break;
+        case '8':
+          // Big chain
+          sprite = static_cast<int>(Sprite::SPRITE_BIG_CHAIN);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case '9':
+          // Mine cart
+          results.enemy = std::make_unique<MineCart>(position);
+          break;
+        case '?':
+          // Tentacle
+          results.enemy = std::make_unique<Tentacle>(position);
+          break;
+        case 'a':
+          // Moving left laser
+          results.hazard = std::make_unique<Laser>(position, true, true);
+          break;
+        case 'B':
+          // Clear block
+          results.actor = std::make_unique<ClearBlock>(position);
+          break;
+        case 'f':
+          sprite = static_cast<int>(block_sprite) + 4;  // SW
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          break;
+        case 'F':
+          results.hazard = std::make_unique<Flame>(position);
+          break;
+        case 'g':
+          sprite = static_cast<int>(block_sprite) + 5;  // S
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          break;
+        case 'h':
+          sprite = static_cast<int>(block_sprite) + 6;  // SE
+          if (block_solid)
+          {
+            flags |= TILE_SOLID;
+          }
+          break;
+          // Bumpable platforms
+        case 'D':
+        case -104:
+          // Keep adding bumpable platforms until we get an 'n'
+          results.actor = std::make_unique<BumpPlatform>(position, static_cast<Sprite>(bump_sprite), tile_id == -104);
+          mode = TileMode::BUMPABLE_PLATFORM;
+          break;
+        case 'd':
+        case -103:
+          results.actor = std::make_unique<BumpPlatform>(position, static_cast<Sprite>(bump_sprite + 1), tile_id == -103);
+          mode = TileMode::BUMPABLE_PLATFORM;
+          break;
+        case 'A':
+          // Green slime
+          results.enemy = std::make_unique<Slime>(position);
+          break;
+        case 'C':
+          // Cycle through concrete sprites
+          sprite = sprite_concrete;
+          if (sprite_concrete == static_cast<int>(Sprite::SPRITE_CONCRETE))
+          {
+            sprite_concrete = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
+          }
+          else
+          {
+            sprite_concrete--;
+          }
+          flags |= TILE_SOLID;
+          break;
+        case 'H':
+          results.moving_platform = std::make_unique<MovingPlatform>(position, true, false);
+          break;
+        case 'i':
+          // Stop sign
+          results.actor = std::make_unique<StopSign>(position);
+          break;
+        case 'I':
+          // Thorn
+          results.hazard = std::make_unique<Thorn>(position);
+          break;
+        case 'J':
+          // Flame spout
+          sprite = static_cast<int>(Sprite::SPRITE_FLAME_SPOUT);
+          flags |= TILE_SOLID;
+          break;
+        case 'k':
+          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_V);
+          flags |= TILE_SOLID;
+          break;
+        case 'K':
+          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE);
+          flags |= TILE_SOLID;
+          break;
+        case 'l':
+          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_X);
+          flags |= TILE_SOLID;
+          break;
+        case 'L':
+          sprite = static_cast<int>(Sprite::SPRITE_CONCRETE_H);
+          flags |= TILE_SOLID;
+          break;
+        case 'm':
+          // Moving earth
+          earth = new Earth(position, true);
+          results.actor.reset(earth);
+          break;
+        case 'M':
+          // Ostrich
+          results.enemy = std::make_unique<Ostrich>(position);
+          break;
+        case 'n':
+        {
+          bool handled = false;
+
+          // Check tile above for continuation tile, unless it's the first row
+          if (i >= w)
+          {
+            handled = true;
+            switch (tile_ids[i - w])
+            {
+              case '[':
+                switch (tile_ids[i - w + 1])
+                {
+                  case '#':
+                    // Bottom left of grille
+                    sprite = static_cast<int>(Sprite::SPRITE_GRILLE_3);
+                    break;
+                  case '*':
+                    // Bottom left of gear
+                    sprite = static_cast<int>(Sprite::SPRITE_GEAR_3);
+                    break;
+                  case 'b':  // Fallthrough
+                  case 'g':  // Fallthrough
+                  case 'y':
+                    // Bottom left of crate
+                    sprite = static_cast<int>(Sprite::SPRITE_CRATE_DL);
+                    mode = TileMode::CRATE_SECOND_ROW;
+                    break;
+                  case 'A':  // Fallthrough
+                  case 'B':
+                    // Bottom left of planet
+                    sprite = static_cast<int>(Sprite::SPRITE_PLANET_DL);
+                    mode = TileMode::PLANET_SECOND_ROW;
+                    break;
+                  case 'c':
+                    // Bottom left of hazard crate
+                    sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_DL);
+                    break;
+                  case 'x':
+                    // Bottom left of metal crate
+                    sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_DL);
+                    break;
+                  default:
+                    break;
+                }
+                break;
+              case '#':
+                // Bottom right of grille
+                sprite = static_cast<int>(Sprite::SPRITE_GRILLE_4);
+                break;
+              case '*':
+                // Bottom right of gear
+                sprite = static_cast<int>(Sprite::SPRITE_GEAR_4);
+                break;
+              case '$':
+                // Air tank (bottom)
+                results.actor = std::make_unique<AirTank>(position, false);
+                break;
+              case 'c':
+                // Bottom right of hazard crate
+                sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_DR);
+                break;
+              case 'x':
+                // Bottom right of metal crate
+                sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_DR);
+                break;
+              case 'i':
+                // Stop sign pole
+                sprite = static_cast<int>(Sprite::SPRITE_STOP_POLE);
+                break;
+              case 'n':
+                // Keep looking left to see what we're continuing from
+                for (int ci = i - w - 1; ci >= 0; ci--)
+                {
+                  switch (tile_ids[ci])
+                  {
+                    case 'X':
+                      // Bottom-right of exit
+                      sprite = static_cast<int>(Sprite::SPRITE_EXIT_BOTTOM_RIGHT_1);
+                      flags |= TILE_ANIMATED | TILE_SOLID;
+                      sprite_count = 4;
+                      break;
+                    default:
+                      break;
+                  }
+                  if (tile_ids[ci] != 'n')
+                  {
+                    break;
+                  }
+                }
+                break;
+              case 'T':
+                // Column below head
+                sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
+                break;
+              case 'U':
+                // Hammer
+                sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
+                mode = TileMode::HAMMER;
+                break;
+              case 'X':
+                // Bottom-left of exit
+                // Ignore - we've already added an exit
+                break;
+              case -8:
+                // Glass ball thing
+                sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_3);
+                mode = TileMode::GLASS_BALL;
+                flags |= TILE_RENDER_IN_FRONT;
+                break;
+              case -32:
+                // Bottom of stand mixer
+                sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_BOTTOM_1);
+                flags |= TILE_RENDER_IN_FRONT | TILE_SOLID_TOP;
+                mode = TileMode::STAND_MIXER_SECOND_ROW;
+                break;
+              case -91:
+                // Bottom of blue door; skip as we should have added it using the top
+                break;
+              case -92:
+                // Bottom of green door; skip as we should have added it using the top
+                break;
+              case -93:
+                // Bottom of red door; skip as we should have added it using the top
+                break;
+              case -128:
+                // Bottom of sector sign
+                sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_BOTTOM_1);
+                flags |= TILE_RENDER_IN_FRONT;
+                mode = TileMode::SECTOR_SIGN_SECOND_ROW;
+                break;
+              default:
+                handled = false;
+                break;
+            }
+          }
+
+          if (!handled && i < w * (h - 1))
+          {
+            handled = true;
+            // Check below for continuation tile
+            switch (tile_ids[i + w])
+            {
+              case -120:
+                // Hanging leaves
+                sprite = static_cast<int>(Sprite::SPRITE_HANGING_LEAVES);
+                flags |= TILE_RENDER_IN_FRONT;
+                break;
+              case -121:
+                // Vine
+                sprite = static_cast<int>(Sprite::SPRITE_VINE);
+                flags |= TILE_RENDER_IN_FRONT;
+                break;
+              case -122:
+                // Small chains
+                sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS);
+                flags |= TILE_RENDER_IN_FRONT;
+                break;
+              default:
+                handled = false;
+                break;
+            }
+          }
+          if (!handled && position.x() > 0)
+          {
+            handled = true;
+            // Check previous tile
+            switch (tile_ids[i - 1])
+            {
+              case -107:
+                // Yellow fence (R)
+                sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_R);
+                flags |= TILE_RENDER_IN_FRONT;
+                break;
+              default:
+                handled = false;
+                break;
+            }
+          }
+          if (!handled)
+          {
+            LOG_INFO("Unknown tile on level %d (%d,%d) tile_id=%d (%c)",
+                     static_cast<int>(level_id),
+                     position.x() / 16,
+                     position.y() / 16,
+                     tile_id,
+                     static_cast<char>(tile_id));
+            results.tile_unknown = true;
+          }
+        }
+        break;
+        case 'N':
+          results.actor = std::make_unique<Moon>(position, *earth);
+          break;
+        case 'o':
+          // Inactive rockman
+          sprite = static_cast<int>(Sprite::SPRITE_ROCKMAN_R_1);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case 'p':
+          // Rocky platform
+          sprite = static_cast<int>(Sprite::SPRITE_ROCKY_PLATFORM_L);
+          flags |= TILE_SOLID_TOP;
+          mode = TileMode::ROCKY_PLATFORM;
+          break;
+        case 'q':
+          // Left laser
+          results.hazard = std::make_unique<Laser>(position, true);
+          break;
+        case 's':
+          // Moving right laser
+          results.hazard = std::make_unique<Laser>(position, false, true);
+          break;
+        case 'S':
+          // Snake
+          results.enemy = std::make_unique<Snake>(position);
+          break;
+        case 'T':
+          // Hammer rail
+          sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
+          mode = TileMode::HAMMER_RAIL;
+          break;
+        case 'U':
+          // Hammer
+          sprite = static_cast<int>(Sprite::SPRITE_HAMMER_RAIL_1);
+          mode = TileMode::HAMMER;
+          results.hazard = std::make_unique<Hammer>(position);
+          break;
+        case 'u':
+          results.actor = std::make_unique<VolcanoEjecta>(position, Sprite::SPRITE_VOLCANO_EJECTA_R_1);
+          mode = TileMode::EJECTA;
+          break;
+        case 'v':
+          // Horizontal toggle switch
+          results.actor = std::make_unique<Switch>(position, Sprite::SPRITE_SWITCH_OFF, SWITCH_FLAG_MOVING_PLATFORMS);
+          break;
+        case 'V':
+          results.moving_platform = std::make_unique<MovingPlatform>(position, false, false);
+          break;
+        case 'w':
+          // Right laser
+          results.hazard = std::make_unique<Laser>(position, false);
+          break;
+        case 'W':
+          // Air Pipe
+          // WL = left facing, WR = right facing
+          results.hazard = std::make_unique<AirPipe>(position, tile_ids[i + 1] == 'L');
+          mode = TileMode::AIR_PIPE;
+          break;
+        case 'x':
+          // Show levels under construction with cones
+          if (!episode_def.completedLevels.contains(static_cast<LevelId>(entrance_level)))
+          {
+            sprite = static_cast<int>(Sprite::SPRITE_CONES);
+            flags |= TILE_RENDER_IN_FRONT;
+          }
+          results.entrance = std::make_unique<Entrance>(
+            position, entrance_level, state.levels_completed[entrance_level] ? EntranceState::COMPLETE : EntranceState::CLOSED);
+          entrance_level++;
+          break;
+        case 'X':
+          // Xn = exit
+          results.exit = std::make_unique<Exit>(position);
+          mode = TileMode::EXIT;
+          break;
+        case 'Y':
+          // Player spawn
+          results.is_player_spawn = true;
+          // Special case for finale - show planet at player spawn
+          if (level_id == LevelId::FINALE)
+          {
+            sprite = static_cast<int>(Sprite::SPRITE_PLANET_UL);
+          }
+          break;
+        case 'z':
+          if (is_horizon_row || (position.x() == 0 && tile_ids[i + 1] == 'Z'))
+          {
+            is_horizon_row = true;
+          }
+          else
+          {
+            is_stars_row = true;
+          }
+          break;
+        case 'Z':
+          break;
+        case '[':
+          switch (tile_ids[i + 1])
+          {
+            case '-':
+              // [- = hanging platform
+              sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_1);
+              flags |= TILE_SOLID;
+              mode = TileMode::SIGN;
+              break;
+            case '1':
+              // [1 = reverse gravity sign
+              results.is_reverse_gravity = true;
+              sprite = static_cast<int>(Sprite::SPRITE_REVERSE_GRAVITY_1);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::SIGN;
+              break;
+            case '2':
+              // [2 = low gravity sign
+              results.is_low_gravity = true;
+              sprite = static_cast<int>(Sprite::SPRITE_LOW_GRAVITY_1);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::SIGN;
+              break;
+            case '3':
+              // [3 = kilroy sign
+              sprite = static_cast<int>(Sprite::SPRITE_KILROY_1);
+              mode = TileMode::SIGN;
+              break;
+            case '4':
+              // [4n = winners drugs sign
+              sprite = static_cast<int>(Sprite::SPRITE_WINNERS_1);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::SIGN;
+              break;
+            case '5':
+              // [5 = trading post sign
+              sprite = static_cast<int>(Sprite::SPRITE_TRADING_POST_1);
+              mode = TileMode::SIGN;
+              break;
+            case ':':
+              // [: = pipe top
+              sprite = static_cast<int>(Sprite::SPRITE_PIPE_TOP_L);
+              flags |= TILE_SOLID;
+              mode = TileMode::SIGN;
+              break;
+            case ';':
+              // [; = pipe
+              sprite = static_cast<int>(Sprite::SPRITE_PIPE_L);
+              flags |= TILE_SOLID;
+              mode = TileMode::SIGN;
+              break;
+            case '=':
+              // [=n - triceratops
+              results.enemy = std::make_unique<Triceratops>(position);
+              mode = TileMode::TRI_ENEMY;
+              break;
+            case 'b':
+              // [bnn = Yellow/green crate, 4x2
+              sprite = static_cast<int>(Sprite::SPRITE_CRATE_UL);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::CRATE;
+              break;
+            case 'A':
+              // [A = planet
+              sprite = static_cast<int>(Sprite::SPRITE_PLANET_UL);
+              mode = TileMode::SIGN;
+              break;
+            case 'B':
+              // [B = trading planet
+              sprite = static_cast<int>(Sprite::SPRITE_TRADING_PLANET_1);
+              mode = TileMode::SIGN;
+              break;
+            case 'c':
+              // [c = hazard crate, 2x2
+              sprite = static_cast<int>(Sprite::SPRITE_HAZARD_CRATE_UL);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::HAZARD_CRATE;
+              break;
+            case 'd':
+              // [d = danger sign
+              sprite = static_cast<int>(Sprite::SPRITE_DANGER_1);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::SIGN;
+              break;
+            case 'D':
+              // [D = danger sign (falls)
+              results.hazard =
+                std::make_unique<FallingSign>(position, std::vector<Sprite>{Sprite::SPRITE_DANGER_1, Sprite::SPRITE_DANGER_2});
+              mode = TileMode::SIGN;
+              break;
+            case 'E':
+              // [En = eye monster
+              results.enemy = std::make_unique<EyeMonster>(position);
+              mode = TileMode::TRI_ENEMY;
+              break;
+            case 'f':
+              // [f = falling rocks sign
+              falling_rocks = true;
+              sprite = static_cast<int>(Sprite::SPRITE_FALLING_ROCKS_1);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::SIGN;
+              break;
+            case 'g':
+              // [gn = Yellow/green crate, 3x2
+              sprite = static_cast<int>(Sprite::SPRITE_CRATE_UL);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::CRATE;
+              break;
+            case 'm':
+              // [m = mine sign
+              sprite = static_cast<int>(Sprite::SPRITE_MINE_SIGN_1);
+              flags |= TILE_RENDER_IN_FRONT;
+              mode = TileMode::SIGN;
+              break;
+            case 'P':
+              // [P = caterpillar
+              {
+                auto new_caterpillar = new Caterpillar(position);
+                if (caterpillar)
+                {
+                  caterpillar->set_child(*new_caterpillar);
+                }
+                caterpillar = new_caterpillar;
+                results.enemy.reset(caterpillar);
+                mode = TileMode::CATERPILLAR;
+              }
+              break;
+            case 'r':
+              // [r = red crate
+              sprite = static_cast<int>(Sprite::SPRITE_RED_CRATE_1);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::SIGN;
+              break;
+            case 'T':
+              // [Tn = Head of column
+              sprite = static_cast<int>(Sprite::SPRITE_COLUMN_HEAD_L);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::COLUMN;
+              break;
+            case 'x':
+              // [x = Metal crate 2x2
+              sprite = static_cast<int>(Sprite::SPRITE_METAL_CRATE_UL);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::METAL_CRATE;
+              break;
+            case 'y':
+              // [y = Yellow/green crate, 2x2
+              sprite = static_cast<int>(Sprite::SPRITE_CRATE_UL);
+              flags |= TILE_SOLID_TOP;
+              mode = TileMode::CRATE;
+              break;
+            case '#':
+              // [# = 2x2 grille
+              sprite = static_cast<int>(Sprite::SPRITE_GRILLE_1);
+              mode = TileMode::SIGN;
+              break;
+            case '*':
+              // [* = 2x2 gear
+              sprite = static_cast<int>(Sprite::SPRITE_GEAR_1);
+              mode = TileMode::SIGN;
+              break;
+            case '^':
+              // [^ = Hanging platform hoist
+              sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_HOIST_1);
+              mode = TileMode::SIGN;
+              break;
+            case '|':
+              // [| = Hanging platform cable
+              sprite = static_cast<int>(Sprite::SPRITE_HANGING_PLATFORM_CABLE_1);
+              mode = TileMode::SIGN;
+              break;
+            default:
+              results.tile_unknown = true;
+              break;
+          }
+          break;
+        case ']':
+          // Power
+          results.actor = std::make_unique<Power>(position);
+          break;
+        case '^':
+          // Bird
+          results.enemy = std::make_unique<Bird>(position);
+          break;
+        case '/':
+          results.enemy = std::make_unique<Hopper>(position);
+          break;
+        case '_':
+          results.actor = std::make_unique<OneWayPlatform>(position, episode_def.platforms[static_cast<int>(level_id)]);
+          break;
+        case '|':
+          // Stalactite
+          results.hazard = std::make_unique<Stalactite>(position);
+          break;
+        case '~':
+          // Bat
+          results.enemy = std::make_unique<Bat>(position);
+          break;
+        case -4:
+          // Nukage
+          results.hazard = std::make_unique<Nukage>(position, Sprite::SPRITE_NUKAGE_1);
+          break;
+        case -5:
+          sprite = static_cast<int>(Sprite::SPRITE_BARREL_BROKEN);
+          flags |= TILE_SOLID_TOP;
+          break;
+        case -6:
+          sprite = static_cast<int>(Sprite::SPRITE_BARREL_CRACKED);
+          flags |= TILE_SOLID_TOP;
+          break;
+        case -7:
+          sprite = static_cast<int>(Sprite::SPRITE_BARREL);
+          flags |= TILE_SOLID_TOP;
+          break;
+        case -8:
+          // Glass ball thing
+          sprite = static_cast<int>(Sprite::SPRITE_GLASS_BALL_1);
+          mode = TileMode::GLASS_BALL;
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -9:
+          // Stalagmite
+          results.hazard = std::make_unique<Speleothem>(position, Sprite::SPRITE_STALAGMITE_2);
+          break;
+        case -10:
+          // Stalagmite
+          results.hazard = std::make_unique<Speleothem>(position, Sprite::SPRITE_STALAGMITE_1);
+          break;
+        case -11:
+          // Shovel
+          results.actor = std::make_unique<ScoreItem>(position, Sprite::SPRITE_SHOVEL, SoundType::SOUND_PICKUP_GUN, 800);
+          break;
+        case -12:
+          // Pickaxe
+          results.actor = std::make_unique<ScoreItem>(position, Sprite::SPRITE_PICKAXE, SoundType::SOUND_PICKUP_GUN, 5000);
+          break;
+        case -13:
+          // Snoozer
+          results.enemy = std::make_unique<Snoozer>(position);
+          break;
+        case -14:
+          // Tall Green Monster
+          results.enemy = std::make_unique<Bigfoot>(position);
+          break;
+        case -16:
+          if (tile_ids[i + 1] == 'n')
+          {
+            // Wood struts
+            sprite = static_cast<int>(Sprite::SPRITE_WOOD_STRUT_1);
+            mode = TileMode::WOOD_STRUT;
+          }
+          break;
+        case -19:
+          sprite = static_cast<int>(Sprite::SPRITE_PIPE_DR);
+          break;
+        case -20:
+          sprite = static_cast<int>(Sprite::SPRITE_PIPE_DL);
+          break;
+        case -21:
+          sprite = static_cast<int>(Sprite::SPRITE_PIPE_UL);
+          break;
+        case -22:
+          sprite = static_cast<int>(Sprite::SPRITE_PIPE_UR);
+          break;
+        case -23:
+          sprite = static_cast<int>(Sprite::SPRITE_PIPE_H);
+          break;
+        case -24:
+          sprite = static_cast<int>(Sprite::SPRITE_PIPE_V);
+          break;
+        case -25:
+          sprite = static_cast<int>(Sprite::SPRITE_MINE_PIPE);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -32:
+          // Stand mixer
+          sprite = static_cast<int>(Sprite::SPRITE_STAND_MIXER_TOP_1);
+          flags |= TILE_RENDER_IN_FRONT;
+          mode = TileMode::STAND_MIXER;
+          break;
+        case -36:
+          // Static moon
+          results.actor = std::make_unique<Moon>(position, *earth);
+          break;
+        case -37:
+          // Static earth
+          results.actor = std::make_unique<Earth>(position, false);
+          break;
+        case -38:
+          // Pipe (UL)
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_UL);
+          flags |= TILE_SOLID;
+          break;
+        case -39:
+          // Pipe (DR)
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_DR);
+          flags |= TILE_SOLID;
+          break;
+        case -40:
+          // Switch for turning off laser
+          results.actor = std::make_unique<Switch>(position, Sprite::SPRITE_SWITCH_OFF, SWITCH_FLAG_LASERS);
+          break;
+        case -41:
+          // Stopped vertical moving platform
+          results.moving_platform = std::make_unique<MovingPlatform>(position, false, true);
+          break;
+        case -43:
+          sprite = static_cast<int>(Sprite::SPRITE_TORCH_1);
+          sprite_count = 4;
+          flags |= TILE_ANIMATED;
+          break;
+        case -47:
+          // Pipe (U)
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_U);
+          flags |= TILE_SOLID_TOP | TILE_RENDER_IN_FRONT;
+          break;
+        case -48:
+          sprite = static_cast<int>(Sprite::SPRITE_METER);
+          break;
+        case -49:
+          // Pipe (D)
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_D);
+          break;
+        case -50:
+          // Grass
+          sprite = static_cast<int>(Sprite::SPRITE_GRASS);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -53:
+          sprite = static_cast<int>(Sprite::SPRITE_PILLAR_1);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -54:
+          sprite = static_cast<int>(Sprite::SPRITE_PILLAR_3);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -56:
+          // Slime barrier
+          flags |= TILE_BLOCKS_SLIME;
+          break;
+        case -57:
+          sprite = static_cast<int>(Sprite::SPRITE_SIGN_UP);
+          break;
+        case -58:
+          sprite = static_cast<int>(Sprite::SPRITE_SIGN_DOWN);
+          break;
+        case -59:
+          // Pipes (H+V)
+          results.actor = std::make_unique<OneWayPlatform>(position, Sprite::SPRITE_GPIPE_H);
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_V);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -62:
+          // Pipe (UT)
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_UT);
+          flags |= TILE_SOLID;
+          break;
+        case -64:
+          // Pipe (DL)
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_DL);
+          flags |= TILE_SOLID;
+          break;
+        case -65:
+          // Pipe (UR)
+          sprite = static_cast<int>(Sprite::SPRITE_GPIPE_UR);
+          flags |= TILE_SOLID;
+          break;
+        case -66:
+          sprite = static_cast<int>(Sprite::SPRITE_LEDGE_L);
+          flags |= TILE_SOLID_TOP;
+          break;
+        case -67:
+          sprite = static_cast<int>(Sprite::SPRITE_LEDGE_R);
+          flags |= TILE_SOLID_TOP;
+          break;
+        case -69:
+          sprite = static_cast<int>(Sprite::SPRITE_PURPLE_MUSHROOM);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -70:
+          sprite = static_cast<int>(Sprite::SPRITE_PILLAR_2);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -77:
+          if (tile_ids[i + 1] == 'n')
+          {
+            // Wood pillar
+            sprite = static_cast<int>(Sprite::SPRITE_WOOD_PILLAR_1);
+            mode = TileMode::WOOD_PILLAR;
+          }
+          break;
+        case -78:
+          sprite = static_cast<int>(Sprite::SPRITE_WOOD_V);
+          flags |= TILE_SOLID;
+          break;
+        case -79:
+          sprite = static_cast<int>(Sprite::SPRITE_WOOD_H);
+          flags |= TILE_SOLID;
+          break;
+        case -80:
+          // Hidden block
+          results.actor = std::make_unique<HiddenBlock>(position);
+          break;
+        case -84:
+          // Green mushroom
+          results.actor = std::make_unique<GreenMushroom>(position);
+          break;
+        case -85:
+          // Red mushroom
+          results.actor = std::make_unique<RedMushroom>(position);
+          break;
+        case -86:
+          // Blue mushroom
+          results.actor = std::make_unique<ScoreItem>(position, Sprite::SPRITE_MUSHROOM_BLUE, SoundType::SOUND_BLUE_MUSHROOM, 1000);
+          break;
+        case -87:
+          // Egg
+          results.actor = std::make_unique<Egg>(position);
+          break;
+        case -88:
+          // Key
+          results.actor = std::make_unique<Key>(position);
+          break;
+        case -89:
+          // Chest
+          results.actor = std::make_unique<Chest>(position);
+          break;
+        case -90:
+          // Light switch
+          results.actor = std::make_unique<Switch>(position, Sprite::SPRITE_LIGHT_SWITCH_OFF, SWITCH_FLAG_LIGHTS);
+          // Light switch implies level is dark
+          switch_flags &= ~SWITCH_FLAG_LIGHTS;
+          break;
+        case -91:
+          // Top of blue door
+          results.actor = std::make_unique<Door>(position, LeverColor::LEVER_COLOR_B);
+          break;
+        case -92:
+          // Top of green door
+          results.actor = std::make_unique<Door>(position, LeverColor::LEVER_COLOR_G);
+          break;
+        case -93:
+          // Top of red door
+          results.actor = std::make_unique<Door>(position, LeverColor::LEVER_COLOR_R);
+          break;
+        case -94:
+          // Blue lever
+          results.actor = std::make_unique<Lever>(position, LeverColor::LEVER_COLOR_B);
+          break;
+        case -95:
+          // Green lever
+          results.actor = std::make_unique<Lever>(position, LeverColor::LEVER_COLOR_G);
+          break;
+        case -96:
+          // Red lever
+          results.actor = std::make_unique<Lever>(position, LeverColor::LEVER_COLOR_R);
+          break;
+        case -107:
+          // Yellow fence (mid)
+          sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_MID);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -108:
+          // Yellow fence (L)
+          sprite = static_cast<int>(Sprite::SPRITE_FENCE_Y_L);
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -110:
+          // Nukage with a bone
+          results.hazard = std::make_unique<Nukage>(position, Sprite::SPRITE_NUKAGE_BONE);
+          break;
+        case -111:
+          // Nukage
+          results.hazard = std::make_unique<Nukage>(position, Sprite::SPRITE_NUKAGE_2);
+          break;
+        case -112:
+          sprite = static_cast<int>(Sprite::SPRITE_COLUMN);
+          break;
+        case -113:
+          if (tile_ids[i + 1] == 'n')
+          {
+            // -113 nnn = bottom of volcano
+            results.actor =
+              std::make_unique<BasicTile>(position + geometry::Position{VOLCANO_DX, 0}, Sprite::SPRITE_VOLCANO_BOTTOM_1, VOLCANO_PARALLAX);
+            mode = TileMode::VOLCANO;
+            volcano_sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_BOTTOM_1) + 1;
+          }
+          break;
+        case -114:
+          if (tile_ids[i + 1] == 'n')
+          {
+            // -114 n = top of volcano
+            results.actor =
+              std::make_unique<BasicTile>(position + geometry::Position{VOLCANO_DX, 0}, Sprite::SPRITE_VOLCANO_TOP_1, VOLCANO_PARALLAX);
+            mode = TileMode::VOLCANO;
+            volcano_sprite = static_cast<int>(Sprite::SPRITE_VOLCANO_TOP_1) + 1;
+          }
+          break;
+        case -116:
+          // Gravity
+          results.actor = std::make_unique<Gravity>(position);
+          break;
+        case -117:
+          // Candle
+          results.actor = std::make_unique<ScoreItem>(position, Sprite::SPRITE_CANDLE, SoundType::SOUND_PICKUP_GUN, 1000);
+          break;
+        case -119:
+          // Pipe in hole (H)
+          sprite = static_cast<int>(Sprite::SPRITE_HOLE_PIPE_H);
+          break;
+        case -118:
+          // Pipe in hole (V)
+          sprite = static_cast<int>(Sprite::SPRITE_HOLE_PIPE_V);
+          break;
+        case -120:
+          if (tile_ids[i - w] == -120)
+          {
+            // Hanging flower
+            sprite = static_cast<int>(Sprite::SPRITE_HANGING_FLOWER);
+          }
+          else
+          {
+            // Hanging leaves
+            sprite = static_cast<int>(Sprite::SPRITE_HANGING_LEAVES);
+          }
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -121:
+          // Vine
+          if (i < w * (h - 1) && tile_ids[i + w] == -121)
+          {
+            // Continuing vine
+            sprite = static_cast<int>(Sprite::SPRITE_VINE);
+          }
+          else
+          {
+            // Vine loop
+            sprite = static_cast<int>(Sprite::SPRITE_VINE_LOOP);
+          }
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -122:
+          // Small chains
+          if (i < w * (h - 1) && tile_ids[i + w] == -122)
+          {
+            // Continuing chains
+            sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS);
+          }
+          else
+          {
+            // Chain end
+            sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS_END);
+          }
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -124:
+          // Right laser
+          results.hazard = std::make_unique<Laser>(position, false);
+          break;
+        case -126:
+          // Right laser
+          results.hazard = std::make_unique<Laser>(position, true);
+          break;
+        case -128:
+          // Sector alpha sign
+          sprite = static_cast<int>(Sprite::SPRITE_SECTOR_ALPHA_SIGN_TOP_1);
+          flags |= TILE_SOLID_TOP | TILE_RENDER_IN_FRONT;
+          mode = TileMode::SECTOR_SIGN;
+          break;
+        default:
+          LOG_INFO("Unknown tile on level %d (%d,%d) tile_id=%d (%c)",
+                   static_cast<int>(level_id),
+                   position.x() / 16,
+                   position.y() / 16,
+                   tile_id,
+                   static_cast<char>(tile_id));
+          results.tile_unknown = true;
+          break;
+      }
+      break;
+  }
+  if (sprite == -1 && flags == 0)
+  {
+    tile = Tile::INVALID;
+  }
+  else
+  {
+    tile = Tile(sprite, sprite_count, flags);
+  }
+  results.tile = tile;
+  results.mode = mode;
+  return results;
 }
 }
