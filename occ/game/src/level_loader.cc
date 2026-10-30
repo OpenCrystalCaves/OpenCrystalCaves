@@ -172,7 +172,7 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_PLATFORM_BLUE,
    },
    Sprite::SPRITE_CRYSTAL_1_R},
-  {{LevelId::LEVEL_1},
+  {{LevelId::LEVEL_1, LevelId::LEVEL_2},
    {
      // Intro 1-2
      Sprite::SPRITE_BLOCK_PEBBLE_NW,
@@ -520,7 +520,6 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       skip_row = !level->is_space() && tile_id == ' ';
       if (skip_row)
       {
-        // TODO: add enemies etc from the previous skip row
         level->height--;
       }
       else
@@ -528,11 +527,8 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
         y++;
       }
     }
-    if (skip_row)
-    {
-      continue;
-    }
     // Decode tile ids from exe data
+    const auto position = geometry::Position{x * 16, (y + (skip_row ? 1 : 0)) * 16};
     auto results = decode_tile(mode,
                                state,
                                tile_id,
@@ -542,7 +538,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                                level_id,
                                level->tile_ids,
                                episode_def,
-                               geometry::Position{x * 16, y * 16},
+                               position,
                                volcano_sprite,
                                sprite_concrete,
                                entrance_level,
@@ -552,6 +548,15 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
                                is_horizon_row,
                                falling_rocks,
                                level->switch_flags);
+    if (skip_row)
+    {
+      // Just add enemies etc from the skip row
+      if (results.enemy)
+      {
+        level->enemies.emplace_back(std::move(results.enemy));
+      }
+      continue;
+    }
     int bg = static_cast<int>(std::get<0>(background));
     if (is_stars_row)
     {
