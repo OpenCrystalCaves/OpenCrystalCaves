@@ -45,6 +45,7 @@ Features that are missing:
 - Volcano ejecta is constant
 - Death animations
 - Skip intro/outro
+- Random fruit
 
 Known bugs:
 

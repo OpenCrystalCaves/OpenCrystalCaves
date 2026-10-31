@@ -416,7 +416,7 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
   auto level = std::make_unique<Level>();
   level->level_id = level_id;
   // Render player control hints if player hasn't completed any level
-  level->show_player_controls = !state.has_completed_any_level();
+  level->show_player_controls = level_id == LevelId::MAIN_LEVEL && !state.has_completed_any_level();
   if (level->is_space())
   {
     level->gravity = 0;

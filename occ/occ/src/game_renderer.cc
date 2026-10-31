@@ -145,22 +145,18 @@ void GameRenderer::render_background() const
     }
   }
 
-  // MAIN_LEVEL has some special things that needs to be rendered
-  if (game_->get_level().level_id == LevelId::MAIN_LEVEL)
+  if (game_->get_level().show_player_controls)
   {
-    if (game_->get_level().show_player_controls)
-    {
-      // Movement
-      sprite_manager_->render_other("icon_walk", {46, 16}, game_camera_.position);
-      sprite_manager_->render_other("key_left", {38, 32}, game_camera_.position);
-      sprite_manager_->render_other("key_right", {52, 32}, game_camera_.position);
-      // Jump
-      sprite_manager_->render_other("icon_jump", {72, 16}, game_camera_.position);
-      sprite_manager_->render_other("key_z", {72, 32}, game_camera_.position);
-      // Shoot
-      sprite_manager_->render_other("icon_fire", {92, 16}, game_camera_.position);
-      sprite_manager_->render_other("key_x", {92, 32}, game_camera_.position);
-    }
+    // Movement
+    sprite_manager_->render_other("icon_walk", {46, 16}, game_camera_.position);
+    sprite_manager_->render_other("key_left", {38, 32}, game_camera_.position);
+    sprite_manager_->render_other("key_right", {52, 32}, game_camera_.position);
+    // Jump
+    sprite_manager_->render_other("icon_jump", {72, 16}, game_camera_.position);
+    sprite_manager_->render_other("key_z", {72, 32}, game_camera_.position);
+    // Shoot
+    sprite_manager_->render_other("icon_fire", {92, 16}, game_camera_.position);
+    sprite_manager_->render_other("key_x", {92, 32}, game_camera_.position);
   }
 }
 
