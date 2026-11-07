@@ -172,7 +172,7 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_PLATFORM_BLUE,
    },
    Sprite::SPRITE_CRYSTAL_1_R},
-  {{LevelId::LEVEL_1, LevelId::LEVEL_2},
+  {{LevelId::LEVEL_1, LevelId::LEVEL_2, LevelId::LEVEL_3},
    {
      // Intro 1-2
      Sprite::SPRITE_BLOCK_PEBBLE_NW,
@@ -1086,6 +1086,11 @@ TileResults decode_tile(TileMode mode,
                 sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS);
                 flags |= TILE_RENDER_IN_FRONT;
                 break;
+              case -123:
+                // Big chains
+                sprite = static_cast<int>(Sprite::SPRITE_BIG_CHAINS);
+                flags |= TILE_RENDER_IN_FRONT;
+                break;
               default:
                 break;
             }
@@ -1516,6 +1521,11 @@ TileResults decode_tile(TileMode mode,
               case -122:
                 // Small chains
                 sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS);
+                flags |= TILE_RENDER_IN_FRONT;
+                break;
+              case -123:
+                // Big chains
+                sprite = static_cast<int>(Sprite::SPRITE_BIG_CHAINS);
                 flags |= TILE_RENDER_IN_FRONT;
                 break;
               default:
@@ -2198,6 +2208,20 @@ TileResults decode_tile(TileMode mode,
           {
             // Chain end
             sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS_END);
+          }
+          flags |= TILE_RENDER_IN_FRONT;
+          break;
+        case -123:
+          // Big chains
+          if (i < w * (h - 1) && tile_ids[i + w] == -123)
+          {
+            // Continuing chains
+            sprite = static_cast<int>(Sprite::SPRITE_BIG_CHAINS);
+          }
+          else
+          {
+            // Chain end
+            sprite = static_cast<int>(Sprite::SPRITE_BIG_CHAINS_HOOK);
           }
           flags |= TILE_RENDER_IN_FRONT;
           break;
