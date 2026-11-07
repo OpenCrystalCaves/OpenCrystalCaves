@@ -20,7 +20,11 @@ struct MovingPlatform
 
  private:
   bool is_reverse() const { return velocity.x() > 0 || velocity.y() > 0; }
-  geometry::Position collide_position() const { return position + geometry::Position(0, -16); }
+  geometry::Position collide_position() const
+  {
+    // Vertical moving platforms leave a tile above them (don't crush Mylo!)
+    return position + geometry::Position(0, (velocity.y() != 0 ? -16 : 0));
+  }
   Vector<int> velocity;
   bool controlled_;
   const int sprite_id_;

@@ -1076,6 +1076,20 @@ TileResults decode_tile(TileMode mode,
               sprite = static_cast<int>(Sprite::SPRITE_PLANET_DR);
             }
           }
+          else if (i < w * (h - 1))
+          {
+            // Check tile below in case it's a chain to continue
+            switch (tile_ids[i + w])
+            {
+              case -122:
+                // Small chains
+                sprite = static_cast<int>(Sprite::SPRITE_SMALL_CHAINS);
+                flags |= TILE_RENDER_IN_FRONT;
+                break;
+              default:
+                break;
+            }
+          }
           break;
         case '!':
           // Faucet
