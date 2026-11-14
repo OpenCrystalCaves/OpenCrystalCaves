@@ -1942,7 +1942,8 @@ TileResults decode_tile(TileMode mode,
           break;
         case -37:
           // Static earth
-          results.actor = std::make_unique<Earth>(position, false);
+		  earth = new Earth(position, false);
+		  results.actor.reset(earth);
           break;
         case -38:
           // Pipe (UL)

@@ -37,6 +37,7 @@ dll/
 
 # macOS
 occ/build/
+build/DerivedData/
 
 # VSCode
 .vscode/
