@@ -41,7 +41,7 @@ jobs:
       if: startsWith(matrix.os, 'ubuntu')
       run: |
         sudo apt-get update
-        sudo apt install libsdl2-dev libsdl2-mixer-dev
+        sudo apt install binutils libsdl2-dev libsdl2-mixer-dev
     - name: Set up Homebrew (macOS)
       id: set-up-homebrew
       if: matrix.os == 'macos-latest'
