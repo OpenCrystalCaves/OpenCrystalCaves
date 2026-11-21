@@ -21,6 +21,8 @@ struct EpisodeDef
   const std::tuple<Sprite, geometry::Size, int> levelBGs[static_cast<int>(LevelId::NUM_LEVELS)];
   const Sprite bump_platforms[static_cast<int>(LevelId::NUM_LEVELS)];
   const int levelRows[static_cast<int>(LevelId::NUM_LEVELS)];
+  // For levels with 23 rows, whether the extra row comes after (true) or before (false)
+  const bool extraRowBelow[static_cast<int>(LevelId::NUM_LEVELS)];
   const Sprite platforms[static_cast<int>(LevelId::NUM_LEVELS)];
   const Sprite crystal_sprite;
 };
@@ -147,6 +149,32 @@ static const std::array<EpisodeDef, 3> episodes{{
      24,
    },
    {
+     // intro
+     false,
+     // finale
+     false,
+     // main
+     false,
+     // 1-8
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     // 9-16
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+   },
+   {
      // Intro 1-2
      Sprite::SPRITE_PLATFORM_BLUE,
      Sprite::SPRITE_PLATFORM_BLUE,
@@ -260,7 +288,7 @@ static const std::array<EpisodeDef, 3> episodes{{
      24,
      25,
      24,
-     24,
+     23,
      23,
      24,
      23,
@@ -274,6 +302,32 @@ static const std::array<EpisodeDef, 3> episodes{{
      23,
      24,
      23,
+   },
+   {
+     // intro
+     false,
+     // finale
+     false,
+     // main
+     false,
+     // 1-8
+     false,
+     false,
+     false,
+     true,
+     false,
+     false,
+     false,
+     false,
+     // 9-16
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
    },
    {
      // Intro 1-2
@@ -424,9 +478,10 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
 
   // Read the tile ids of the level
   level->width = 0;
-  if (episode_def.levelRows[l] == 23)
+  if (episode_def.levelRows[l] == 23 && !episode_def.extraRowBelow[l])
   {
     // Some levels have a missing first row
+
     LOG_DEBUG("%s", extraRow.c_str());
     for (char c : extraRow)
     {
@@ -470,8 +525,18 @@ std::unique_ptr<Level> load(const ExeData& exe_data, const LevelId level_id, con
       level->tile_unknown.push_back(false);
     }
   }
+  if (episode_def.levelRows[l] == 23 && episode_def.extraRowBelow[l])
+  {
+    // Some levels have a missing last row - copy from the first row
+    for (int i = 0; i < level->width; i++)
+    {
+      const auto c = level->tile_ids[i];
+      level->tile_ids.push_back(static_cast<int>(c));
+      level->tile_unknown.push_back(false);
+    }
+  }
   // Insert extra rows below for space levels
-  if (level->is_space())
+  else if (level->is_space())
   {
     const int extraRows = 24 - episode_def.levelRows[l];
     for (int i = 0; i < (extraRows + 1) / 2; i++)
