@@ -177,7 +177,7 @@ void Droplet::update([[maybe_unused]] AbstractSoundManager& sound_manager,
   position += geometry::Position(0, 6);
   if (level.collides_solid(position, size) || level.collides_solid_top(position, size))
   {
-    // TODO: make sound
+    sound_manager.play_sound(SoundType::SOUND_DROPLET);
     // TODO: leave alive for one more frame but don't hurt player
     alive_ = false;
     parent_.remove_child();
