@@ -200,7 +200,7 @@ static const std::array<EpisodeDef, 3> episodes{{
      Sprite::SPRITE_PLATFORM_BLUE,
    },
    Sprite::SPRITE_CRYSTAL_1_R},
-  {{LevelId::LEVEL_1, LevelId::LEVEL_2, LevelId::LEVEL_3},
+  {{LevelId::LEVEL_1, LevelId::LEVEL_2, LevelId::LEVEL_3, LevelId::LEVEL_4},
    {
      // Intro 1-2
      Sprite::SPRITE_BLOCK_PEBBLE_NW,

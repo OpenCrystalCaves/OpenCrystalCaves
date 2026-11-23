@@ -121,7 +121,7 @@ bool Missile::update(AbstractSoundManager& sound_manager, const geometry::Rectan
         alive = false;
         set_cooldown();
         explode = true;
-        // TODO: sound
+        sound_manager.play_sound(SoundType::SOUND_ROCKET_EXPLODE);
         break;
       }
     }
