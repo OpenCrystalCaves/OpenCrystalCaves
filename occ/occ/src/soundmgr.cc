@@ -25,7 +25,7 @@ struct Sound
   uint16_t unknown2;
 };
 
-std::string to_raw(const Sound& sound, const SDL_AudioSpec spec)
+std::string to_raw(const Sound& sound, const SDL_AudioSpec spec, const int sound_idx = -1)
 {
   const double samples_per_tick = static_cast<double>(spec.freq) / DOS_TICK_RATE;
   // Bytes per sample (single channel)
@@ -41,7 +41,31 @@ std::string to_raw(const Sound& sound, const SDL_AudioSpec spec)
     }
   }
 
-  const size_t total_samples = static_cast<size_t>(src_len * samples_per_tick);
+  // Frequency sequence to synthesize
+  std::vector<int16_t> freqs;
+  if (sound_idx == static_cast<int>(SoundType::SOUND_ENEMY_HURT))
+  {
+    // In original DOS game, enemies enter a 4-frame hurt state where hurt sound is re-triggered thrice
+    // Each re-trigger restarts the sound. Therefore repeat the first burst of the sound
+    constexpr size_t BURST_LEN = 8;
+    for (size_t r = 0; r < 2; r++)
+    {
+      for (size_t k = 0; k < BURST_LEN && k < src_len; k++)
+      {
+        freqs.push_back(sound.data[k]);
+      }
+    }
+    for (size_t k = 0; k < src_len; k++)
+    {
+      freqs.push_back(sound.data[k]);
+    }
+  }
+  else
+  {
+    freqs.assign(sound.data, sound.data + src_len);
+  }
+
+  const size_t total_samples = static_cast<size_t>(freqs.size() * samples_per_tick);
   std::string s(total_samples * spec.channels * bps, '\0');
 
   // Amplitude for 16-bit signed audio (symmetrical around 0 to avoid DC bias and pops)
@@ -52,10 +76,10 @@ std::string to_raw(const Sound& sound, const SDL_AudioSpec spec)
   double phase = 0.0;
   size_t out_idx = 0;
 
-  for (size_t i = 0; i < src_len; i++)
+  for (size_t i = 0; i < freqs.size(); i++)
   {
     // Generate square wave at frequency
-    const auto freq = sound.data[i];
+    const auto freq = freqs[i];
     const bool is_muted = (freq <= 18) || (sound.vibrate > 0 && ((i + 2) % sound.vibrate == 0));
 
     const size_t tick_start_sample = static_cast<size_t>(i * samples_per_tick);
@@ -154,9 +178,9 @@ bool SoundManager::load_sounds(const int episode)
   LOG_DEBUG("Read %d sounds", static_cast<int>(sounds.size()));
 
   // Convert sounds to chunks
-  for (const auto& sound : sounds)
+  for (size_t sound_idx = 0; sound_idx < sounds.size(); sound_idx++)
   {
-    auto& raw_chunk = raw_chunks_.emplace_back(to_raw(sound, spec_));
+    auto& raw_chunk = raw_chunks_.emplace_back(to_raw(sounds[sound_idx], spec_, static_cast<int>(sound_idx)));
     chunks_.push_back(Mix_QuickLoad_RAW((Uint8*)raw_chunk.data(), (Uint32)raw_chunk.size()));
   }
   return !chunks_.empty();

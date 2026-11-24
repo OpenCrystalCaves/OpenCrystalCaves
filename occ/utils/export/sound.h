@@ -8,7 +8,7 @@ enum class SoundType : int
   SOUND_EXIT_LEVEL,
   SOUND_DIE,  // TODO: use
   SOUND_ENEMY_DIE,
-  SOUND_ENEMY_HURT,  // TODO: some effect is missing, this is too short
+  SOUND_ENEMY_HURT,  // TODO: use
   SOUND_CRYSTAL,
   SOUND_PICKUP_GUN,
   SOUND_SECRET_CRYSTAL,
